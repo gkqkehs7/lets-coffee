@@ -42,7 +42,6 @@ export function RoomView({
         const names = g.people
           .map((p) => {
             let n = p.user_name;
-            if (p.order?.extra_shot) n += "(샷 추가)";
             if (p.order?.note) n += `(${p.order.note})`;
             return n;
           })
@@ -160,12 +159,10 @@ export function RoomView({
                     }}
                   >
                     {p.order?.menu_id === "skip"
-                      ? "이번엔 패스"
+                      ? "안먹을게요"
                       : `${p.order?.menu_name} ${p.order?.temperature}${
                           p.order?.size ? ` · ${p.order.size}` : ""
-                        }${p.order?.extra_shot ? " · 샷 추가" : ""}${
-                          p.order?.note ? ` · ${p.order.note}` : ""
-                        }`}
+                        }${p.order?.note ? ` · ${p.order.note}` : ""}`}
                   </div>
                 </div>
                 {/* 수정 버튼 (나인 경우) */}

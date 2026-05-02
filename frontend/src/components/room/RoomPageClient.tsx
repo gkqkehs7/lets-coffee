@@ -173,12 +173,10 @@ export function RoomPageClient({ roomId }: Props) {
     socketRef.current.emit("order:skip", {});
     const skipOrder: Order = {
       menu_id: "skip",
-      menu_name: "안먹어요",
+      menu_name: "안먹을게요",
       menu_emoji: "🙅",
       temperature: null,
       size: null,
-      extra_shot: false,
-      extra_syrup: false,
       note: "",
     };
     setParticipants((prev) =>

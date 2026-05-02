@@ -8,8 +8,6 @@ export interface Order {
   menu_emoji: string;
   temperature: Temperature | null;
   size: Size | null;
-  extra_shot: boolean;
-  extra_syrup: boolean;
   note: string;
 }
 

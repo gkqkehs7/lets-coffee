@@ -18,7 +18,7 @@ _connections: dict[str, tuple[str, str]] = {}
 
 @sio.event
 async def connect(sid: str, environ: dict, auth: dict | None = None) -> None:
-    pass  # 연결 후 room:join 이벤트로 방 입장
+    pass
 
 
 @sio.event
@@ -37,7 +37,7 @@ async def disconnect(sid: str) -> None:
         )
 
 
-@sio.event
+@sio.on("room:join")
 async def room_join(sid: str, data: dict) -> None:
     room_id: str = data.get("room_id", "")
     user_id: str = data.get("user_id", "")
@@ -49,10 +49,9 @@ async def room_join(sid: str, data: dict) -> None:
 
     _connections[sid] = (room_id, user_id)
     await sio.enter_room(sid, room_id)
-
     await room_manager.set_online(room_id, user_id, True)
 
-    # 방 전체 상태 전송
+    # 입장한 본인에게 방 전체 상태 전송
     await sio.emit(
         "room:state",
         {
@@ -64,7 +63,7 @@ async def room_join(sid: str, data: dict) -> None:
         to=sid,
     )
 
-    # 다른 사람들에게 입장 알림
+    # 다른 참가자들에게 입장 알림
     p = room.participants[user_id]
     await sio.emit(
         "participant:joined",
@@ -74,7 +73,7 @@ async def room_join(sid: str, data: dict) -> None:
     )
 
 
-@sio.event
+@sio.on("status:update")
 async def status_update(sid: str, data: dict) -> None:
     conn = _connections.get(sid)
     if conn is None:
@@ -90,7 +89,7 @@ async def status_update(sid: str, data: dict) -> None:
         )
 
 
-@sio.event
+@sio.on("order:submit")
 async def order_submit(sid: str, data: dict) -> None:
     conn = _connections.get(sid)
     if conn is None:
@@ -110,7 +109,7 @@ async def order_submit(sid: str, data: dict) -> None:
         )
 
 
-@sio.event
+@sio.on("order:skip")
 async def order_skip(sid: str, data: dict) -> None:
     conn = _connections.get(sid)
     if conn is None:
@@ -118,7 +117,7 @@ async def order_skip(sid: str, data: dict) -> None:
     room_id, user_id = conn
     order = Order(
         menu_id="skip",
-        menu_name="안먹어요",
+        menu_name="안먹을게요",
         menu_emoji="🙅",
         temperature=None,
         size=None,
@@ -132,7 +131,7 @@ async def order_skip(sid: str, data: dict) -> None:
         )
 
 
-@sio.event
+@sio.on("order:edit")
 async def order_edit(sid: str, data: dict) -> None:
     conn = _connections.get(sid)
     if conn is None:
@@ -147,7 +146,7 @@ async def order_edit(sid: str, data: dict) -> None:
         )
 
 
-@sio.event
+@sio.on("room:close")
 async def room_close(sid: str, data: dict) -> None:
     conn = _connections.get(sid)
     if conn is None:

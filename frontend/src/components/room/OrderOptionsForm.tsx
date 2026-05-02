@@ -14,8 +14,6 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack }: Props) {
   const [customName, setCustomName] = useState("");
   const [temp, setTemp] = useState<Temperature>(menuItem.iced ? "ICED" : "HOT");
   const [size, setSize] = useState<Size>("Grande");
-  const [extraShot, setExtraShot] = useState(false);
-  const [extraSyrup, setExtraSyrup] = useState(false);
   const [note, setNote] = useState("");
 
   const canSubmit = isCustom ? customName.trim().length > 0 : true;
@@ -23,13 +21,11 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack }: Props) {
   const handleSubmit = () => {
     if (!canSubmit) return;
     onSubmit({
-      menu_id:     isCustom ? "custom" : menuItem.id,
-      menu_name:   isCustom ? customName.trim() : menuItem.name,
-      menu_emoji:  isCustom ? "✏️" : menuItem.emoji,
+      menu_id:    isCustom ? "custom" : menuItem.id,
+      menu_name:  isCustom ? customName.trim() : menuItem.name,
+      menu_emoji: isCustom ? "✏️" : menuItem.emoji,
       temperature: temp,
       size,
-      extra_shot:  extraShot,
-      extra_syrup: extraSyrup,
       note,
     });
   };
@@ -110,40 +106,6 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack }: Props) {
         </div>
       </div>
 
-      {/* 추가 옵션 */}
-      <div>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#6F4E37", marginBottom: 10 }}>
-          추가 옵션
-        </div>
-        <div style={{ display: "flex", gap: 10 }}>
-          {[
-            { label: "☕ 샷 추가",  val: extraShot,  set: setExtraShot },
-            { label: "🍯 시럽 추가", val: extraSyrup, set: setExtraSyrup },
-          ].map((opt) => (
-            <button
-              key={opt.label}
-              type="button"
-              className="btn-hover"
-              onClick={() => opt.set(!opt.val)}
-              style={{
-                flex: 1,
-                padding: "12px 8px",
-                borderRadius: 16,
-                background: opt.val ? "#6F4E37" : "#F5E6D3",
-                color: opt.val ? "#FFF8F0" : "#8D6E63",
-                border: "none",
-                fontSize: 13,
-                fontWeight: 600,
-                cursor: "pointer",
-                fontFamily: "inherit",
-              }}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* 메모 */}
       <div>
         <div style={{ fontSize: 13, fontWeight: 700, color: "#6F4E37", marginBottom: 10 }}>
@@ -158,14 +120,36 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack }: Props) {
       </div>
 
       {/* 버튼 */}
-      <div style={{ display: "flex", gap: 10 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <button
+          type="button"
+          className="btn-hover"
+          onClick={handleSubmit}
+          disabled={!canSubmit}
+          style={{
+            width: "100%",
+            padding: "16px",
+            borderRadius: 18,
+            background: canSubmit
+              ? "linear-gradient(135deg, #C9A57B, #6F4E37)"
+              : "#F5E6D3",
+            color: canSubmit ? "#FFF8F0" : "#C9A57B",
+            border: "none",
+            fontSize: 16,
+            fontWeight: 700,
+            cursor: canSubmit ? "pointer" : "not-allowed",
+            fontFamily: "'Gowun Dodum', sans-serif",
+          }}
+        >
+          주문 완료 ✨
+        </button>
         <button
           type="button"
           className="btn-hover"
           onClick={onBack}
           style={{
-            flex: 1,
-            padding: "14px",
+            width: "100%",
+            padding: "13px",
             borderRadius: 16,
             background: "#F5E6D3",
             color: "#6F4E37",
@@ -177,28 +161,6 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack }: Props) {
           }}
         >
           ← 다시 고를게요
-        </button>
-        <button
-          type="button"
-          className="btn-hover"
-          onClick={handleSubmit}
-          disabled={!canSubmit}
-          style={{
-            flex: 2,
-            padding: "14px",
-            borderRadius: 16,
-            background: canSubmit
-              ? "linear-gradient(135deg, #C9A57B, #6F4E37)"
-              : "#F5E6D3",
-            color: canSubmit ? "#FFF8F0" : "#C9A57B",
-            border: "none",
-            fontSize: 15,
-            fontWeight: 700,
-            cursor: canSubmit ? "pointer" : "not-allowed",
-            fontFamily: "'Gowun Dodum', sans-serif",
-          }}
-        >
-          주문 완료 ✨
         </button>
       </div>
     </div>
