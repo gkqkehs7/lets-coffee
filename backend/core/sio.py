@@ -18,11 +18,12 @@ _connections: dict[str, tuple[str, str]] = {}
 
 @sio.event
 async def connect(sid: str, environ: dict, auth: dict | None = None) -> None:
-    pass
+    print(f"[WS] connect sid={sid}", flush=True)
 
 
 @sio.event
 async def disconnect(sid: str) -> None:
+    print(f"[WS] disconnect sid={sid}", flush=True)
     conn = _connections.pop(sid, None)
     if conn is None:
         return
@@ -41,9 +42,11 @@ async def disconnect(sid: str) -> None:
 async def room_join(sid: str, data: dict) -> None:
     room_id: str = data.get("room_id", "")
     user_id: str = data.get("user_id", "")
+    print(f"[WS] room:join room={room_id} user={user_id}", flush=True)
 
     room = await room_manager.get_room(room_id)
     if room is None or user_id not in room.participants:
+        print(f"[WS] room:join FAILED room_found={room is not None} user_in_room={user_id in (room.participants if room else {})}", flush=True)
         await sio.emit("error", {"message": "방을 찾을 수 없어요"}, to=sid)
         return
 
@@ -62,6 +65,7 @@ async def room_join(sid: str, data: dict) -> None:
         },
         to=sid,
     )
+    print(f"[WS] room:state emitted to sid={sid}", flush=True)
 
     # 다른 참가자들에게 입장 알림
     p = room.participants[user_id]
@@ -71,6 +75,7 @@ async def room_join(sid: str, data: dict) -> None:
         room=room_id,
         skip_sid=sid,
     )
+    print(f"[WS] participant:joined emitted to room={room_id}", flush=True)
 
 
 @sio.on("status:update")
