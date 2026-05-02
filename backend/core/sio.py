@@ -56,8 +56,8 @@ async def room_join(sid: str, data: dict) -> None:
         "room:state",
         {
             "room": {
-                **room.model_dump(),
-                "participants": [p.model_dump() for p in room.participants.values()],
+                **room.model_dump(mode="json"),
+                "participants": [p.model_dump(mode="json") for p in room.participants.values()],
             }
         },
         to=sid,
@@ -67,7 +67,7 @@ async def room_join(sid: str, data: dict) -> None:
     p = room.participants[user_id]
     await sio.emit(
         "participant:joined",
-        {"participant": p.model_dump()},
+        {"participant": p.model_dump(mode="json")},
         room=room_id,
         skip_sid=sid,
     )
@@ -84,7 +84,7 @@ async def status_update(sid: str, data: dict) -> None:
     if p:
         await sio.emit(
             "participant:updated",
-            {"participant": p.model_dump()},
+            {"participant": p.model_dump(mode="json")},
             room=room_id,
         )
 
@@ -104,7 +104,7 @@ async def order_submit(sid: str, data: dict) -> None:
     if p:
         await sio.emit(
             "participant:updated",
-            {"participant": p.model_dump()},
+            {"participant": p.model_dump(mode="json")},
             room=room_id,
         )
 
@@ -126,7 +126,7 @@ async def order_skip(sid: str, data: dict) -> None:
     if p:
         await sio.emit(
             "participant:updated",
-            {"participant": p.model_dump()},
+            {"participant": p.model_dump(mode="json")},
             room=room_id,
         )
 
@@ -141,7 +141,7 @@ async def order_edit(sid: str, data: dict) -> None:
     if p:
         await sio.emit(
             "participant:updated",
-            {"participant": p.model_dump()},
+            {"participant": p.model_dump(mode="json")},
             room=room_id,
         )
 
