@@ -1,0 +1,61 @@
+export type Temperature = "HOT" | "ICED";
+export type Size = "Tall" | "Grande" | "Venti";
+export type ParticipantStatus = "thinking" | "ordering" | "decided";
+
+export interface Order {
+  menu_id: string;
+  menu_name: string;
+  menu_emoji: string;
+  temperature: Temperature | null;
+  size: Size | null;
+  extra_shot: boolean;
+  extra_syrup: boolean;
+  note: string;
+}
+
+export interface Participant {
+  user_id: string;
+  user_name: string;
+  is_host: boolean;
+  is_online: boolean;
+  status: ParticipantStatus;
+  order: Order | null;
+  joined_at: string;
+}
+
+export interface Room {
+  room_id: string;
+  room_name: string;
+  host_id: string;
+  is_closed: boolean;
+  created_at: string;
+  participants: Participant[];
+}
+
+export interface MenuItem {
+  id: string;
+  name: string;
+  emoji: string;
+  category: "coffee" | "decaf" | "non-coffee";
+  iced: boolean;
+}
+
+/* REST API 응답 */
+export interface CreateRoomResponse {
+  room_id: string;
+  user_id: string;
+  user_name: string;
+  room_name: string;
+}
+
+export interface JoinRoomResponse {
+  user_id: string;
+  user_name: string;
+  is_host: boolean;
+  room_id: string;
+}
+
+/* Socket.IO 이벤트 페이로드 */
+export interface RoomStateEvent  { room: Room }
+export interface ParticipantEvent { participant: Participant }
+export interface ParticipantLeftEvent { user_id: string }

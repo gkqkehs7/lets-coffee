@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>☕ 커피 뭐드실래요?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Quicksand:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; font-family: 'Noto Sans KR', sans-serif; }
+    body {
+      background: #FFF8F0;
+      color: #3E2723;
+      min-height: 100vh;
+    }
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #D4A574; border-radius: 4px; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes popIn {
+      0%   { transform: scale(0.8); opacity: 0; }
+      70%  { transform: scale(1.08); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    @keyframes dots {
+      0%,20%   { content: '.'; }
+      40%      { content: '..'; }
+      60%,100% { content: '...'; }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-6px); }
+    }
+    @keyframes confetti {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-120px) rotate(720deg); opacity: 0; }
+    }
+    @keyframes shimmer {
+      0%   { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to   { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .fade-up { animation: fadeUp 0.4s ease both; }
+    .pop-in  { animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+    .thinking-dots::after {
+      content: '';
+      animation: dots 1.2s infinite;
+    }
+
+    .card-hover {
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      cursor: pointer;
+    }
+    .card-hover:hover {
+      transform: scale(1.03) translateY(-2px);
+      box-shadow: 0 8px 24px rgba(111,78,55,0.18);
+    }
+    .card-hover:active {
+      transform: scale(0.98);
+    }
+
+    .btn-bounce {
+      transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.14s ease;
+    }
+    .btn-bounce:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(111,78,55,0.25);
+    }
+    .btn-bounce:active {
+      transform: translateY(0) scale(0.97);
+    }
+
+    .confetti-piece {
+      position: fixed;
+      font-size: 20px;
+      animation: confetti 1.2s ease-out forwards;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Toggle switch */
+    .toggle { position: relative; display: inline-flex; background: #F5E6D3; border-radius: 999px; padding: 3px; gap: 2px; }
+    .toggle-btn { padding: 6px 16px; border-radius: 999px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: all 0.2s; background: transparent; color: #8D6E63; font-family: inherit; }
+    .toggle-btn.active { background: #6F4E37; color: #FFF8F0; box-shadow: 0 2px 8px rgba(111,78,55,0.3); }
+
+    /* Pill chip */
+    .chip { display: inline-flex; align-items: center; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+
+    /* Status dot */
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .status-online   { background: #A8C09A; box-shadow: 0 0 0 3px rgba(168,192,154,0.3); }
+    .status-ordering { background: #D4A574; animation: pulse 1.4s infinite; }
+    .status-decided  { background: #6F4E37; }
+    .status-offline  { background: #D0C4B8; }
+
+    /* Input */
+    .input-field {
+      width: 100%; padding: 12px 16px; border-radius: 16px;
+      border: 2px solid #F5E6D3; background: #FFF8F0;
+      font-size: 15px; font-family: inherit; color: #3E2723;
+      outline: none; transition: border-color 0.2s;
+    }
+    .input-field:focus { border-color: #C9A57B; }
+    .input-field::placeholder { color: #C9A57B; }
+
+    /* Modal overlay */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(62,39,35,0.35);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: flex-end; justify-content: center;
+      z-index: 1000; padding: 0;
+    }
+    @media (min-width: 640px) {
+      .modal-overlay { align-items: center; }
+    }
+    .modal-sheet {
+      background: #FFF8F0; border-radius: 28px 28px 0 0;
+      width: 100%; max-width: 480px; padding: 28px 24px 40px;
+      animation: slideIn 0.3s ease;
+    }
+    @media (min-width: 640px) {
+      .modal-sheet { border-radius: 28px; }
+    }
+
+    /* Scrollable content area */
+    .scroll-area { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+/* ==================== DATA ==================== */
+const COFFEE_MENU = [
+  { id: 'americano',     name: '아메리카노',       emoji: '☕', category: 'coffee',  iced: true },
+  { id: 'latte',         name: '카페라떼',          emoji: '🥛', category: 'coffee',  iced: true },
+  { id: 'cappuccino',    name: '카푸치노',           emoji: '☁️', category: 'coffee',  iced: false },
+  { id: 'vanilla_latte', name: '바닐라라떼',         emoji: '🤍', category: 'coffee',  iced: true },
+  { id: 'caramel_mac',   name: '카라멜마키아또',     emoji: '🍮', category: 'coffee',  iced: true },
+  { id: 'mocha',         name: '카페모카',           emoji: '🍫', category: 'coffee',  iced: true },
+  { id: 'espresso',      name: '에스프레소',         emoji: '⚡', category: 'coffee',  iced: false },
+  { id: 'cold_brew',     name: '콜드브루',           emoji: '🧊', category: 'coffee',  iced: true },
+  { id: 'decaf',         name: '디카페인 아메리카노', emoji: '💤', category: 'decaf',   iced: true },
+  { id: 'green_latte',   name: '그린티라떼',         emoji: '🍵', category: 'non-coffee', iced: true },
+  { id: 'choco_latte',   name: '초코라떼',           emoji: '🍫', category: 'non-coffee', iced: true },
+  { id: 'milk_tea',      name: '밀크티',             emoji: '🧋', category: 'non-coffee', iced: true },
+  { id: 'lemonade',      name: '레몬에이드',         emoji: '🍋', category: 'non-coffee', iced: true },
+];
+
+const MOCK_PARTICIPANTS = [
+  { user_id: 'host1', user_name: '민우', is_host: true, is_online: true, status: 'decided',
+    order: { menu_id: 'americano', menu_name: '아메리카노', menu_emoji: '☕', temperature: 'ICED', size: 'Grande', extra_shot: true, extra_syrup: false, note: '' } },
+  { user_id: 'user2', user_name: '영희', is_host: false, is_online: true, status: 'decided',
+    order: { menu_id: 'latte', menu_name: '카페라떼', menu_emoji: '🥛', temperature: 'HOT', size: 'Tall', extra_shot: false, extra_syrup: true, note: '달달하게 해주세요' } },
+  { user_id: 'user3', user_name: '철수', is_host: false, is_online: true, status: 'ordering', order: null },
+  { user_id: 'user4', user_name: '지민', is_host: false, is_online: true, status: 'thinking', order: null },
+  { user_id: 'user5', user_name: '수진', is_host: false, is_online: false, status: 'thinking', order: null },
+];
+
+/* ==================== HELPERS ==================== */
+function generateId() {
+  return Math.random().toString(36).slice(2, 10);
+}
+
+function Confetti({ onDone }) {
+  const emojis = ['☕','🎉','✨','🥛','💛','🍮'];
+  const pieces = Array.from({ length: 12 }, (_, i) => ({
+    id: i,
+    emoji: emojis[i % emojis.length],
+    left: `${10 + Math.random() * 80}%`,
+    top: `${40 + Math.random() * 30}%`,
+    delay: `${Math.random() * 0.4}s`,
+  }));
+  useEffect(() => {
+    const t = setTimeout(onDone, 1600);
+    return () => clearTimeout(t);
+  }, [onDone]);
+  return (
+    <div style={{ pointerEvents: 'none', position: 'fixed', inset: 0, zIndex: 9999 }}>
+      {pieces.map(p => (
+        <span key={p.id} className="confetti-piece"
+          style={{ left: p.left, top: p.top, animationDelay: p.delay }}>
+          {p.emoji}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function Toast({ message, onDone }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 2200);
+    return () => clearTimeout(t);
+  }, [onDone]);
+  return (
+    <div style={{
+      position: 'fixed', bottom: 100, left: '50%', transform: 'translateX(-50%)',
+      background: '#3E2723', color: '#FFF8F0', padding: '12px 24px',
+      borderRadius: 999, fontSize: 14, fontWeight: 600,
+      boxShadow: '0 4px 20px rgba(62,39,35,0.35)',
+      zIndex: 9000, animation: 'popIn 0.3s ease',
+      whiteSpace: 'nowrap',
+    }}>
+      {message}
+    </div>
+  );
+}
+
+
+
+/* ==================== HOME SCREEN ==================== */
+function HomeScreen({ onCreateRoom }) {
+  const [roomName, setRoomName] = useState('');
+  const [hostName, setHostName] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!roomName.trim() || !hostName.trim()) return;
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      onCreateRoom({ roomName: roomName.trim(), hostName: hostName.trim(), roomId: generateId() });
+    }, 800);
+  };
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#FFF8F0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
+      {/* BG decoration */}
+      <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>
+        {['☕','🥛','🍵','🧋','☁️','🍫'].map((e, i) => (
+          <span key={i} style={{
+            position: 'absolute',
+            fontSize: `${28 + i * 8}px`,
+            opacity: 0.07,
+            left: `${[8,75,20,60,40,85][i]}%`,
+            top: `${[10,5,70,80,40,55][i]}%`,
+            animation: `float ${3 + i * 0.5}s ease-in-out infinite`,
+            animationDelay: `${i * 0.6}s`,
+          }}>{e}</span>
+        ))}
+      </div>
+
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 420 }}>
+        {/* Logo */}
+        <div className="fade-up" style={{ textAlign: 'center', marginBottom: 40 }}>
+          <div style={{
+            width: 80, height: 80, background: 'linear-gradient(135deg, #C9A57B, #6F4E37)',
+            borderRadius: 28, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 40, margin: '0 auto 16px',
+            boxShadow: '0 8px 24px rgba(111,78,55,0.3)',
+            animation: 'float 3s ease-in-out infinite',
+          }}>☕</div>
+          <h1 style={{
+            fontFamily: "'Gowun Dodum', sans-serif",
+            fontSize: 26, fontWeight: 700, color: '#3E2723',
+            lineHeight: 1.3,
+          }}>커피 뭐드실래요?</h1>
+          <p style={{ color: '#8D6E63', fontSize: 14, marginTop: 6 }}>
+            링크 하나로 팀 커피 주문 끝! ✨
+          </p>
+        </div>
+
+        {/* Card */}
+        <div className="fade-up" style={{
+          background: '#FFFFFF',
+          borderRadius: 28,
+          padding: '32px 28px',
+          boxShadow: '0 4px 32px rgba(111,78,55,0.12)',
+          border: '1.5px solid #F5E6D3',
+          animationDelay: '0.1s',
+        }}>
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#6F4E37', display: 'block', marginBottom: 8 }}>
+                ☕ 오늘의 커피타임 이름
+              </label>
+              <input
+                className="input-field"
+                placeholder="예: 오후 3시 커피타임"
+                value={roomName}
+                onChange={e => setRoomName(e.target.value)}
+              />
+            </div>
+            <div>
+              <label style={{ fontSize: 13, fontWeight: 600, color: '#6F4E37', display: 'block', marginBottom: 8 }}>
+                👤 내 이름
+              </label>
+              <input
+                className="input-field"
+                placeholder="예: 민우"
+                value={hostName}
+                onChange={e => setHostName(e.target.value)}
+              />
+            </div>
+            <button
+              type="submit"
+              className="btn-bounce"
+              disabled={loading || !roomName.trim() || !hostName.trim()}
+              style={{
+                marginTop: 8,
+                padding: '16px', borderRadius: 18,
+                background: roomName.trim() && hostName.trim()
+                  ? 'linear-gradient(135deg, #C9A57B, #6F4E37)'
+                  : '#F5E6D3',
+                color: roomName.trim() && hostName.trim() ? '#FFF8F0' : '#C9A57B',
+                border: 'none', fontSize: 16, fontWeight: 700,
+                fontFamily: "'Gowun Dodum', sans-serif",
+                cursor: roomName.trim() && hostName.trim() ? 'pointer' : 'not-allowed',
+                transition: 'all 0.2s',
+              }}
+            >
+              {loading ? '만드는 중...' : '방 만들기 🎉'}
+            </button>
+          </form>
+        </div>
+
+        <p className="fade-up" style={{
+          textAlign: 'center', color: '#C9A57B', fontSize: 13, marginTop: 20,
+          animationDelay: '0.2s',
+        }}>
+          로그인 없이 바로 시작해요 🥱
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ==================== JOIN MODAL ==================== */
+function JoinModal({ roomName, onJoin }) {
+  const [name, setName] = useState('');
+  return (
+    <div className="modal-overlay">
+      <div className="modal-sheet pop-in" style={{ maxWidth: 420 }}>
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <div style={{ fontSize: 48, marginBottom: 12 }}>☕</div>
+          <h2 style={{ fontFamily: "'Gowun Dodum', sans-serif", fontSize: 20, color: '#3E2723' }}>
+            {roomName}
+          </h2>
+          <p style={{ color: '#8D6E63', fontSize: 14, marginTop: 4 }}>
+            커피 주문에 참여해요!
+          </p>
+        </div>
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ fontSize: 13, fontWeight: 600, color: '#6F4E37', display: 'block', marginBottom: 8 }}>
+            👤 내 이름
+          </label>
+          <input
+            className="input-field"
+            placeholder="이름을 입력해주세요"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            autoFocus
+          />
+        </div>
+        <button
+          className="btn-bounce"
+          disabled={!name.trim()}
+          onClick={() => name.trim() && onJoin(name.trim())}
+          style={{
+            width: '100%', padding: '16px', borderRadius: 18,
+            background: name.trim() ? 'linear-gradient(135deg, #C9A57B, #6F4E37)' : '#F5E6D3',
+            color: name.trim() ? '#FFF8F0' : '#C9A57B',
+            border: 'none', fontSize: 16, fontWeight: 700,
+            fontFamily: "'Gowun Dodum', sans-serif", cursor: name.trim() ? 'pointer' : 'not-allowed',
+          }}
+        >
+          입장하기 ✨
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+/* ==================== COPY LINK BUTTON ==================== */
+function CopyLinkButton({ roomId }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <button className="btn-bounce" onClick={handleCopy} style={{
+      padding: '3px 9px', borderRadius: 8,
+      background: copied ? '#A8C09A' : '#F5E6D3',
+      color: copied ? '#FFF8F0' : '#8D6E63',
+      border: 'none', fontSize: 11, fontWeight: 600,
+      cursor: 'pointer', fontFamily: 'inherit',
+      transition: 'background 0.2s', flexShrink: 0,
+      whiteSpace: 'nowrap',
+    }}>
+      {copied ? '✓ 복사됨' : '링크 복사'}
+    </button>
+  );
+}
+
+
+/* ==================== MENU GRID ==================== */
+function MenuGrid({ onSelectMenu, selectedId, onSelectCustom }) {
+  const categories = [
+    { id: 'coffee', label: '☕ 커피', items: COFFEE_MENU.filter(m => m.category === 'coffee') },
+    { id: 'decaf',  label: '💤 디카페인', items: COFFEE_MENU.filter(m => m.category === 'decaf') },
+    { id: 'non-coffee', label: '🍵 논커피', items: COFFEE_MENU.filter(m => m.category === 'non-coffee') },
+  ];
+
+  const MenuCard = ({ item, isSelected, onClick }) => (
+    <div
+      className="card-hover"
+      onClick={onClick}
+      style={{
+        background: isSelected ? 'linear-gradient(135deg, #C9A57B22, #6F4E3722)' : '#FFFFFF',
+        borderRadius: 20,
+        padding: '16px 12px',
+        border: `2px solid ${isSelected ? '#6F4E37' : '#F5E6D3'}`,
+        textAlign: 'center',
+        position: 'relative',
+      }}
+    >
+      {isSelected && (
+        <div style={{
+          position: 'absolute', top: 8, right: 8,
+          width: 18, height: 18, borderRadius: 9,
+          background: '#6F4E37', color: '#FFF8F0',
+          fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>✓</div>
+      )}
+      <div style={{ fontSize: 32, marginBottom: 8, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}>
+        {item.emoji}
+      </div>
+      <div style={{ fontSize: 12, fontWeight: 600, color: isSelected ? '#3E2723' : '#6F4E37', lineHeight: 1.3 }}>
+        {item.name}
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      {categories.map(cat => (
+        <div key={cat.id}>
+          <h3 style={{ fontSize: 14, fontWeight: 700, color: '#6F4E37', marginBottom: 12 }}>
+            {cat.label}
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 10 }}>
+            {cat.items.map(item => (
+              <MenuCard key={item.id} item={item} isSelected={selectedId === item.id} onClick={() => onSelectMenu(item)} />
+            ))}
+          </div>
+        </div>
+      ))}
+
+      {/* 기타 섹션 */}
+      <div>
+        <h3 style={{ fontSize: 14, fontWeight: 700, color: '#6F4E37', marginBottom: 12 }}>✏️ 기타</h3>
+        <div
+          className="card-hover"
+          onClick={onSelectCustom}
+          style={{
+            background: selectedId === 'custom' ? 'linear-gradient(135deg, #C9A57B22, #6F4E3722)' : '#FFFFFF',
+            borderRadius: 20, padding: '20px 16px',
+            border: `2px dashed ${selectedId === 'custom' ? '#6F4E37' : '#C9A57B'}`,
+            textAlign: 'center', position: 'relative',
+          }}
+        >
+          {selectedId === 'custom' && (
+            <div style={{
+              position: 'absolute', top: 8, right: 8,
+              width: 18, height: 18, borderRadius: 9,
+              background: '#6F4E37', color: '#FFF8F0',
+              fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>✓</div>
+          )}
+          <div style={{ fontSize: 32, marginBottom: 8 }}>✏️</div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: '#8D6E63', lineHeight: 1.4 }}>
+            직접 입력
+            <br />
+            <span style={{ fontWeight: 400, color: '#C9A57B' }}>메뉴에 없는 음료</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ==================== ORDER OPTIONS ==================== */
+function OrderOptions({ menuItem, onSubmit, onBack }) {
+  const isCustom = menuItem.id === 'custom';
+  const [customName, setCustomName] = useState('');
+  const [temp, setTemp] = useState(menuItem.iced ? 'ICED' : 'HOT');
+  const [size, setSize] = useState('Grande');
+  const [extraShot, setExtraShot] = useState(false);
+  const [extraSyrup, setExtraSyrup] = useState(false);
+  const [note, setNote] = useState('');
+
+  const canSubmit = isCustom ? customName.trim().length > 0 : true;
+
+  const handleSubmit = () => {
+    if (!canSubmit) return;
+    onSubmit({
+      menu_id: isCustom ? 'custom' : menuItem.id,
+      menu_name: isCustom ? customName.trim() : menuItem.name,
+      menu_emoji: isCustom ? '✏️' : menuItem.emoji,
+      temperature: temp,
+      size,
+      extra_shot: extraShot,
+      extra_syrup: extraSyrup,
+      note,
+    });
+  };
+
+  return (
+    <div className="fade-up" style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* Menu header */}
+      <div style={{
+        background: 'linear-gradient(135deg, #F5E6D3, #FFF8F0)',
+        borderRadius: 20, padding: '20px',
+        textAlign: 'center', border: '1.5px solid #F5E6D3',
+      }}>
+        <div style={{ fontSize: 56, marginBottom: 8 }}>{isCustom ? '✏️' : menuItem.emoji}</div>
+        {isCustom ? (
+          <input
+            className="input-field"
+            placeholder="음료 이름을 입력해주세요"
+            value={customName}
+            onChange={e => setCustomName(e.target.value)}
+            autoFocus
+            style={{ textAlign: 'center', fontSize: 17, fontWeight: 700 }}
+          />
+        ) : (
+          <div style={{ fontFamily: "'Gowun Dodum', sans-serif", fontSize: 20, fontWeight: 700, color: '#3E2723' }}>
+            {menuItem.name}
+          </div>
+        )}
+      </div>
+
+      {/* HOT / ICED */}
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#6F4E37', marginBottom: 10 }}>온도</div>
+        <div className="toggle">
+          {['HOT', 'ICED'].map(t => (
+            <button key={t} className={`toggle-btn ${temp === t ? 'active' : ''}`} onClick={() => setTemp(t)}>
+              {t === 'HOT' ? '🔥 HOT' : '🧊 ICED'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Size */}
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#6F4E37', marginBottom: 10 }}>사이즈</div>
+        <div className="toggle">
+          {['Tall', 'Grande', 'Venti'].map(s => (
+            <button key={s} className={`toggle-btn ${size === s ? 'active' : ''}`} onClick={() => setSize(s)}>
+              {s === 'Tall' ? 'S' : s === 'Grande' ? 'M' : 'L'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Options */}
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#6F4E37', marginBottom: 10 }}>추가 옵션</div>
+        <div style={{ display: 'flex', gap: 10 }}>
+          {[
+            { key: 'shot', label: '☕ 샷 추가', val: extraShot, set: setExtraShot },
+            { key: 'syrup', label: '🍯 시럽 추가', val: extraSyrup, set: setExtraSyrup },
+          ].map(opt => (
+            <button key={opt.key} onClick={() => opt.set(!opt.val)} className="btn-bounce" style={{
+              flex: 1, padding: '12px 8px', borderRadius: 16,
+              background: opt.val ? '#6F4E37' : '#F5E6D3',
+              color: opt.val ? '#FFF8F0' : '#8D6E63',
+              border: 'none', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+            }}>
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Note */}
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 700, color: '#6F4E37', marginBottom: 10 }}>메모</div>
+        <input
+          className="input-field"
+          placeholder="예: 얼음 적게요, 달달하게요 🥰"
+          value={note}
+          onChange={e => setNote(e.target.value)}
+        />
+      </div>
+
+      {/* Buttons */}
+      <div style={{ display: 'flex', gap: 10 }}>
+        <button onClick={onBack} className="btn-bounce" style={{
+          flex: 1, padding: '14px', borderRadius: 16,
+          background: '#F5E6D3', color: '#6F4E37',
+          border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+        }}>
+          ← 다시 고를게요
+        </button>
+        <button onClick={handleSubmit} disabled={!canSubmit} className="btn-bounce" style={{
+          flex: 2, padding: '14px', borderRadius: 16,
+          background: canSubmit ? 'linear-gradient(135deg, #C9A57B, #6F4E37)' : '#F5E6D3',
+          color: canSubmit ? '#FFF8F0' : '#C9A57B',
+          border: 'none', fontSize: 15, fontWeight: 700, cursor: canSubmit ? 'pointer' : 'not-allowed',
+          fontFamily: "'Gowun Dodum', sans-serif",
+        }}>
+          주문 완료 ✨
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ==================== UNIFIED ROOM VIEW (participants + summary) ==================== */
+function RoomView({ participants, currentUserId, roomName, isClosed, onEditOrder }) {
+  const [copied, setCopied] = useState(false);
+
+  const decided  = participants.filter(p => p.order);
+  const pending  = participants.filter(p => !p.order);
+  const skipped  = decided.filter(p => p.order.menu_id === 'skip');
+  const ordered  = decided.filter(p => p.order.menu_id !== 'skip');
+
+  // Group decided by menu for summary
+  const groups = {};
+  decided.forEach(p => {
+    const key = `${p.order.menu_name}(${p.order.temperature})`;
+    if (!groups[key]) groups[key] = { order: p.order, people: [] };
+    groups[key].people.push(p);
+  });
+
+  const summaryText = [
+    `📋 ${roomName} (총 ${decided.length}잔)`,
+    ...Object.entries(groups).map(([key, g]) => {
+      const names = g.people.map(p => {
+        let n = p.user_name;
+        if (p.order.extra_shot) n += '(샷 추가)';
+        if (p.order.note) n += `(${p.order.note})`;
+        return n;
+      }).join(', ');
+      return `${g.order.menu_emoji} ${key} x${g.people.length} - ${names}`;
+    }),
+  ].join('\n');
+
+  const handleCopy = () => {
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const SectionLabel = ({ children }) => (
+    <div style={{ fontSize: 12, fontWeight: 700, color: '#8D6E63', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: 10, marginTop: 4 }}>
+      {children}
+    </div>
+  );
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* ── 완료한 사람들 ── */}
+      {ordered.length > 0 && decided.length > 0 && (
+        <div>
+          <SectionLabel>✅ 주문 완료 · {decided.length}명{skipped.length > 0 ? ` (패스 ${skipped.length}명 포함)` : ''}</SectionLabel>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {decided.map(p => (
+              <div key={p.user_id} className="fade-up" style={{
+                background: '#FFFFFF', borderRadius: 18, padding: '12px 14px',
+                border: `2px solid ${p.user_id === currentUserId ? '#C9A57B' : '#F5E6D3'}`,
+                display: 'flex', alignItems: 'center', gap: 12,
+                position: 'relative', overflow: 'hidden',
+              }}>
+                <div style={{
+                  position: 'absolute', inset: 0,
+                  background: 'linear-gradient(135deg, rgba(168,192,154,0.06), transparent)',
+                  pointerEvents: 'none',
+                }} />
+                {/* Avatar */}
+                <div style={{
+                  width: 40, height: 40, borderRadius: 14, flexShrink: 0,
+                  background: p.order.menu_id === 'skip'
+                    ? '#EEE8E3'
+                    : 'linear-gradient(135deg, #F5E6D3, #C9A57B)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22,
+                }}>
+                  {p.order.menu_emoji}
+                </div>
+                {/* Info */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <span style={{ fontWeight: 700, fontSize: 14, color: p.order.menu_id === 'skip' ? '#A89990' : '#3E2723' }}>{p.user_name}</span>
+                    {p.is_host && <span style={{ fontSize: 13 }}>👑</span>}
+                    {p.user_id === currentUserId && (
+                      <span className="chip" style={{ background: '#F5E6D3', color: '#6F4E37', fontSize: 10 }}>나</span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: 12, color: p.order.menu_id === 'skip' ? '#C9A57B' : '#6F4E37', fontWeight: 600, marginTop: 1 }}>
+                    {p.order.menu_id === 'skip'
+                      ? '이번엔 패스'
+                      : `${p.order.menu_name} ${p.order.temperature}${p.order.size ? ` · ${p.order.size}` : ''}${p.order.extra_shot ? ' · 샷 추가' : ''}${p.order.note ? ` · ${p.order.note}` : ''}`
+                    }
+                  </div>
+                </div>
+                {/* Edit */}
+                {p.user_id === currentUserId && !isClosed && (
+                  <button onClick={onEditOrder} className="btn-bounce" style={{
+                    padding: '6px 12px', borderRadius: 10, flexShrink: 0,
+                    background: '#F5E6D3', color: '#6F4E37',
+                    border: 'none', fontSize: 11, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit',
+                  }}>수정</button>
+                )}
+                {/* Badge */}
+                {p.user_id !== currentUserId && (
+                  <span style={{ color: '#A8C09A', fontSize: 18, flexShrink: 0 }}>✓</span>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Summary copy block */}
+          {decided.length >= 2 && (
+            <div style={{
+              marginTop: 12, background: '#F5E6D3', borderRadius: 16, padding: '14px 16px',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
+            }}>
+              <div style={{ fontSize: 13, color: '#6F4E37', fontWeight: 600 }}>
+                총 {ordered.length}잔 집계됐어요
+              </div>
+              <button onClick={handleCopy} className="btn-bounce" style={{
+                padding: '7px 14px', borderRadius: 10, flexShrink: 0,
+                background: copied ? '#A8C09A' : '#6F4E37',
+                color: '#FFF8F0', border: 'none', fontSize: 12, fontWeight: 600,
+                cursor: 'pointer', fontFamily: 'inherit', transition: 'background 0.2s',
+              }}>
+                {copied ? '복사됨 ✓' : '📋 주문 복사'}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── 아직 고르는 중 ── */}
+      {pending.length > 0 && (
+        <div>
+          <SectionLabel>⏳ 고르는 중 · {pending.length}명</SectionLabel>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {pending.map(p => (
+              <div key={p.user_id} style={{
+                background: '#FFFFFF', borderRadius: 18, padding: '12px 14px',
+                border: `2px solid ${p.user_id === currentUserId ? '#C9A57B' : '#F5E6D3'}`,
+                opacity: p.is_online ? 1 : 0.5,
+                display: 'flex', alignItems: 'center', gap: 12,
+              }}>
+                {/* Avatar */}
+                <div style={{
+                  width: 40, height: 40, borderRadius: 14, flexShrink: 0,
+                  background: p.is_online ? '#F5E6D3' : '#EEE8E3',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 18, color: p.is_online ? '#C9A57B' : '#C0B0A8', fontWeight: 700,
+                }}>
+                  ?
+                </div>
+                {/* Info */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <span style={{ fontWeight: 700, fontSize: 14, color: p.is_online ? '#3E2723' : '#A89990' }}>{p.user_name}</span>
+                    {p.is_host && <span style={{ fontSize: 13 }}>👑</span>}
+                    {p.user_id === currentUserId && (
+                      <span className="chip" style={{ background: '#F5E6D3', color: '#6F4E37', fontSize: 10 }}>나</span>
+                    )}
+                  </div>
+                  {p.status === 'ordering'
+                    ? <div style={{ fontSize: 12, color: '#D4A574', fontWeight: 600, marginTop: 1 }}>고민중<span className="thinking-dots"></span></div>
+                    : <div style={{ fontSize: 12, color: '#C9A57B', marginTop: 1 }}>{p.is_online ? '접속 중' : '오프라인'}</div>
+                  }
+                </div>
+                {/* Status dot */}
+                <div className={`status-dot ${p.status === 'ordering' ? 'status-ordering' : p.is_online ? 'status-online' : 'status-offline'}`}></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {decided.length === 0 && pending.length === 0 && (
+        <div style={{ textAlign: 'center', padding: '40px 0', color: '#C9A57B' }}>
+          🥱 아직 아무도 없어요
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ==================== MAIN ROOM SCREEN ==================== */
+function RoomScreen({ roomData, currentUser, participants: initParticipants }) {
+  const [participants, setParticipants] = useState(initParticipants);
+  const [view, setView] = useState('room'); // room | menu | options
+  const [selectedMenu, setSelectedMenu] = useState(null);
+  const [isClosed, setIsClosed] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const me = participants.find(p => p.user_id === currentUser.user_id);
+  const myOrder = me?.order;
+  const isHost = me?.is_host;
+  const decidedCount = participants.filter(p => p.order).length;
+  const totalCount = participants.filter(p => p.is_online).length;
+
+  const showToast = (msg) => setToast(msg);
+
+  const handleSelectMenu = (item) => {
+    setSelectedMenu(item);
+    setView('options');
+    setParticipants(prev => prev.map(p =>
+      p.user_id === currentUser.user_id ? { ...p, status: 'ordering' } : p
+    ));
+  };
+
+  const handleSelectCustom = () => {
+    setSelectedMenu({ id: 'custom', name: '', emoji: '✏️', iced: true });
+    setView('options');
+    setParticipants(prev => prev.map(p =>
+      p.user_id === currentUser.user_id ? { ...p, status: 'ordering' } : p
+    ));
+  };
+
+  const handleSubmitOrder = (order) => {
+    setParticipants(prev => prev.map(p =>
+      p.user_id === currentUser.user_id ? { ...p, status: 'decided', order } : p
+    ));
+    setView('room');
+    setShowConfetti(true);
+    showToast('주문 완료! ✨');
+  };
+
+  const handleEditOrder = () => {
+    setView('menu');
+    setParticipants(prev => prev.map(p =>
+      p.user_id === currentUser.user_id ? { ...p, status: 'ordering', order: null } : p
+    ));
+  };
+
+  const handleSkip = () => {
+    setParticipants(prev => prev.map(p =>
+      p.user_id === currentUser.user_id
+        ? { ...p, status: 'decided', order: { menu_id: 'skip', menu_name: '안먹어요', menu_emoji: '🙅', temperature: null, size: null, extra_shot: false, extra_syrup: false, note: '' } }
+        : p
+    ));
+    showToast('안먹기로 했어요 🙅');
+  };
+
+  const handleCloseRoom = () => {
+    setIsClosed(true);
+    showToast('주문이 마감됐어요! ✨');
+  };
+
+  return (
+    <div style={{ minHeight: '100vh', background: '#FFF8F0', display: 'flex', flexDirection: 'column', maxWidth: 480, margin: '0 auto' }}>
+      {showConfetti && <Confetti onDone={() => setShowConfetti(false)} />}
+      {toast && <Toast message={toast} onDone={() => setToast(null)} />}
+
+      {/* Header */}
+      <div style={{
+        background: '#FFFFFF', padding: '16px 20px 14px',
+        borderBottom: '1.5px solid #F5E6D3',
+        position: 'sticky', top: 0, zIndex: 100,
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <h1 style={{ fontFamily: "'Gowun Dodum', sans-serif", fontSize: 20, color: '#3E2723', lineHeight: 1.2 }}>
+                ☕ {roomData.room_name}
+              </h1>
+              {!isClosed && <CopyLinkButton roomId={roomData.room_id} />}
+              {isClosed && (
+                <span className="chip" style={{ background: '#F5E6D3', color: '#6F4E37', fontSize: 12 }}>✨ 마감</span>
+              )}
+            </div>
+            <div style={{ fontSize: 12, color: '#8D6E63', marginTop: 3 }}>
+              {isClosed ? '🔒 주문이 마감됐어요' : `${decidedCount}/${totalCount}명 주문 완료`}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="scroll-area" style={{ flex: 1, padding: '16px 20px', paddingBottom: 120 }}>
+
+        {/* ── 메뉴 선택 화면 ── */}
+        {view === 'menu' && !isClosed && (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+              <button onClick={() => setView('room')} style={{
+                background: '#F5E6D3', border: 'none', borderRadius: 12,
+                padding: '8px 14px', fontSize: 13, color: '#6F4E37', cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit',
+              }}>← 뒤로</button>
+              <h2 style={{ fontFamily: "'Gowun Dodum', sans-serif", fontSize: 18, color: '#3E2723' }}>
+                메뉴 선택 ☕
+              </h2>
+            </div>
+            <MenuGrid
+              onSelectMenu={handleSelectMenu}
+              onSelectCustom={handleSelectCustom}
+              selectedId={selectedMenu?.id}
+            />
+          </div>
+        )}
+
+        {/* ── 옵션 선택 화면 ── */}
+        {view === 'options' && selectedMenu && !isClosed && (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+              <button onClick={() => setView('menu')} style={{
+                background: '#F5E6D3', border: 'none', borderRadius: 12,
+                padding: '8px 14px', fontSize: 13, color: '#6F4E37', cursor: 'pointer', fontWeight: 600, fontFamily: 'inherit',
+              }}>← 뒤로</button>
+              <h2 style={{ fontFamily: "'Gowun Dodum', sans-serif", fontSize: 18, color: '#3E2723' }}>
+                옵션 선택
+              </h2>
+            </div>
+            <OrderOptions
+              menuItem={selectedMenu}
+              onSubmit={handleSubmitOrder}
+              onBack={() => setView('menu')}
+            />
+          </div>
+        )}
+
+        {/* ── 메인 주문현황 ── */}
+        {view === 'room' && (
+          <RoomView
+            participants={participants}
+            currentUserId={currentUser.user_id}
+            roomName={roomData.room_name}
+            isClosed={isClosed}
+            onEditOrder={handleEditOrder}
+          />
+        )}
+      </div>
+
+      {/* Bottom Bar */}
+      {view === 'room' && (
+        <div style={{
+          position: 'fixed', bottom: 0, left: '50%', transform: 'translateX(-50%)',
+          width: '100%', maxWidth: 480,
+          background: '#FFFFFF',
+          borderTop: '1.5px solid #F5E6D3',
+          padding: '12px 20px 28px',
+          display: 'flex', flexDirection: 'column', gap: 10,
+          zIndex: 200,
+        }}>
+          {!myOrder && !isClosed && (
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button onClick={() => setView('menu')} className="btn-bounce" style={{
+                flex: 3, padding: '16px', borderRadius: 18,
+                background: 'linear-gradient(135deg, #C9A57B, #6F4E37)',
+                color: '#FFF8F0', border: 'none',
+                fontSize: 16, fontWeight: 700, cursor: 'pointer',
+                fontFamily: "'Gowun Dodum', sans-serif",
+              }}>
+                메뉴 고르러 가기 ☕
+              </button>
+              <button onClick={handleSkip} className="btn-bounce" style={{
+                flex: 1, padding: '16px', borderRadius: 18,
+                background: '#F5E6D3', color: '#8D6E63',
+                border: 'none', fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                fontFamily: 'inherit',
+              }}>
+                안먹기 🙅
+              </button>
+            </div>
+          )}
+          {isHost && !isClosed && (
+            <button onClick={handleCloseRoom} className="btn-bounce" style={{
+              width: '100%', padding: '13px', borderRadius: 16,
+              background: '#F5E6D3', color: '#6F4E37', border: 'none',
+              fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+            }}>
+              🔒 주문 마감하기
+            </button>
+          )}
+          {isClosed && (
+            <div style={{
+              padding: '12px', borderRadius: 16,
+              background: 'linear-gradient(135deg, #F5E6D3, #FFF8F0)',
+              border: '1.5px solid #C9A57B',
+              textAlign: 'center', color: '#6F4E37', fontSize: 14, fontWeight: 600,
+            }}>
+              ✨ 주문이 마감됐어요! 맛있는 커피 타임 되세요 ☕
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ==================== APP ROOT ==================== */
+function App() {
+  const { useTweaks, TweaksPanel, TweakSection, TweakToggle, TweakColor, TweakRadio } = window;
+
+  const [tweaks, setTweak] = useTweaks(/*EDITMODE-BEGIN*/{
+    "primaryColor": "#6F4E37",
+    "accentColor": "#C9A57B",
+    "bgColor": "#FFF8F0",
+    "fontTitle": "Gowun Dodum",
+    "roundedCards": true,
+    "showAnimations": true
+  }/*EDITMODE-END*/);
+
+  // Simple CSS variable injection for tweaks
+  useEffect(() => {
+    document.documentElement.style.setProperty('--primary', tweaks.primaryColor);
+    document.documentElement.style.setProperty('--accent', tweaks.accentColor);
+    document.documentElement.style.setProperty('--bg', tweaks.bgColor);
+    document.body.style.background = tweaks.bgColor;
+  }, [tweaks]);
+
+  // ---- Screen state ----
+  const [screen, setScreen] = useState('home'); // home | room
+  const [roomData, setRoomData] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [showJoin, setShowJoin] = useState(false);
+
+  const handleCreateRoom = ({ roomName, hostName, roomId }) => {
+    const user = { user_id: 'me', user_name: hostName, is_host: true };
+    setRoomData({ room_id: roomId, room_name: roomName });
+    setCurrentUser(user);
+    setScreen('room');
+  };
+
+  const handleJoinRoom = (name) => {
+    const user = { user_id: 'me', user_name: name, is_host: false };
+    setCurrentUser(user);
+    setShowJoin(false);
+  };
+
+  // Demo: enter a room from guest perspective
+  const handleDemoJoin = () => {
+    setRoomData({ room_id: 'demo1234', room_name: '오후 3시 커피타임' });
+    setShowJoin(true);
+    setScreen('room');
+  };
+
+  // Participants (for room demo)
+  const demoParticipants = [
+    { user_id: currentUser?.user_id || 'me', user_name: currentUser?.user_name || '나', is_host: currentUser?.is_host ?? true, is_online: true, status: 'thinking', order: null },
+    ...MOCK_PARTICIPANTS.filter(p => p.user_id !== 'host1'),
+  ];
+
+  return (
+    <>
+      {screen === 'home' && (
+        <>
+          <HomeScreen onCreateRoom={handleCreateRoom} />
+          <button onClick={handleDemoJoin} style={{
+            position: 'fixed', bottom: 24, right: 24,
+            background: '#6F4E37', color: '#FFF8F0', border: 'none',
+            borderRadius: 20, padding: '10px 18px', fontSize: 13, fontWeight: 600,
+            cursor: 'pointer', fontFamily: 'inherit',
+            boxShadow: '0 4px 16px rgba(111,78,55,0.3)',
+            zIndex: 500,
+          }} className="btn-bounce">
+            🔗 게스트로 입장 데모
+          </button>
+        </>
+      )}
+
+      {screen === 'room' && roomData && (
+        <>
+          {showJoin && <JoinModal roomName={roomData.room_name} onJoin={handleJoinRoom} />}
+          {currentUser && (
+            <RoomScreen
+              roomData={roomData}
+              currentUser={demoParticipants[0].user_id === 'me'
+                ? { ...currentUser, user_id: 'me' }
+                : currentUser}
+              participants={demoParticipants}
+            />
+          )}
+        </>
+      )}
+
+      <TweaksPanel tweaks={tweaks} setTweak={setTweak}>
+        <TweakSection title="색상">
+          <TweakColor id="primaryColor" label="메인 색상 (에스프레소)" value={tweaks.primaryColor} />
+          <TweakColor id="accentColor" label="포인트 색상 (라떼)" value={tweaks.accentColor} />
+          <TweakColor id="bgColor" label="배경 색상" value={tweaks.bgColor} />
+        </TweakSection>
+        <TweakSection title="타이포">
+          <TweakRadio
+            id="fontTitle"
+            label="타이틀 폰트"
+            options={[
+              { value: 'Gowun Dodum', label: '고운돋움' },
+              { value: 'Noto Sans KR', label: '노토' },
+            ]}
+            value={tweaks.fontTitle}
+          />
+        </TweakSection>
+        <TweakSection title="스타일">
+          <TweakToggle id="roundedCards" label="둥근 카드" value={tweaks.roundedCards} />
+          <TweakToggle id="showAnimations" label="애니메이션" value={tweaks.showAnimations} />
+        </TweakSection>
+      </TweaksPanel>
+    </>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
