@@ -132,7 +132,7 @@ export function CreateRoomForm() {
               <label
                 style={{ fontSize: 13, fontWeight: 600, color: "#6F4E37", display: "block", marginBottom: 8 }}
               >
-                ☕ 오늘의 커피타임 이름
+                오늘의 커피타임 이름
               </label>
               <input
                 className="input-field"
@@ -170,15 +170,16 @@ export function CreateRoomForm() {
                 marginTop: 8,
                 padding: "16px",
                 borderRadius: 18,
-                background: canSubmit
+                background: canSubmit && !loading
                   ? "linear-gradient(135deg, #C9A57B, #6F4E37)"
                   : "#F5E6D3",
-                color: canSubmit ? "#FFF8F0" : "#C9A57B",
+                color: canSubmit && !loading ? "#FFF8F0" : "#C9A57B",
                 border: "none",
                 fontSize: 16,
                 fontWeight: 700,
                 fontFamily: "'Gowun Dodum', sans-serif",
-                cursor: canSubmit ? "pointer" : "not-allowed",
+                cursor: canSubmit && !loading ? "pointer" : "not-allowed",
+                opacity: loading ? 0.65 : 1,
                 transition: "all 0.2s",
               }}
             >

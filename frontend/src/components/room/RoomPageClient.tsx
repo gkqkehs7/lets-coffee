@@ -26,23 +26,46 @@ export function RoomPageClient({ roomId }: Props) {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  // 내 세션
   const [myUserId, setMyUserId] = useState<string | null>(null);
-  const [myUserName, setMyUserName] = useState<string | null>(null);
   const [isHost, setIsHost] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
 
-  // 화면 뷰
   const [view, setView] = useState<ViewState>("room");
   const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
 
-  // UI 상태
   const [showConfetti, setShowConfetti] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   const socketRef = useRef(connectSocket());
+  // userId를 ref에도 저장 — 소켓 재연결 시 room:join 재전송에 사용
+  const userIdRef = useRef<string | null>(null);
 
   const showToast = useCallback((msg: string) => setToast(msg), []);
+
+  // ── 소켓 room:join 전송 (연결 완료 보장) ──
+  const joinSocketRoom = useCallback(
+    (userId: string) => {
+      userIdRef.current = userId;
+      const s = socketRef.current;
+      if (s.connected) {
+        s.emit("room:join", { room_id: roomId, user_id: userId });
+      }
+      // 연결 중이면 connect 이벤트 시 전송됨 (아래 useEffect)
+    },
+    [roomId],
+  );
+
+  // ── 소켓 연결/재연결 시 항상 room:join 전송 ──
+  useEffect(() => {
+    const s = socketRef.current;
+    const handleConnect = () => {
+      if (userIdRef.current) {
+        s.emit("room:join", { room_id: roomId, user_id: userIdRef.current });
+      }
+    };
+    s.on("connect", handleConnect);
+    return () => { s.off("connect", handleConnect); };
+  }, [roomId]);
 
   // ── 소켓 이벤트 구독 ──
   useEffect(() => {
@@ -58,20 +81,28 @@ export function RoomPageClient({ roomId }: Props) {
     s.on("participant:joined", (data: { participant: Participant }) => {
       setParticipants((prev) => {
         const exists = prev.find((p) => p.user_id === data.participant.user_id);
-        if (exists) return prev.map((p) => p.user_id === data.participant.user_id ? data.participant : p);
+        if (exists) {
+          return prev.map((p) =>
+            p.user_id === data.participant.user_id ? data.participant : p,
+          );
+        }
         return [...prev, data.participant];
       });
     });
 
     s.on("participant:left", (data: { user_id: string }) => {
       setParticipants((prev) =>
-        prev.map((p) => p.user_id === data.user_id ? { ...p, is_online: false } : p)
+        prev.map((p) =>
+          p.user_id === data.user_id ? { ...p, is_online: false } : p,
+        ),
       );
     });
 
     s.on("participant:updated", (data: { participant: Participant }) => {
       setParticipants((prev) =>
-        prev.map((p) => p.user_id === data.participant.user_id ? data.participant : p)
+        prev.map((p) =>
+          p.user_id === data.participant.user_id ? data.participant : p,
+        ),
       );
     });
 
@@ -89,7 +120,7 @@ export function RoomPageClient({ roomId }: Props) {
     };
   }, [showToast]);
 
-  // ── 초기 로드: 방 정보 & 세션 확인 ──
+  // ── 초기 로드 ──
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -102,11 +133,9 @@ export function RoomPageClient({ roomId }: Props) {
 
         const session = loadSession(roomId);
         if (session) {
-          // 세션 있으면 바로 입장
           setMyUserId(session.user_id);
-          setMyUserName(session.user_name);
           setIsHost(session.is_host);
-          socketRef.current.emit("room:join", { room_id: roomId, user_id: session.user_id });
+          joinSocketRoom(session.user_id);
         } else {
           setShowJoin(true);
         }
@@ -117,18 +146,22 @@ export function RoomPageClient({ roomId }: Props) {
       }
     })();
     return () => { mounted = false; };
-  }, [roomId]);
+  }, [roomId, joinSocketRoom]);
 
   // ── 이름 입력 후 입장 ──
   const handleJoin = async (name: string) => {
     try {
       const res = await api.joinRoom(roomId, name);
-      saveSession({ user_id: res.user_id, user_name: res.user_name, is_host: res.is_host, room_id: roomId });
+      saveSession({
+        user_id: res.user_id,
+        user_name: res.user_name,
+        is_host: res.is_host,
+        room_id: roomId,
+      });
       setMyUserId(res.user_id);
-      setMyUserName(res.user_name);
       setIsHost(res.is_host);
       setShowJoin(false);
-      socketRef.current.emit("room:join", { room_id: roomId, user_id: res.user_id });
+      joinSocketRoom(res.user_id);
     } catch {
       showToast("입장에 실패했어요 😢");
     }
@@ -140,7 +173,9 @@ export function RoomPageClient({ roomId }: Props) {
     setView("options");
     socketRef.current.emit("status:update", { status: "ordering" });
     setParticipants((prev) =>
-      prev.map((p) => p.user_id === myUserId ? { ...p, status: "ordering" } : p)
+      prev.map((p) =>
+        p.user_id === myUserId ? { ...p, status: "ordering" } : p,
+      ),
     );
   };
 
@@ -152,7 +187,9 @@ export function RoomPageClient({ roomId }: Props) {
   const handleSubmitOrder = (order: Order) => {
     socketRef.current.emit("order:submit", { order });
     setParticipants((prev) =>
-      prev.map((p) => p.user_id === myUserId ? { ...p, status: "decided", order } : p)
+      prev.map((p) =>
+        p.user_id === myUserId ? { ...p, status: "decided", order } : p,
+      ),
     );
     setView("room");
     setShowConfetti(true);
@@ -163,7 +200,9 @@ export function RoomPageClient({ roomId }: Props) {
   const handleEditOrder = () => {
     socketRef.current.emit("order:edit", {});
     setParticipants((prev) =>
-      prev.map((p) => p.user_id === myUserId ? { ...p, status: "ordering", order: null } : p)
+      prev.map((p) =>
+        p.user_id === myUserId ? { ...p, status: "ordering", order: null } : p,
+      ),
     );
     setView("menu");
   };
@@ -180,7 +219,9 @@ export function RoomPageClient({ roomId }: Props) {
       note: "",
     };
     setParticipants((prev) =>
-      prev.map((p) => p.user_id === myUserId ? { ...p, status: "decided", order: skipOrder } : p)
+      prev.map((p) =>
+        p.user_id === myUserId ? { ...p, status: "decided", order: skipOrder } : p,
+      ),
     );
     showToast("안먹기로 했어요 🙅");
   };
@@ -201,7 +242,6 @@ export function RoomPageClient({ roomId }: Props) {
   const onlineCount = participants.filter((p) => p.is_online).length;
   const decidedCount = participants.filter((p) => p.order !== null).length;
 
-  // ── 로딩 화면 ──
   if (loading) {
     return (
       <div style={{
@@ -215,7 +255,6 @@ export function RoomPageClient({ roomId }: Props) {
     );
   }
 
-  // ── 404 ──
   if (notFound) {
     return (
       <div style={{
@@ -267,7 +306,7 @@ export function RoomPageClient({ roomId }: Props) {
                 fontFamily: "'Gowun Dodum', sans-serif",
                 fontSize: 20, color: "#3E2723", lineHeight: 1.2,
               }}>
-                ☕ {room?.room_name}
+                {room?.room_name}
               </h1>
               {!isClosed && <ShareButton roomId={roomId} />}
               {isClosed && (
@@ -288,7 +327,6 @@ export function RoomPageClient({ roomId }: Props) {
       {/* 컨텐츠 */}
       <div style={{ flex: 1, padding: "16px 20px", paddingBottom: 120, overflowY: "auto" }}>
 
-        {/* 메뉴 선택 */}
         {view === "menu" && !isClosed && (
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
@@ -314,7 +352,6 @@ export function RoomPageClient({ roomId }: Props) {
           </div>
         )}
 
-        {/* 옵션 선택 */}
         {view === "options" && selectedMenu && !isClosed && (
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
@@ -340,7 +377,6 @@ export function RoomPageClient({ roomId }: Props) {
           </div>
         )}
 
-        {/* 주문 현황 */}
         {view === "room" && myUserId && (
           <RoomView
             participants={participants}
