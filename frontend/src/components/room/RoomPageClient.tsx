@@ -238,9 +238,14 @@ export function RoomPageClient({ roomId }: Props) {
     return () => { disconnectSocket(); };
   }, []);
 
-  const myOrder = participants.find((p) => p.user_id === myUserId)?.order ?? null;
-  const onlineCount = participants.filter((p) => p.is_online).length;
-  const decidedCount = participants.filter((p) => p.order !== null).length;
+  // 내가 화면을 보고 있으면 무조건 온라인 — 백엔드 응답을 기다릴 필요 없음
+  const displayParticipants = myUserId
+    ? participants.map((p) => p.user_id === myUserId ? { ...p, is_online: true } : p)
+    : participants;
+
+  const myOrder = displayParticipants.find((p) => p.user_id === myUserId)?.order ?? null;
+  const onlineCount = displayParticipants.filter((p) => p.is_online).length;
+  const decidedCount = displayParticipants.filter((p) => p.order !== null).length;
 
   if (loading) {
     return (
@@ -379,7 +384,7 @@ export function RoomPageClient({ roomId }: Props) {
 
         {view === "room" && myUserId && (
           <RoomView
-            participants={participants}
+            participants={displayParticipants}
             currentUserId={myUserId}
             roomName={room?.room_name ?? ""}
             isClosed={isClosed}
