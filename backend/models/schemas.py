@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
 from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
@@ -27,7 +26,6 @@ class Participant(BaseModel):
     is_online: bool = True
     status: ParticipantStatus = "thinking"
     order: Optional[Order] = None
-    joined_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class Room(BaseModel):
@@ -35,7 +33,6 @@ class Room(BaseModel):
     room_name: str
     host_id: str
     is_closed: bool = False
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     participants: dict[str, Participant] = Field(default_factory=dict)
 
 
