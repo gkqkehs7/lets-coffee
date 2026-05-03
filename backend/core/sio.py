@@ -16,42 +16,39 @@ sio = socketio.AsyncServer(
 _connections: dict[str, tuple[str, str]] = {}
 
 
+async def _broadcast(event: str, data: dict, room_id: str, skip_sid: str | None = None) -> None:
+    for sid, (r_id, _) in list(_connections.items()):
+        if r_id == room_id and sid != skip_sid:
+            await sio.emit(event, data, to=sid)
+
+
 @sio.event
 async def connect(sid: str, environ: dict, auth: dict | None = None) -> None:
-    print(f"[WS] connect sid={sid}", flush=True)
+    pass
 
 
 @sio.event
 async def disconnect(sid: str) -> None:
-    print(f"[WS] disconnect sid={sid}", flush=True)
     conn = _connections.pop(sid, None)
     if conn is None:
         return
     room_id, user_id = conn
     p = await room_manager.set_online(room_id, user_id, False)
     if p:
-        await sio.emit(
-            "participant:left",
-            {"user_id": user_id},
-            room=room_id,
-            skip_sid=sid,
-        )
+        await _broadcast("participant:left", {"user_id": user_id}, room_id)
 
 
 @sio.on("room:join")
 async def room_join(sid: str, data: dict) -> None:
     room_id: str = data.get("room_id", "")
     user_id: str = data.get("user_id", "")
-    print(f"[WS] room:join room={room_id} user={user_id}", flush=True)
 
     room = await room_manager.get_room(room_id)
     if room is None or user_id not in room.participants:
-        print(f"[WS] room:join FAILED room_found={room is not None} user_in_room={user_id in (room.participants if room else {})}", flush=True)
         await sio.emit("error", {"message": "방을 찾을 수 없어요"}, to=sid)
         return
 
     _connections[sid] = (room_id, user_id)
-    await sio.enter_room(sid, room_id)
     await room_manager.set_online(room_id, user_id, True)
 
     # 입장한 본인에게 방 전체 상태 전송
@@ -65,17 +62,10 @@ async def room_join(sid: str, data: dict) -> None:
         },
         to=sid,
     )
-    print(f"[WS] room:state emitted to sid={sid}", flush=True)
 
     # 다른 참가자들에게 입장 알림
     p = room.participants[user_id]
-    await sio.emit(
-        "participant:joined",
-        {"participant": p.model_dump(mode="json")},
-        room=room_id,
-        skip_sid=sid,
-    )
-    print(f"[WS] participant:joined emitted to room={room_id}", flush=True)
+    await _broadcast("participant:joined", {"participant": p.model_dump(mode="json")}, room_id, skip_sid=sid)
 
 
 @sio.on("status:update")
@@ -87,11 +77,7 @@ async def status_update(sid: str, data: dict) -> None:
     status = data.get("status", "thinking")
     p = await room_manager.update_status(room_id, user_id, status)
     if p:
-        await sio.emit(
-            "participant:updated",
-            {"participant": p.model_dump(mode="json")},
-            room=room_id,
-        )
+        await _broadcast("participant:updated", {"participant": p.model_dump(mode="json")}, room_id)
 
 
 @sio.on("order:submit")
@@ -107,11 +93,7 @@ async def order_submit(sid: str, data: dict) -> None:
         return
     p = await room_manager.submit_order(room_id, user_id, order)
     if p:
-        await sio.emit(
-            "participant:updated",
-            {"participant": p.model_dump(mode="json")},
-            room=room_id,
-        )
+        await _broadcast("participant:updated", {"participant": p.model_dump(mode="json")}, room_id)
 
 
 @sio.on("order:skip")
@@ -129,11 +111,7 @@ async def order_skip(sid: str, data: dict) -> None:
     )
     p = await room_manager.submit_order(room_id, user_id, order)
     if p:
-        await sio.emit(
-            "participant:updated",
-            {"participant": p.model_dump(mode="json")},
-            room=room_id,
-        )
+        await _broadcast("participant:updated", {"participant": p.model_dump(mode="json")}, room_id)
 
 
 @sio.on("order:edit")
@@ -144,11 +122,7 @@ async def order_edit(sid: str, data: dict) -> None:
     room_id, user_id = conn
     p = await room_manager.edit_order(room_id, user_id)
     if p:
-        await sio.emit(
-            "participant:updated",
-            {"participant": p.model_dump(mode="json")},
-            room=room_id,
-        )
+        await _broadcast("participant:updated", {"participant": p.model_dump(mode="json")}, room_id)
 
 
 @sio.on("room:close")
@@ -159,6 +133,6 @@ async def room_close(sid: str, data: dict) -> None:
     room_id, user_id = conn
     ok = await room_manager.close_room(room_id, user_id)
     if ok:
-        await sio.emit("room:closed", {}, room=room_id)
+        await _broadcast("room:closed", {}, room_id)
     else:
         await sio.emit("error", {"message": "마감 권한이 없어요"}, to=sid)
