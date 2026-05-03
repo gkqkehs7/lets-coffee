@@ -43,6 +43,25 @@ export function CreateRoomForm() {
     }
   };
 
+  if (loading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "#FFF8F0",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          gap: 16,
+        }}
+      >
+        <div className="animate-float" style={{ fontSize: 48 }}>☕</div>
+        <p style={{ color: "#8D6E63", fontSize: 14 }}>방을 만들고 있어요...</p>
+      </div>
+    );
+  }
+
   return (
     <div
       style={{
@@ -165,25 +184,24 @@ export function CreateRoomForm() {
             <button
               type="submit"
               className="btn-hover"
-              disabled={loading || !canSubmit}
+              disabled={!canSubmit}
               style={{
                 marginTop: 8,
                 padding: "16px",
                 borderRadius: 18,
-                background: canSubmit && !loading
+                background: canSubmit
                   ? "linear-gradient(135deg, #C9A57B, #6F4E37)"
                   : "#F5E6D3",
-                color: canSubmit && !loading ? "#FFF8F0" : "#C9A57B",
+                color: canSubmit ? "#FFF8F0" : "#C9A57B",
                 border: "none",
                 fontSize: 16,
                 fontWeight: 700,
                 fontFamily: "'Gowun Dodum', sans-serif",
-                cursor: canSubmit && !loading ? "pointer" : "not-allowed",
-                opacity: loading ? 0.65 : 1,
+                cursor: canSubmit ? "pointer" : "not-allowed",
                 transition: "all 0.2s",
               }}
             >
-              {loading ? "만드는 중..." : "방 만들기 🎉"}
+              방 만들기 🎉
             </button>
           </form>
         </div>
