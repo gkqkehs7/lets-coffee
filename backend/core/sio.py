@@ -51,21 +51,14 @@ async def room_join(sid: str, data: dict) -> None:
     _connections[sid] = (room_id, user_id)
     await room_manager.set_online(room_id, user_id, True)
 
-    # 입장한 본인에게 방 전체 상태 전송
-    await sio.emit(
-        "room:state",
-        {
-            "room": {
-                **room.model_dump(mode="json"),
-                "participants": [p.model_dump(mode="json") for p in room.participants.values()],
-            }
-        },
-        to=sid,
-    )
-
-    # 다른 참가자들에게 입장 알림
-    p = room.participants[user_id]
-    await _broadcast("participant:joined", {"participant": p.model_dump(mode="json")}, room_id, skip_sid=sid)
+    # 방 안 모든 참가자(신규 포함)에게 최신 상태 브로드캐스트
+    room_state = {
+        "room": {
+            **room.model_dump(mode="json"),
+            "participants": [p.model_dump(mode="json") for p in room.participants.values()],
+        }
+    }
+    await _broadcast("room:state", room_state, room_id)
 
 
 @sio.on("status:update")
