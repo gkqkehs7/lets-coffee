@@ -389,8 +389,28 @@ export function RoomPageClient({ roomId }: Props) {
                 </span>
               )}
             </div>
-            <div style={{ fontSize: 12, color: "#8D6E63", marginTop: 3 }}>
-              {isClosed ? "🔒 주문이 마감됐어요" : `${decidedCount}/${onlineCount}명 주문 완료`}
+            <div style={{ marginTop: 5 }}>
+              {isClosed ? (
+                <div style={{ fontSize: 12, color: "#8D6E63" }}>🔒 주문이 마감됐어요</div>
+              ) : (
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{
+                    flex: 1, height: 6, borderRadius: 3,
+                    background: "#F5E6D3", overflow: "hidden",
+                  }}>
+                    <div style={{
+                      height: "100%",
+                      width: onlineCount > 0 ? `${(decidedCount / onlineCount) * 100}%` : "0%",
+                      background: "linear-gradient(90deg, #C9A57B, #6F4E37)",
+                      borderRadius: 3,
+                      transition: "width 0.4s ease",
+                    }} />
+                  </div>
+                  <span style={{ fontSize: 11, color: "#8D6E63", fontWeight: 600, flexShrink: 0 }}>
+                    {decidedCount}/{onlineCount}명
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
