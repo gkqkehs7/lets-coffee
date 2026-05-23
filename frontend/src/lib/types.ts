@@ -1,6 +1,6 @@
 export type Temperature = "HOT" | "ICED";
 export type Size = "Tall" | "Grande" | "Venti";
-export type ParticipantStatus = "thinking" | "ordering" | "decided";
+export type ParticipantStatus = "thinking" | "ordering" | "editing" | "decided";
 
 export interface Order {
   menu_id: string;

@@ -313,6 +313,12 @@ export function RoomView({
                     >
                       고민중<span className="thinking-dots" />
                     </div>
+                  ) : p.status === "editing" ? (
+                    <div
+                      style={{ fontSize: 12, color: "#A8C09A", fontWeight: 600, marginTop: 1 }}
+                    >
+                      변경중<span className="thinking-dots" />
+                    </div>
                   ) : (
                     <div style={{ fontSize: 12, color: "#C9A57B", marginTop: 1 }}>
                       {p.is_online ? "접속 중" : "오프라인"}
@@ -322,7 +328,7 @@ export function RoomView({
                 {/* 상태 점 */}
                 <div
                   className={`status-dot ${
-                    p.status === "ordering"
+                    p.status === "ordering" || p.status === "editing"
                       ? "status-ordering"
                       : p.is_online
                       ? "status-online"

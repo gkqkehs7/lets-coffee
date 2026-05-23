@@ -223,12 +223,24 @@ export function RoomPageClient({ roomId }: Props) {
   // ── 수정 ──
   const handleEditOrder = () => {
     socketRef.current.emit("order:edit", {});
+    socketRef.current.emit("status:update", { status: "editing" });
     setParticipants((prev) =>
       prev.map((p) =>
-        p.user_id === myUserId ? { ...p, status: "ordering", order: null } : p,
+        p.user_id === myUserId ? { ...p, status: "editing", order: null } : p,
       ),
     );
     setView("menu");
+  };
+
+  // ── 메뉴/옵션 취소 (room으로 복귀) ──
+  const handleCancelToRoom = () => {
+    socketRef.current.emit("status:update", { status: "thinking" });
+    setParticipants((prev) =>
+      prev.map((p) =>
+        p.user_id === myUserId ? { ...p, status: "thinking" } : p,
+      ),
+    );
+    setView("room");
   };
 
   // ── 안먹기 ──
@@ -360,7 +372,7 @@ export function RoomPageClient({ roomId }: Props) {
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
               <button
-                onClick={() => setView("room")}
+                onClick={handleCancelToRoom}
                 style={{
                   background: "#F5E6D3", border: "none", borderRadius: 12,
                   padding: "8px 14px", fontSize: 13, color: "#6F4E37",
