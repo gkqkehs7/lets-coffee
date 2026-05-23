@@ -335,7 +335,7 @@ export function RoomPageClient({ roomId }: Props) {
     }}>
       {showConfetti && <Confetti onDone={() => setShowConfetti(false)} />}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
-      {showJoin && room && <JoinRoomModal roomName={room.room_name} onJoin={handleJoin} />}
+      {showJoin && room && <JoinRoomModal roomName={room.room_name} cafeInfo={cafeInfo} onJoin={handleJoin} />}
 
       {/* 헤더 */}
       <div style={{
@@ -345,6 +345,7 @@ export function RoomPageClient({ roomId }: Props) {
         position: "sticky", top: 0, zIndex: 100,
       }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+          {/* 왼쪽: 방 이름 + 상태 */}
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <h1 style={{
@@ -366,6 +367,38 @@ export function RoomPageClient({ roomId }: Props) {
                 : `${decidedCount}/${onlineCount}명 주문 완료`}
             </div>
           </div>
+
+          {/* 오른쪽: 카페 로고 + 이름 */}
+          {cafeInfo && (
+            <div style={{
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+              flexShrink: 0,
+            }}>
+              <div style={{
+                width: 44, height: 44, borderRadius: 14,
+                overflow: "hidden",
+                background: `${cafeInfo.color}18`,
+                border: `1.5px solid ${cafeInfo.color}33`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={cafeInfo.logoPath}
+                  alt={cafeInfo.name}
+                  width={36}
+                  height={36}
+                  style={{ objectFit: "contain", borderRadius: 8 }}
+                />
+              </div>
+              <span style={{
+                fontSize: 10, fontWeight: 700,
+                color: cafeInfo.color,
+                letterSpacing: "-0.02em",
+              }}>
+                {cafeInfo.name}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

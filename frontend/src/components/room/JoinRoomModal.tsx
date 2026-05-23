@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import type { CafeInfo } from "@/lib/menu-data";
 
 interface Props {
   roomName: string;
+  cafeInfo: CafeInfo | null;
   onJoin: (name: string) => Promise<void>;
 }
 
-export function JoinRoomModal({ roomName, onJoin }: Props) {
+export function JoinRoomModal({ roomName, cafeInfo, onJoin }: Props) {
   const [name, setName] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -26,12 +28,51 @@ export function JoinRoomModal({ roomName, onJoin }: Props) {
     <div className="modal-overlay">
       <div className="modal-sheet animate-pop-in" style={{ maxWidth: 420 }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
-          <div style={{ fontSize: 48, marginBottom: 12 }}>☕</div>
+          {/* 카페 로고 */}
+          {cafeInfo ? (
+            <div style={{
+              width: 64, height: 64, borderRadius: 20,
+              background: `${cafeInfo.color}18`,
+              border: `2px solid ${cafeInfo.color}33`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              margin: "0 auto 12px",
+              overflow: "hidden",
+            }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={cafeInfo.logoPath}
+                alt={cafeInfo.name}
+                width={48}
+                height={48}
+                style={{ objectFit: "contain" }}
+              />
+            </div>
+          ) : (
+            <div style={{ fontSize: 48, marginBottom: 12 }}>☕</div>
+          )}
+
+          {/* 카페 이름 뱃지 */}
+          {cafeInfo && (
+            <div style={{
+              display: "inline-block",
+              padding: "4px 12px",
+              borderRadius: 20,
+              background: `${cafeInfo.color}15`,
+              border: `1px solid ${cafeInfo.color}40`,
+              fontSize: 12, fontWeight: 700,
+              color: cafeInfo.color,
+              marginBottom: 10,
+            }}>
+              {cafeInfo.name}
+            </div>
+          )}
+
           <h2
             style={{
               fontFamily: "'Gowun Dodum', sans-serif",
               fontSize: 20,
               color: "#3E2723",
+              display: "block",
             }}
           >
             {roomName}
