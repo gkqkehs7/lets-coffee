@@ -4,15 +4,22 @@ import { useState } from "react";
 
 interface Props {
   roomName: string;
-  onJoin: (name: string) => void;
+  onJoin: (name: string) => Promise<void>;
 }
 
 export function JoinRoomModal({ roomName, onJoin }: Props) {
   const [name, setName] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim()) onJoin(name.trim());
+    if (!name.trim() || submitting) return;
+    setSubmitting(true);
+    try {
+      await onJoin(name.trim());
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -60,23 +67,23 @@ export function JoinRoomModal({ roomName, onJoin }: Props) {
           <button
             type="submit"
             className="btn-hover"
-            disabled={!name.trim()}
+            disabled={!name.trim() || submitting}
             style={{
               width: "100%",
               padding: "16px",
               borderRadius: 18,
-              background: name.trim()
+              background: name.trim() && !submitting
                 ? "linear-gradient(135deg, #C9A57B, #6F4E37)"
                 : "#F5E6D3",
-              color: name.trim() ? "#FFF8F0" : "#C9A57B",
+              color: name.trim() && !submitting ? "#FFF8F0" : "#C9A57B",
               border: "none",
               fontSize: 16,
               fontWeight: 700,
               fontFamily: "'Gowun Dodum', sans-serif",
-              cursor: name.trim() ? "pointer" : "not-allowed",
+              cursor: name.trim() && !submitting ? "pointer" : "not-allowed",
             }}
           >
-            입장하기 ✨
+            {submitting ? "입장 중..." : "입장하기 ✨"}
           </button>
         </form>
       </div>

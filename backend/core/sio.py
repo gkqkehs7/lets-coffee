@@ -57,6 +57,13 @@ async def room_join(sid: str, data: dict) -> None:
         await sio.emit("error", {"message": "방을 찾을 수 없어요"}, to=sid)
         return
 
+    # 같은 sid가 이미 다른 user로 등록돼 있으면 이전 user를 오프라인 처리
+    prev = _connections.get(sid)
+    if prev is not None and prev != (room_id, user_id):
+        prev_room_id, prev_user_id = prev
+        log.warning("[ROOM:JOIN] sid=%s 이미 다른 user(%s)로 등록됨 → 이전 user 오프라인 처리", sid, prev_user_id)
+        await room_manager.set_online(prev_room_id, prev_user_id, False)
+
     _connections[sid] = (room_id, user_id)
     await room_manager.set_online(room_id, user_id, True)
 
