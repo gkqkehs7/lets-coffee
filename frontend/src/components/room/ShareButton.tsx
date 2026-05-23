@@ -31,21 +31,24 @@ export function ShareButton({ roomId }: Props) {
       className="btn-hover"
       onClick={handleCopy}
       style={{
-        padding: "3px 9px",
-        borderRadius: 8,
+        width: 44,
+        height: 44,
+        borderRadius: 12,
         background: copied ? "#A8C09A" : "#F5E6D3",
         color: copied ? "#FFF8F0" : "#8D6E63",
         border: "none",
-        fontSize: 11,
-        fontWeight: 600,
+        fontSize: copied ? 11 : 12,
+        fontWeight: 700,
         cursor: "pointer",
         fontFamily: "inherit",
         transition: "background 0.2s",
         flexShrink: 0,
-        whiteSpace: "nowrap",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      {copied ? "✓ 복사됨" : "링크 복사"}
+      {copied ? "✓" : "공유"}
     </button>
   );
 }
