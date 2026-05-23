@@ -20,10 +20,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const api = {
-  createRoom(roomName: string, hostName: string): Promise<CreateRoomResponse> {
+  createRoom(roomName: string, hostName: string, cafeId: string): Promise<CreateRoomResponse> {
     return request("/api/rooms", {
       method: "POST",
-      body: JSON.stringify({ room_name: roomName, host_name: hostName }),
+      body: JSON.stringify({ room_name: roomName, host_name: hostName, cafe_id: cafeId }),
     });
   },
 

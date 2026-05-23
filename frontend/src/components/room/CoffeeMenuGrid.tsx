@@ -1,9 +1,10 @@
 "use client";
 
-import { COFFEE_MENU, MENU_CATEGORIES } from "@/lib/menu-data";
+import { MENU_CATEGORIES } from "@/lib/menu-data";
 import type { MenuItem } from "@/lib/types";
 
 interface Props {
+  menu: MenuItem[];
   selectedId: string | null;
   onSelectMenu: (item: MenuItem) => void;
   onSelectCustom: () => void;
@@ -76,10 +77,13 @@ function MenuCard({
   );
 }
 
-export function CoffeeMenuGrid({ selectedId, onSelectMenu, onSelectCustom }: Props) {
+export function CoffeeMenuGrid({ menu, selectedId, onSelectMenu, onSelectCustom }: Props) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-      {MENU_CATEGORIES.map((cat) => (
+      {MENU_CATEGORIES.map((cat) => {
+        const items = menu.filter((m) => m.category === cat.id);
+        if (items.length === 0) return null;
+        return (
         <div key={cat.id}>
           <h3
             style={{
@@ -98,7 +102,7 @@ export function CoffeeMenuGrid({ selectedId, onSelectMenu, onSelectCustom }: Pro
               gap: 10,
             }}
           >
-            {COFFEE_MENU.filter((m) => m.category === cat.id).map((item) => (
+            {items.map((item) => (
               <MenuCard
                 key={item.id}
                 item={item}
@@ -108,7 +112,8 @@ export function CoffeeMenuGrid({ selectedId, onSelectMenu, onSelectCustom }: Pro
             ))}
           </div>
         </div>
-      ))}
+        );
+      })}
 
       {/* 기타 직접 입력 */}
       <div>

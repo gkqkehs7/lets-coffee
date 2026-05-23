@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import { loadSession, saveSession } from "@/lib/session";
 import { connectSocket, disconnectSocket } from "@/lib/socket";
+import { getCafeInfo, getMenuByCafe } from "@/lib/menu-data";
 import type { MenuItem, Order, Participant, Room } from "@/lib/types";
 import { JoinRoomModal } from "./JoinRoomModal";
 import { CoffeeMenuGrid } from "./CoffeeMenuGrid";
@@ -283,6 +284,9 @@ export function RoomPageClient({ roomId }: Props) {
   const onlineCount = displayParticipants.filter((p) => p.is_online).length;
   const decidedCount = displayParticipants.filter((p) => p.order !== null).length;
 
+  const cafeMenu = room ? getMenuByCafe(room.cafe_id) : [];
+  const cafeInfo = room ? getCafeInfo(room.cafe_id) : null;
+
   if (loading) {
     return (
       <div style={{
@@ -382,10 +386,11 @@ export function RoomPageClient({ roomId }: Props) {
                 ← 뒤로
               </button>
               <h2 style={{ fontFamily: "'Gowun Dodum', sans-serif", fontSize: 18, color: "#3E2723" }}>
-                메뉴 선택 ☕
+                {cafeInfo ? `${cafeInfo.name} 메뉴` : "메뉴 선택 ☕"}
               </h2>
             </div>
             <CoffeeMenuGrid
+              menu={cafeMenu}
               selectedId={selectedMenu?.id ?? null}
               onSelectMenu={handleSelectMenu}
               onSelectCustom={handleSelectCustom}

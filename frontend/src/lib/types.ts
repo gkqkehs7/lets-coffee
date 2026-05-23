@@ -1,6 +1,7 @@
 export type Temperature = "HOT" | "ICED";
 export type Size = "Tall" | "Grande" | "Venti";
 export type ParticipantStatus = "thinking" | "ordering" | "editing" | "decided";
+export type CafeId = "starbucks" | "mega" | "twosome";
 
 export interface Order {
   menu_id: string;
@@ -25,6 +26,7 @@ export interface Room {
   room_id: string;
   room_name: string;
   host_id: string;
+  cafe_id: CafeId;
   is_closed: boolean;
   created_at: string;
   participants: Participant[];
@@ -44,6 +46,7 @@ export interface CreateRoomResponse {
   user_id: string;
   user_name: string;
   room_name: string;
+  cafe_id: CafeId;
 }
 
 export interface JoinRoomResponse {

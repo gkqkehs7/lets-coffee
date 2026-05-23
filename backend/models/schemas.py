@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 Temperature = Literal["HOT", "ICED"]
 Size = Literal["Tall", "Grande", "Venti"]
 ParticipantStatus = Literal["thinking", "ordering", "editing", "decided"]
+CafeId = Literal["starbucks", "mega", "twosome"]
 
 
 class Order(BaseModel):
@@ -32,6 +33,7 @@ class Room(BaseModel):
     room_id: str
     room_name: str
     host_id: str
+    cafe_id: CafeId = "starbucks"
     is_closed: bool = False
     participants: dict[str, Participant] = Field(default_factory=dict)
 
@@ -41,6 +43,7 @@ class Room(BaseModel):
 class CreateRoomRequest(BaseModel):
     room_name: str = Field(min_length=1, max_length=50)
     host_name: str = Field(min_length=1, max_length=20)
+    cafe_id: CafeId = "starbucks"
 
 
 class CreateRoomResponse(BaseModel):
@@ -48,6 +51,7 @@ class CreateRoomResponse(BaseModel):
     user_id: str
     user_name: str
     room_name: str
+    cafe_id: CafeId
 
 
 class JoinRoomRequest(BaseModel):
@@ -64,6 +68,7 @@ class JoinRoomResponse(BaseModel):
 class RoomResponse(BaseModel):
     room_id: str
     room_name: str
+    cafe_id: CafeId
     is_closed: bool
     participants: list[Participant]
 

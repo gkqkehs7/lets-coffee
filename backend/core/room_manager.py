@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime
 from typing import Optional
 
 from nanoid import generate
@@ -18,7 +17,7 @@ class RoomManager:
         self._rooms: dict[str, Room] = {}
         self._lock = asyncio.Lock()
 
-    async def create_room(self, room_name: str, host_name: str) -> tuple[Room, Participant]:
+    async def create_room(self, room_name: str, host_name: str, cafe_id: str = "starbucks") -> tuple[Room, Participant]:
         async with self._lock:
             room_id = _new_id(8)
             user_id = _new_id(12)
@@ -33,6 +32,7 @@ class RoomManager:
                 room_id=room_id,
                 room_name=room_name,
                 host_id=user_id,
+                cafe_id=cafe_id,  # type: ignore[arg-type]
                 participants={user_id: host},
             )
             self._rooms[room_id] = room

@@ -14,12 +14,13 @@ router = APIRouter(prefix="/api/rooms", tags=["rooms"])
 
 @router.post("", response_model=CreateRoomResponse)
 async def create_room(body: CreateRoomRequest) -> CreateRoomResponse:
-    room, host = await room_manager.create_room(body.room_name, body.host_name)
+    room, host = await room_manager.create_room(body.room_name, body.host_name, body.cafe_id)
     return CreateRoomResponse(
         room_id=room.room_id,
         user_id=host.user_id,
         user_name=host.user_name,
         room_name=room.room_name,
+        cafe_id=room.cafe_id,
     )
 
 
@@ -31,6 +32,7 @@ async def get_room(room_id: str) -> RoomResponse:
     return RoomResponse(
         room_id=room.room_id,
         room_name=room.room_name,
+        cafe_id=room.cafe_id,
         is_closed=room.is_closed,
         participants=list(room.participants.values()),
     )

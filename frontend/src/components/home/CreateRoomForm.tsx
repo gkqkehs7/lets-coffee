@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { saveSession } from "@/lib/session";
+import { CAFE_LIST } from "@/lib/menu-data";
+import type { CafeId } from "@/lib/types";
 
 const BG_EMOJIS = [
   { e: "☕", size: 44, left: "8%",  top: "10%", dur: 3.0 },
@@ -16,6 +19,7 @@ const BG_EMOJIS = [
 
 export function CreateRoomForm() {
   const router = useRouter();
+  const [cafeId, setCafeId] = useState<CafeId>("starbucks");
   const [roomName, setRoomName] = useState("");
   const [hostName, setHostName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,7 +33,7 @@ export function CreateRoomForm() {
     setLoading(true);
     setError(null);
     try {
-      const res = await api.createRoom(roomName.trim(), hostName.trim());
+      const res = await api.createRoom(roomName.trim(), hostName.trim(), cafeId);
       saveSession({
         user_id:  res.user_id,
         user_name: res.user_name,
@@ -146,7 +150,93 @@ export function CreateRoomForm() {
             animationDelay: "0.1s",
           }}
         >
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+            {/* 카페 선택 */}
+            <div>
+              <label
+                style={{ fontSize: 13, fontWeight: 600, color: "#6F4E37", display: "block", marginBottom: 10 }}
+              >
+                ☕ 어느 카페로 주문할까요?
+              </label>
+              <div style={{ display: "flex", gap: 8 }}>
+                {CAFE_LIST.map((cafe) => {
+                  const selected = cafeId === cafe.id;
+                  return (
+                    <button
+                      key={cafe.id}
+                      type="button"
+                      onClick={() => setCafeId(cafe.id)}
+                      style={{
+                        flex: 1,
+                        padding: "12px 8px",
+                        borderRadius: 16,
+                        border: `2px solid ${selected ? cafe.color : "#F5E6D3"}`,
+                        background: selected ? `${cafe.color}12` : "#FAFAFA",
+                        cursor: "pointer",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 6,
+                        transition: "all 0.15s",
+                        outline: "none",
+                      }}
+                    >
+                      {/* 카페 로고 — 이미지가 없으면 color dot으로 fallback */}
+                      <div
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 12,
+                          overflow: "hidden",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          background: `${cafe.color}22`,
+                          position: "relative",
+                        }}
+                      >
+                        <Image
+                          src={cafe.logoPath}
+                          alt={cafe.name}
+                          width={40}
+                          height={40}
+                          style={{ objectFit: "contain", borderRadius: 10 }}
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).style.display = "none";
+                          }}
+                        />
+                      </div>
+                      <span
+                        style={{
+                          fontSize: 11,
+                          fontWeight: 700,
+                          color: selected ? cafe.color : "#8D6E63",
+                          lineHeight: 1.2,
+                          textAlign: "center",
+                        }}
+                      >
+                        {cafe.name}
+                      </span>
+                      {selected && (
+                        <div
+                          style={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: "50%",
+                            background: cafe.color,
+                          }}
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 구분선 */}
+            <div style={{ height: 1, background: "#F5E6D3" }} />
+
             <div>
               <label
                 style={{ fontSize: 13, fontWeight: 600, color: "#6F4E37", display: "block", marginBottom: 8 }}
@@ -186,7 +276,7 @@ export function CreateRoomForm() {
               className="btn-hover"
               disabled={!canSubmit}
               style={{
-                marginTop: 8,
+                marginTop: 4,
                 padding: "16px",
                 borderRadius: 18,
                 background: canSubmit
