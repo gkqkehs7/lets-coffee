@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+import logging
 import socketio
 
 from core.room_manager import room_manager
 from models.schemas import Order
+
+logging.basicConfig(level=logging.DEBUG, format="[%(asctime)s] %(levelname)s %(message)s")
+log = logging.getLogger("sio")
 
 sio = socketio.AsyncServer(
     async_mode="asgi",
@@ -17,24 +21,27 @@ _connections: dict[str, tuple[str, str]] = {}
 
 
 async def _broadcast(event: str, data: dict, room_id: str, skip_sid: str | None = None) -> None:
-    for sid, (r_id, _) in list(_connections.items()):
-        if r_id == room_id and sid != skip_sid:
-            await sio.emit(event, data, to=sid)
+    targets = [(sid, uid) for sid, (r_id, uid) in list(_connections.items()) if r_id == room_id and sid != skip_sid]
+    log.debug("[BROADCAST] event=%s room=%s target_users=%s", event, room_id, [t[1] for t in targets])
+    for t in targets:
+        await sio.emit(event, data, to=t[0])
 
 
 @sio.event
 async def connect(sid: str, environ: dict, auth: dict | None = None) -> None:
-    pass
+    log.debug("[CONNECT] sid=%s  connections_total=%d", sid, len(_connections))
 
 
 @sio.event
 async def disconnect(sid: str) -> None:
     conn = _connections.pop(sid, None)
+    log.debug("[DISCONNECT] sid=%s  was_registered=%s  connections_after=%d", sid, conn is not None, len(_connections))
     if conn is None:
         return
     room_id, user_id = conn
     p = await room_manager.set_online(room_id, user_id, False)
     if p:
+        log.debug("[DISCONNECT] broadcasting participant:left user=%s room=%s", user_id, room_id)
         await _broadcast("participant:left", {"user_id": user_id}, room_id)
 
 
@@ -42,9 +49,11 @@ async def disconnect(sid: str) -> None:
 async def room_join(sid: str, data: dict) -> None:
     room_id: str = data.get("room_id", "")
     user_id: str = data.get("user_id", "")
+    log.debug("[ROOM:JOIN] sid=%s room=%s user=%s", sid, room_id, user_id)
 
     room = await room_manager.get_room(room_id)
     if room is None or user_id not in room.participants:
+        log.warning("[ROOM:JOIN] REJECTED — room_exists=%s user_in_room=%s", room is not None, user_id in (room.participants if room else {}))
         await sio.emit("error", {"message": "방을 찾을 수 없어요"}, to=sid)
         return
 
@@ -52,6 +61,10 @@ async def room_join(sid: str, data: dict) -> None:
     await room_manager.set_online(room_id, user_id, True)
 
     # 방 안 모든 참가자(신규 포함)에게 최신 상태 브로드캐스트
+    room = await room_manager.get_room(room_id)  # set_online 반영된 최신 room 재조회
+    participants_in_room = list(room.participants.keys())
+    connections_in_room = [uid for r_id, uid in _connections.values() if r_id == room_id]
+    log.debug("[ROOM:JOIN] participants_in_room=%s  connections_in_room=%s", participants_in_room, connections_in_room)
     room_state = {
         "room": {
             **room.model_dump(mode="json"),

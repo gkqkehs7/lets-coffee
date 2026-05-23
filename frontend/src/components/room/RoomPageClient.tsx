@@ -47,10 +47,13 @@ export function RoomPageClient({ roomId }: Props) {
     (userId: string) => {
       userIdRef.current = userId;
       const s = socketRef.current;
+      console.log("[SOCKET] joinSocketRoom  user=%s  connected=%s", userId, s.connected);
       if (s.connected) {
+        console.log("[SOCKET] emit room:join  room=%s user=%s", roomId, userId);
         s.emit("room:join", { room_id: roomId, user_id: userId });
+      } else {
+        console.log("[SOCKET] not connected yet — room:join will fire on connect event");
       }
-      // 연결 중이면 connect 이벤트 시 전송됨 (아래 useEffect)
     },
     [roomId],
   );
@@ -59,12 +62,21 @@ export function RoomPageClient({ roomId }: Props) {
   useEffect(() => {
     const s = socketRef.current;
     const handleConnect = () => {
+      console.log("[SOCKET] connected  sid=%s  userIdRef=%s", s.id, userIdRef.current);
       if (userIdRef.current) {
+        console.log("[SOCKET] emit room:join  room=%s user=%s", roomId, userIdRef.current);
         s.emit("room:join", { room_id: roomId, user_id: userIdRef.current });
       }
     };
+    const handleDisconnect = (reason: string) => {
+      console.log("[SOCKET] disconnected  reason=%s  userIdRef=%s", reason, userIdRef.current);
+    };
     s.on("connect", handleConnect);
-    return () => { s.off("connect", handleConnect); };
+    s.on("disconnect", handleDisconnect);
+    return () => {
+      s.off("connect", handleConnect);
+      s.off("disconnect", handleDisconnect);
+    };
   }, [roomId]);
 
   // ── 소켓 이벤트 구독 ──
@@ -73,12 +85,14 @@ export function RoomPageClient({ roomId }: Props) {
 
     s.on("room:state", (data: { room: Room & { participants: Participant[] } }) => {
       const r = data.room;
+      console.log("[EVENT] room:state  participants=%o  is_closed=%s", r.participants.map(p => `${p.user_name}(online=${p.is_online})`), r.is_closed);
       setRoom(r);
       setParticipants(r.participants);
       setIsClosed(r.is_closed);
     });
 
     s.on("participant:joined", (data: { participant: Participant }) => {
+      console.log("[EVENT] participant:joined  user=%s", data.participant.user_name);
       setParticipants((prev) => {
         const exists = prev.find((p) => p.user_id === data.participant.user_id);
         if (exists) {
@@ -91,6 +105,7 @@ export function RoomPageClient({ roomId }: Props) {
     });
 
     s.on("participant:left", (data: { user_id: string }) => {
+      console.log("[EVENT] participant:left  user_id=%s", data.user_id);
       setParticipants((prev) =>
         prev.map((p) =>
           p.user_id === data.user_id ? { ...p, is_online: false } : p,
@@ -99,6 +114,7 @@ export function RoomPageClient({ roomId }: Props) {
     });
 
     s.on("participant:updated", (data: { participant: Participant }) => {
+      console.log("[EVENT] participant:updated  user=%s  status=%s  online=%s", data.participant.user_name, data.participant.status, data.participant.is_online);
       setParticipants((prev) =>
         prev.map((p) =>
           p.user_id === data.participant.user_id ? data.participant : p,
@@ -107,8 +123,13 @@ export function RoomPageClient({ roomId }: Props) {
     });
 
     s.on("room:closed", () => {
+      console.log("[EVENT] room:closed");
       setIsClosed(true);
       showToast("주문이 마감됐어요! ✨");
+    });
+
+    s.on("error", (data: { message: string }) => {
+      console.error("[EVENT] error from server:", data.message);
     });
 
     return () => {
@@ -117,6 +138,7 @@ export function RoomPageClient({ roomId }: Props) {
       s.off("participant:left");
       s.off("participant:updated");
       s.off("room:closed");
+      s.off("error");
     };
   }, [showToast]);
 
@@ -151,7 +173,9 @@ export function RoomPageClient({ roomId }: Props) {
   // ── 이름 입력 후 입장 ──
   const handleJoin = async (name: string) => {
     try {
+      console.log("[JOIN] HTTP joinRoom  name=%s", name);
       const res = await api.joinRoom(roomId, name);
+      console.log("[JOIN] HTTP joinRoom response  user_id=%s", res.user_id);
       saveSession({
         user_id: res.user_id,
         user_name: res.user_name,
@@ -386,6 +410,7 @@ export function RoomPageClient({ roomId }: Props) {
           <RoomView
             participants={displayParticipants}
             currentUserId={myUserId}
+            isHost={isHost}
             roomName={room?.room_name ?? ""}
             isClosed={isClosed}
             onEditOrder={handleEditOrder}
@@ -408,7 +433,15 @@ export function RoomPageClient({ roomId }: Props) {
             <div style={{ display: "flex", gap: 10 }}>
               <button
                 className="btn-hover"
-                onClick={() => setView("menu")}
+                onClick={() => {
+                  setView("menu");
+                  socketRef.current.emit("status:update", { status: "ordering" });
+                  setParticipants((prev) =>
+                    prev.map((p) =>
+                      p.user_id === myUserId ? { ...p, status: "ordering" } : p,
+                    ),
+                  );
+                }}
                 style={{
                   flex: 3, padding: "16px", borderRadius: 18,
                   background: "linear-gradient(135deg, #C9A57B, #6F4E37)",

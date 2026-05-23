@@ -6,6 +6,7 @@ import type { Participant } from "@/lib/types";
 interface Props {
   participants: Participant[];
   currentUserId: string;
+  isHost: boolean;
   roomName: string;
   isClosed: boolean;
   onEditOrder: () => void;
@@ -14,6 +15,7 @@ interface Props {
 export function RoomView({
   participants,
   currentUserId,
+  isHost,
   roomName,
   isClosed,
   onEditOrder,
@@ -193,8 +195,8 @@ export function RoomView({
             ))}
           </div>
 
-          {/* 집계 & 복사 */}
-          {ordered.length >= 1 && (
+          {/* 집계 & 복사 — 방장만 */}
+          {isHost && ordered.length >= 1 && (
             <div
               style={{
                 marginTop: 12,
