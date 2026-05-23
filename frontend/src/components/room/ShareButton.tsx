@@ -14,7 +14,6 @@ export function ShareButton({ roomId }: Props) {
     try {
       await navigator.clipboard.writeText(url);
     } catch {
-      // fallback for older browsers
       const el = document.createElement("textarea");
       el.value = url;
       document.body.appendChild(el);
@@ -28,24 +27,24 @@ export function ShareButton({ roomId }: Props) {
 
   return (
     <button
-      className="btn-hover"
       onClick={handleCopy}
       style={{
-        width: 44,
-        height: 44,
-        borderRadius: 12,
-        background: copied ? "#A8C09A" : "#F5E6D3",
-        color: copied ? "#FFF8F0" : "#8D6E63",
-        border: "none",
-        fontSize: copied ? 11 : 12,
+        width: 38,
+        height: 38,
+        borderRadius: 4,
+        background: copied ? "#1C1C1A" : "transparent",
+        color: copied ? "#F5F3EE" : "#1C1C1A",
+        border: "1.5px solid #1C1C1A",
+        fontSize: 11,
         fontWeight: 700,
         cursor: "pointer",
         fontFamily: "inherit",
-        transition: "background 0.2s",
+        transition: "background 0.15s, color 0.15s",
         flexShrink: 0,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        letterSpacing: "0.02em",
       }}
     >
       {copied ? "✓" : "공유"}

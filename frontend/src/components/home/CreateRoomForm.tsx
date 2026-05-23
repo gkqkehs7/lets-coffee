@@ -8,15 +8,6 @@ import { saveSession } from "@/lib/session";
 import { CAFE_LIST } from "@/lib/menu-data";
 import type { CafeId } from "@/lib/types";
 
-const BG_EMOJIS = [
-  { e: "☕", size: 44, left: "8%",  top: "10%", dur: 3.0 },
-  { e: "🥛", size: 52, left: "75%", top: "5%",  dur: 3.5 },
-  { e: "🍵", size: 36, left: "20%", top: "70%", dur: 3.2 },
-  { e: "🧋", size: 56, left: "60%", top: "80%", dur: 2.8 },
-  { e: "☁️", size: 40, left: "40%", top: "40%", dur: 4.0 },
-  { e: "🍫", size: 48, left: "85%", top: "55%", dur: 3.6 },
-];
-
 export function CreateRoomForm() {
   const router = useRouter();
   const [cafeId, setCafeId] = useState<CafeId>("starbucks");
@@ -35,10 +26,10 @@ export function CreateRoomForm() {
     try {
       const res = await api.createRoom(roomName.trim(), hostName.trim(), cafeId);
       saveSession({
-        user_id:  res.user_id,
+        user_id:   res.user_id,
         user_name: res.user_name,
-        is_host:  true,
-        room_id:  res.room_id,
+        is_host:   true,
+        room_id:   res.room_id,
       });
       router.push(`/room/${res.room_id}`);
     } catch {
@@ -49,116 +40,108 @@ export function CreateRoomForm() {
 
   if (loading) {
     return (
-      <div
-        style={{
-          minHeight: "100vh",
-          background: "#FFF8F0",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-          gap: 16,
-        }}
-      >
-        <div className="animate-float" style={{ fontSize: 48 }}>☕</div>
-        <p style={{ color: "#8D6E63", fontSize: 14 }}>방을 만들고 있어요...</p>
+      <div style={{
+        minHeight: "100vh",
+        background: "#F5F3EE",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "column",
+        gap: 14,
+      }}>
+        <div style={{
+          fontFamily: "'DM Mono', monospace",
+          fontSize: 11,
+          color: "#6B6762",
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+        }}>
+          Creating room...
+        </div>
+        <div style={{
+          width: 120,
+          height: 2,
+          background: "#E8E5E0",
+          position: "relative",
+          overflow: "hidden",
+        }}>
+          <div style={{
+            position: "absolute",
+            top: 0,
+            height: "100%",
+            width: "35%",
+            background: "#D4341A",
+            animation: "scanLine 0.9s linear infinite",
+          }} />
+        </div>
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#FFF8F0",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "24px 20px",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      {/* 배경 이모지 */}
-      <div style={{ position: "fixed", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: 0 }}>
-        {BG_EMOJIS.map((b, i) => (
-          <span
-            key={i}
-            className="animate-float"
-            style={{
-              position: "absolute",
-              fontSize: b.size,
-              opacity: 0.07,
-              left: b.left,
-              top: b.top,
-              animationDuration: `${b.dur}s`,
-              animationDelay: `${i * 0.6}s`,
-            }}
-          >
-            {b.e}
-          </span>
-        ))}
-      </div>
+    <div style={{
+      minHeight: "100vh",
+      background: "#F5F3EE",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "24px 20px",
+    }}>
+      <div style={{ width: "100%", maxWidth: 400 }}>
 
-      {/* 카드 컨테이너 */}
-      <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 420 }}>
-        {/* 로고 */}
-        <div className="animate-fade-up" style={{ textAlign: "center", marginBottom: 40 }}>
-          <div
-            className="animate-float"
-            style={{
-              width: 80,
-              height: 80,
-              background: "linear-gradient(135deg, #C9A57B, #6F4E37)",
-              borderRadius: 28,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 40,
-              margin: "0 auto 16px",
-              boxShadow: "0 8px 24px rgba(111,78,55,0.3)",
-            }}
-          >
-            ☕
+        {/* 헤더 */}
+        <div className="animate-slide-in" style={{ marginBottom: 28 }}>
+          <div style={{
+            fontFamily: "'DM Mono', monospace",
+            fontSize: 10,
+            color: "#B0ADA8",
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            marginBottom: 10,
+          }}>
+            Team Coffee Order
           </div>
-          <h1
-            style={{
-              fontFamily: "'Gowun Dodum', sans-serif",
-              fontSize: 26,
-              fontWeight: 700,
-              color: "#3E2723",
-              lineHeight: 1.3,
-            }}
-          >
+          <h1 style={{
+            fontSize: 28,
+            fontWeight: 800,
+            color: "#1C1C1A",
+            letterSpacing: "-0.02em",
+            lineHeight: 1.15,
+          }}>
             커피 뭐드실래요?
           </h1>
-          <p style={{ color: "#8D6E63", fontSize: 14, marginTop: 6 }}>
-            링크 하나로 팀 커피 주문 끝! ✨
+          <p style={{ color: "#6B6762", fontSize: 14, marginTop: 6 }}>
+            링크 하나로 팀 커피 주문 끝
           </p>
         </div>
 
         {/* 폼 카드 */}
         <div
-          className="animate-fade-up"
+          className="animate-slide-in"
           style={{
             background: "#FFFFFF",
-            borderRadius: 28,
-            padding: "32px 28px",
-            boxShadow: "0 4px 32px rgba(111,78,55,0.12)",
-            border: "1.5px solid #F5E6D3",
-            animationDelay: "0.1s",
+            border: "1.5px solid #1C1C1A",
+            borderRadius: 4,
+            padding: "28px 24px",
+            boxShadow: "4px 4px 0 #1C1C1A",
+            animationDelay: "0.05s",
           }}
         >
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
             {/* 카페 선택 */}
             <div>
-              <label
-                style={{ fontSize: 13, fontWeight: 600, color: "#6F4E37", display: "block", marginBottom: 10 }}
-              >
-                ☕ 어느 카페로 주문할까요?
-              </label>
+              <div style={{
+                fontSize: 10,
+                fontWeight: 700,
+                color: "#6B6762",
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                marginBottom: 10,
+              }}>
+                카페 선택
+              </div>
               <div style={{ display: "flex", gap: 8 }}>
                 {CAFE_LIST.map((cafe) => {
                   const selected = cafeId === cafe.id;
@@ -170,82 +153,74 @@ export function CreateRoomForm() {
                       style={{
                         flex: 1,
                         padding: "12px 8px",
-                        borderRadius: 16,
-                        border: `2px solid ${selected ? cafe.color : "#F5E6D3"}`,
-                        background: selected ? `${cafe.color}12` : "#FAFAFA",
+                        border: selected ? `2px solid ${cafe.color}` : "1.5px solid #D0CCC7",
+                        borderRadius: 4,
+                        background: selected ? `${cafe.color}0D` : "#FFFFFF",
                         cursor: "pointer",
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
                         gap: 6,
-                        transition: "all 0.15s",
+                        transition: "all 0.12s",
                         outline: "none",
+                        boxShadow: selected ? `2px 2px 0 ${cafe.color}` : "none",
                       }}
                     >
-                      {/* 카페 로고 — 이미지가 없으면 color dot으로 fallback */}
-                      <div
-                        style={{
-                          width: 40,
-                          height: 40,
-                          borderRadius: 12,
-                          overflow: "hidden",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          background: `${cafe.color}22`,
-                          position: "relative",
-                        }}
-                      >
+                      <div style={{
+                        width: 36,
+                        height: 36,
+                        border: `1.5px solid ${selected ? cafe.color : "#D0CCC7"}`,
+                        borderRadius: 4,
+                        overflow: "hidden",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: "#FFFFFF",
+                        position: "relative",
+                      }}>
                         <Image
                           src={cafe.logoPath}
                           alt={cafe.name}
-                          width={40}
-                          height={40}
-                          style={{ objectFit: "contain", borderRadius: 10 }}
+                          width={36}
+                          height={36}
+                          style={{ objectFit: "contain" }}
                           onError={(e) => {
                             (e.currentTarget as HTMLImageElement).style.display = "none";
                           }}
                         />
                       </div>
-                      <span
-                        style={{
-                          fontSize: 11,
-                          fontWeight: 700,
-                          color: selected ? cafe.color : "#8D6E63",
-                          lineHeight: 1.2,
-                          textAlign: "center",
-                        }}
-                      >
+                      <span style={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: selected ? cafe.color : "#6B6762",
+                        lineHeight: 1.2,
+                        textAlign: "center",
+                      }}>
                         {cafe.name}
                       </span>
-                      {selected && (
-                        <div
-                          style={{
-                            width: 6,
-                            height: 6,
-                            borderRadius: "50%",
-                            background: cafe.color,
-                          }}
-                        />
-                      )}
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            {/* 구분선 */}
-            <div style={{ height: 1, background: "#F5E6D3" }} />
+            <div style={{ borderTop: "1.5px dashed #D0CCC7" }} />
 
             <div>
-              <label
-                style={{ fontSize: 13, fontWeight: 600, color: "#6F4E37", display: "block", marginBottom: 8 }}
-              >
-                오늘의 커피타임 이름
+              <label style={{
+                fontSize: 10,
+                fontWeight: 700,
+                color: "#6B6762",
+                display: "block",
+                marginBottom: 8,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+              }}>
+                커피타임 이름
               </label>
               <input
                 className="input-field"
-                placeholder="예: 오후 3시 커피타임"
+                placeholder="오후 3시 커피타임"
                 value={roomName}
                 onChange={(e) => setRoomName(e.target.value)}
                 maxLength={50}
@@ -253,14 +228,20 @@ export function CreateRoomForm() {
             </div>
 
             <div>
-              <label
-                style={{ fontSize: 13, fontWeight: 600, color: "#6F4E37", display: "block", marginBottom: 8 }}
-              >
-                👤 내 이름
+              <label style={{
+                fontSize: 10,
+                fontWeight: 700,
+                color: "#6B6762",
+                display: "block",
+                marginBottom: 8,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+              }}>
+                내 이름
               </label>
               <input
                 className="input-field"
-                placeholder="예: 민우"
+                placeholder="민우"
                 value={hostName}
                 onChange={(e) => setHostName(e.target.value)}
                 maxLength={20}
@@ -268,45 +249,29 @@ export function CreateRoomForm() {
             </div>
 
             {error && (
-              <p style={{ color: "#E57373", fontSize: 13, textAlign: "center" }}>{error}</p>
+              <p style={{ color: "#D4341A", fontSize: 13 }}>{error}</p>
             )}
 
             <button
               type="submit"
-              className="btn-hover"
+              className="btn-primary"
               disabled={!canSubmit}
-              style={{
-                marginTop: 4,
-                padding: "16px",
-                borderRadius: 18,
-                background: canSubmit
-                  ? "linear-gradient(135deg, #C9A57B, #6F4E37)"
-                  : "#F5E6D3",
-                color: canSubmit ? "#FFF8F0" : "#C9A57B",
-                border: "none",
-                fontSize: 16,
-                fontWeight: 700,
-                fontFamily: "'Gowun Dodum', sans-serif",
-                cursor: canSubmit ? "pointer" : "not-allowed",
-                transition: "all 0.2s",
-              }}
+              style={{ padding: "15px", fontSize: 15, width: "100%" }}
             >
-              방 만들기 🎉
+              방 만들기
             </button>
           </form>
         </div>
 
-        <p
-          className="animate-fade-up"
-          style={{
-            textAlign: "center",
-            color: "#C9A57B",
-            fontSize: 13,
-            marginTop: 20,
-            animationDelay: "0.2s",
-          }}
-        >
-          로그인 없이 바로 시작해요 🥱
+        <p style={{
+          textAlign: "center",
+          color: "#B0ADA8",
+          fontSize: 11,
+          marginTop: 16,
+          fontFamily: "'DM Mono', monospace",
+          letterSpacing: "0.04em",
+        }}>
+          로그인 없이 바로 시작
         </p>
       </div>
     </div>

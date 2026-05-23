@@ -14,30 +14,30 @@ export function Toast({ message, onDone }: Props) {
   }, [onDone]);
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: 100,
-        left: 0,
-        right: 0,
-        display: "flex",
-        justifyContent: "center",
-        pointerEvents: "none",
-        zIndex: 9000,
-      }}
-    >
+    <div style={{
+      position: "fixed",
+      bottom: 100,
+      left: 0,
+      right: 0,
+      display: "flex",
+      justifyContent: "center",
+      pointerEvents: "none",
+      zIndex: 9000,
+    }}>
       <div
-        className="animate-pop-in"
+        className="animate-slide-in"
         style={{
-          background: "#3E2723",
-          color: "#FFF8F0",
-          padding: "12px 24px",
-          borderRadius: 999,
-          fontSize: 14,
+          background: "#1C1C1A",
+          color: "#F5F3EE",
+          padding: "10px 20px",
+          borderRadius: 4,
+          fontSize: 13,
           fontWeight: 600,
-          boxShadow: "0 4px 20px rgba(62,39,35,0.35)",
+          border: "1.5px solid #1C1C1A",
+          boxShadow: "3px 3px 0 #6B6762",
           whiteSpace: "nowrap",
           pointerEvents: "auto",
+          fontFamily: "inherit",
         }}
       >
         {message}
