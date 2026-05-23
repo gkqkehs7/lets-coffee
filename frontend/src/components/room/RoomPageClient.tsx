@@ -345,7 +345,7 @@ export function RoomPageClient({ roomId }: Props) {
         position: "sticky", top: 0, zIndex: 100,
       }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-          {/* 왼쪽: 방 이름 + 상태 */}
+          {/* 왼쪽: 방 이름 + 카페 + 상태 */}
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <h1 style={{
@@ -354,51 +354,44 @@ export function RoomPageClient({ roomId }: Props) {
               }}>
                 {room?.room_name}
               </h1>
-              {!isClosed && <ShareButton roomId={roomId} />}
               {isClosed && (
                 <span className="chip" style={{ background: "#F5E6D3", color: "#6F4E37", fontSize: 12 }}>
                   ✨ 마감
                 </span>
               )}
             </div>
-            <div style={{ fontSize: 12, color: "#8D6E63", marginTop: 3 }}>
-              {isClosed
-                ? "🔒 주문이 마감됐어요"
-                : `${decidedCount}/${onlineCount}명 주문 완료`}
+            {/* 카페 + 상태 한 줄 */}
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 5 }}>
+              {cafeInfo && (
+                <div style={{
+                  display: "flex", alignItems: "center", gap: 5,
+                  padding: "3px 8px 3px 4px",
+                  borderRadius: 20,
+                  background: `${cafeInfo.color}12`,
+                  border: `1px solid ${cafeInfo.color}30`,
+                }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={cafeInfo.logoPath}
+                    alt={cafeInfo.name}
+                    width={16}
+                    height={16}
+                    style={{ objectFit: "contain", borderRadius: 4 }}
+                  />
+                  <span style={{ fontSize: 11, fontWeight: 700, color: cafeInfo.color }}>
+                    {cafeInfo.name}
+                  </span>
+                </div>
+              )}
+              <span style={{ fontSize: 11, color: "#B0A090" }}>·</span>
+              <span style={{ fontSize: 11, color: "#8D6E63" }}>
+                {isClosed ? "🔒 주문 마감" : `${decidedCount}/${onlineCount}명 주문 완료`}
+              </span>
             </div>
           </div>
 
-          {/* 오른쪽: 카페 로고 + 이름 */}
-          {cafeInfo && (
-            <div style={{
-              display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
-              flexShrink: 0,
-            }}>
-              <div style={{
-                width: 44, height: 44, borderRadius: 14,
-                overflow: "hidden",
-                background: `${cafeInfo.color}18`,
-                border: `1.5px solid ${cafeInfo.color}33`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={cafeInfo.logoPath}
-                  alt={cafeInfo.name}
-                  width={36}
-                  height={36}
-                  style={{ objectFit: "contain", borderRadius: 8 }}
-                />
-              </div>
-              <span style={{
-                fontSize: 10, fontWeight: 700,
-                color: cafeInfo.color,
-                letterSpacing: "-0.02em",
-              }}>
-                {cafeInfo.name}
-              </span>
-            </div>
-          )}
+          {/* 오른쪽: 공유 버튼 */}
+          {!isClosed && <ShareButton roomId={roomId} />}
         </div>
       </div>
 

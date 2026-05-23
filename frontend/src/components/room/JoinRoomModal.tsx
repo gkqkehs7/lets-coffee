@@ -28,56 +28,51 @@ export function JoinRoomModal({ roomName, cafeInfo, onJoin }: Props) {
     <div className="modal-overlay">
       <div className="modal-sheet animate-pop-in" style={{ maxWidth: 420 }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
-          {/* 카페 로고 */}
-          {cafeInfo ? (
-            <div style={{
-              width: 64, height: 64, borderRadius: 20,
-              background: `${cafeInfo.color}18`,
-              border: `2px solid ${cafeInfo.color}33`,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              margin: "0 auto 12px",
-              overflow: "hidden",
+          {/* 카페 로고 + 이름 한 줄 */}
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 8,
+            padding: "6px 14px 6px 8px",
+            borderRadius: 24,
+            background: cafeInfo ? `${cafeInfo.color}12` : "#F5E6D3",
+            border: `1.5px solid ${cafeInfo ? `${cafeInfo.color}35` : "#E8D5C0"}`,
+            marginBottom: 16,
+          }}>
+            {cafeInfo ? (
+              <div style={{
+                width: 32, height: 32, borderRadius: 10,
+                overflow: "hidden", flexShrink: 0,
+                background: `${cafeInfo.color}20`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={cafeInfo.logoPath}
+                  alt={cafeInfo.name}
+                  width={26}
+                  height={26}
+                  style={{ objectFit: "contain" }}
+                />
+              </div>
+            ) : (
+              <span style={{ fontSize: 24 }}>☕</span>
+            )}
+            <span style={{
+              fontSize: 14, fontWeight: 700,
+              color: cafeInfo ? cafeInfo.color : "#6F4E37",
             }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={cafeInfo.logoPath}
-                alt={cafeInfo.name}
-                width={48}
-                height={48}
-                style={{ objectFit: "contain" }}
-              />
-            </div>
-          ) : (
-            <div style={{ fontSize: 48, marginBottom: 12 }}>☕</div>
-          )}
+              {cafeInfo ? cafeInfo.name : "커피 주문"}
+            </span>
+          </div>
 
-          {/* 카페 이름 뱃지 */}
-          {cafeInfo && (
-            <div style={{
-              display: "inline-block",
-              padding: "4px 12px",
-              borderRadius: 20,
-              background: `${cafeInfo.color}15`,
-              border: `1px solid ${cafeInfo.color}40`,
-              fontSize: 12, fontWeight: 700,
-              color: cafeInfo.color,
-              marginBottom: 10,
-            }}>
-              {cafeInfo.name}
-            </div>
-          )}
-
-          <h2
-            style={{
-              fontFamily: "'Gowun Dodum', sans-serif",
-              fontSize: 20,
-              color: "#3E2723",
-              display: "block",
-            }}
-          >
+          {/* 방 이름 */}
+          <h2 style={{
+            fontFamily: "'Gowun Dodum', sans-serif",
+            fontSize: 22, color: "#3E2723",
+            marginBottom: 6,
+          }}>
             {roomName}
           </h2>
-          <p style={{ color: "#8D6E63", fontSize: 14, marginTop: 4 }}>
+          <p style={{ color: "#8D6E63", fontSize: 13 }}>
             커피 주문에 참여해요!
           </p>
         </div>
