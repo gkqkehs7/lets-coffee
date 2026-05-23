@@ -21,51 +21,28 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack }: Props) {
   const handleSubmit = () => {
     if (!canSubmit) return;
     onSubmit({
-      menu_id:     isCustom ? "custom" : menuItem.id,
-      menu_name:   isCustom ? customName.trim() : menuItem.name,
-      menu_emoji:  isCustom ? "✏️" : menuItem.emoji,
+      menu_id:    isCustom ? "custom" : menuItem.id,
+      menu_name:  isCustom ? customName.trim() : menuItem.name,
+      menu_emoji: isCustom ? "✏️" : menuItem.emoji,
       temperature: temp,
       size,
       note,
     });
   };
 
-  const sectionLabel = (text: string) => (
-    <div style={{
-      fontSize: 10,
-      fontWeight: 700,
-      color: "#6B6762",
-      letterSpacing: "0.1em",
-      textTransform: "uppercase",
-      marginBottom: 10,
-    }}>
-      {text}
-    </div>
-  );
-
   return (
-    <div className="animate-slide-in" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-
+    <div className="animate-fade-up" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {/* 메뉴 헤더 */}
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 12,
-        paddingBottom: 16,
-        borderBottom: "1.5px solid #1C1C1A",
-      }}>
-        <div style={{
-          width: 48,
-          height: 48,
-          border: "1.5px solid #D0CCC7",
-          borderRadius: 4,
-          background: "#F5F3EE",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 26,
-          flexShrink: 0,
-        }}>
+      <div
+        style={{
+          background: "linear-gradient(135deg, #F5E6D3, #FFF8F0)",
+          borderRadius: 20,
+          padding: "20px",
+          textAlign: "center",
+          border: "1.5px solid #F5E6D3",
+        }}
+      >
+        <div style={{ fontSize: 56, marginBottom: 8 }}>
           {isCustom ? "✏️" : menuItem.emoji}
         </div>
         {isCustom ? (
@@ -75,19 +52,27 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack }: Props) {
             value={customName}
             onChange={(e) => setCustomName(e.target.value)}
             autoFocus
-            style={{ fontSize: 15, fontWeight: 700, flex: 1, width: "auto" }}
+            style={{ textAlign: "center", fontSize: 17, fontWeight: 700 }}
           />
         ) : (
-          <div>
-            <div style={{ fontSize: 17, fontWeight: 700, color: "#1C1C1A" }}>{menuItem.name}</div>
-            <div style={{ fontSize: 12, color: "#6B6762", marginTop: 2 }}>옵션을 선택해주세요</div>
+          <div
+            style={{
+              fontFamily: "'Gowun Dodum', sans-serif",
+              fontSize: 20,
+              fontWeight: 700,
+              color: "#3E2723",
+            }}
+          >
+            {menuItem.name}
           </div>
         )}
       </div>
 
       {/* 온도 */}
       <div>
-        {sectionLabel("온도")}
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#6F4E37", marginBottom: 10 }}>
+          온도
+        </div>
         <div className="toggle-group">
           {(["HOT", "ICED"] as Temperature[]).map((t) => (
             <button
@@ -96,7 +81,7 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack }: Props) {
               onClick={() => setTemp(t)}
               type="button"
             >
-              {t === "HOT" ? "HOT" : "ICED"}
+              {t === "HOT" ? "🔥 HOT" : "🧊 ICED"}
             </button>
           ))}
         </div>
@@ -104,7 +89,9 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack }: Props) {
 
       {/* 사이즈 */}
       <div>
-        {sectionLabel("사이즈")}
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#6F4E37", marginBottom: 10 }}>
+          사이즈
+        </div>
         <div className="toggle-group">
           {(["Tall", "Grande", "Venti"] as Size[]).map((s) => (
             <button
@@ -113,7 +100,7 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack }: Props) {
               onClick={() => setSize(s)}
               type="button"
             >
-              {s === "Tall" ? "S · Tall" : s === "Grande" ? "M · Grande" : "L · Venti"}
+              {s === "Tall" ? "S" : s === "Grande" ? "M" : "L"}
             </button>
           ))}
         </div>
@@ -121,33 +108,59 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack }: Props) {
 
       {/* 메모 */}
       <div>
-        {sectionLabel("메모 (선택)")}
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#6F4E37", marginBottom: 10 }}>
+          메모
+        </div>
         <input
           className="input-field"
-          placeholder="얼음 적게, 달달하게 등"
+          placeholder="예: 얼음 적게요, 달달하게요 🥰"
           value={note}
           onChange={(e) => setNote(e.target.value)}
         />
       </div>
 
       {/* 버튼 */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, paddingTop: 4 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <button
           type="button"
-          className="btn-primary"
+          className="btn-hover"
           onClick={handleSubmit}
           disabled={!canSubmit}
-          style={{ width: "100%", padding: "15px", fontSize: 15 }}
+          style={{
+            width: "100%",
+            padding: "16px",
+            borderRadius: 18,
+            background: canSubmit
+              ? "linear-gradient(135deg, #C9A57B, #6F4E37)"
+              : "#F5E6D3",
+            color: canSubmit ? "#FFF8F0" : "#C9A57B",
+            border: "none",
+            fontSize: 16,
+            fontWeight: 700,
+            cursor: canSubmit ? "pointer" : "not-allowed",
+            fontFamily: "'Gowun Dodum', sans-serif",
+          }}
         >
-          주문 완료
+          주문 완료 ✨
         </button>
         <button
           type="button"
-          className="btn-ghost"
+          className="btn-hover"
           onClick={onBack}
-          style={{ width: "100%", padding: "12px", fontSize: 14 }}
+          style={{
+            width: "100%",
+            padding: "13px",
+            borderRadius: 16,
+            background: "#F5E6D3",
+            color: "#6F4E37",
+            border: "none",
+            fontSize: 14,
+            fontWeight: 600,
+            cursor: "pointer",
+            fontFamily: "inherit",
+          }}
         >
-          다시 고를게요
+          ← 다시 고를게요
         </button>
       </div>
     </div>

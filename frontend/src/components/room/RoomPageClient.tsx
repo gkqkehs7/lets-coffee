@@ -38,10 +38,12 @@ export function RoomPageClient({ roomId }: Props) {
   const [toast, setToast] = useState<string | null>(null);
 
   const socketRef = useRef(connectSocket());
+  // userId를 ref에도 저장 — 소켓 재연결 시 room:join 재전송에 사용
   const userIdRef = useRef<string | null>(null);
 
   const showToast = useCallback((msg: string) => setToast(msg), []);
 
+  // ── 소켓 room:join 전송 (연결 완료 보장) ──
   const joinSocketRoom = useCallback(
     (userId: string) => {
       userIdRef.current = userId;
@@ -57,6 +59,7 @@ export function RoomPageClient({ roomId }: Props) {
     [roomId],
   );
 
+  // ── 소켓 연결/재연결 시 항상 room:join 전송 ──
   useEffect(() => {
     const s = socketRef.current;
     const handleConnect = () => {
@@ -77,6 +80,7 @@ export function RoomPageClient({ roomId }: Props) {
     };
   }, [roomId]);
 
+  // ── 소켓 이벤트 구독 ──
   useEffect(() => {
     const s = socketRef.current;
 
@@ -122,7 +126,7 @@ export function RoomPageClient({ roomId }: Props) {
     s.on("room:closed", () => {
       console.log("[EVENT] room:closed");
       setIsClosed(true);
-      showToast("주문이 마감됐어요");
+      showToast("주문이 마감됐어요! ✨");
     });
 
     s.on("error", (data: { message: string }) => {
@@ -139,6 +143,7 @@ export function RoomPageClient({ roomId }: Props) {
     };
   }, [showToast]);
 
+  // ── 초기 로드 ──
   useEffect(() => {
     let mounted = true;
     (async () => {
@@ -166,26 +171,28 @@ export function RoomPageClient({ roomId }: Props) {
     return () => { mounted = false; };
   }, [roomId, joinSocketRoom]);
 
+  // ── 이름 입력 후 입장 ──
   const handleJoin = async (name: string) => {
     try {
       console.log("[JOIN] HTTP joinRoom  name=%s", name);
       const res = await api.joinRoom(roomId, name);
       console.log("[JOIN] HTTP joinRoom response  user_id=%s", res.user_id);
       saveSession({
-        user_id:   res.user_id,
+        user_id: res.user_id,
         user_name: res.user_name,
-        is_host:   res.is_host,
-        room_id:   roomId,
+        is_host: res.is_host,
+        room_id: roomId,
       });
       setMyUserId(res.user_id);
       setIsHost(res.is_host);
       setShowJoin(false);
       joinSocketRoom(res.user_id);
     } catch {
-      showToast("입장에 실패했어요");
+      showToast("입장에 실패했어요 😢");
     }
   };
 
+  // ── 메뉴 선택 ──
   const handleSelectMenu = (item: MenuItem) => {
     setSelectedMenu(item);
     setView("options");
@@ -201,6 +208,7 @@ export function RoomPageClient({ roomId }: Props) {
     handleSelectMenu({ id: "custom", name: "", emoji: "✏️", category: "coffee", iced: true });
   };
 
+  // ── 주문 제출 ──
   const handleSubmitOrder = (order: Order) => {
     socketRef.current.emit("order:submit", { order });
     setParticipants((prev) =>
@@ -210,9 +218,10 @@ export function RoomPageClient({ roomId }: Props) {
     );
     setView("room");
     setShowConfetti(true);
-    showToast("주문 완료!");
+    showToast("주문 완료! ✨");
   };
 
+  // ── 수정 ──
   const handleEditOrder = () => {
     socketRef.current.emit("order:edit", {});
     socketRef.current.emit("status:update", { status: "editing" });
@@ -224,6 +233,7 @@ export function RoomPageClient({ roomId }: Props) {
     setView("menu");
   };
 
+  // ── 메뉴/옵션 취소 (room으로 복귀) ──
   const handleCancelToRoom = () => {
     socketRef.current.emit("status:update", { status: "thinking" });
     setParticipants((prev) =>
@@ -234,111 +244,82 @@ export function RoomPageClient({ roomId }: Props) {
     setView("room");
   };
 
+  // ── 안먹기 ──
   const handleSkip = () => {
     socketRef.current.emit("order:skip", {});
     const skipOrder: Order = {
-      menu_id:     "skip",
-      menu_name:   "안먹을게요",
-      menu_emoji:  "🙅",
+      menu_id: "skip",
+      menu_name: "안먹을게요",
+      menu_emoji: "🙅",
       temperature: null,
-      size:        null,
-      note:        "",
+      size: null,
+      note: "",
     };
     setParticipants((prev) =>
       prev.map((p) =>
         p.user_id === myUserId ? { ...p, status: "decided", order: skipOrder } : p,
       ),
     );
-    showToast("안먹기로 했어요");
+    showToast("안먹기로 했어요 🙅");
   };
 
+  // ── 방 마감 ──
   const handleCloseRoom = () => {
     socketRef.current.emit("room:close", {});
     setIsClosed(true);
-    showToast("주문이 마감됐어요");
+    showToast("주문이 마감됐어요! ✨");
   };
 
+  // ── 언마운트 시 소켓 해제 ──
   useEffect(() => {
     return () => { disconnectSocket(); };
   }, []);
 
+  // 내가 화면을 보고 있으면 무조건 온라인 — 백엔드 응답을 기다릴 필요 없음
   const displayParticipants = myUserId
     ? participants.map((p) => p.user_id === myUserId ? { ...p, is_online: true } : p)
     : participants;
 
-  const myOrder       = displayParticipants.find((p) => p.user_id === myUserId)?.order ?? null;
-  const onlineParticipants = displayParticipants.filter((p) => p.is_online);
-  const decidedCount  = displayParticipants.filter((p) => p.order !== null).length;
+  const myOrder = displayParticipants.find((p) => p.user_id === myUserId)?.order ?? null;
+  const onlineCount = displayParticipants.filter((p) => p.is_online).length;
+  const decidedCount = displayParticipants.filter((p) => p.order !== null).length;
 
   const cafeMenu = room ? getMenuByCafe(room.cafe_id) : [];
   const cafeInfo = room ? getCafeInfo(room.cafe_id) : null;
 
-  /* ── 로딩 ── */
   if (loading) {
     return (
       <div style={{
-        minHeight: "100vh",
-        background: "#F5F3EE",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "column",
-        gap: 14,
+        minHeight: "100vh", background: "#FFF8F0",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        flexDirection: "column", gap: 16,
       }}>
-        <div style={{
-          fontFamily: "'DM Mono', monospace",
-          fontSize: 11,
-          color: "#6B6762",
-          letterSpacing: "0.1em",
-          textTransform: "uppercase",
-        }}>
-          Loading...
-        </div>
-        <div style={{ width: 120, height: 2, background: "#E8E5E0", position: "relative", overflow: "hidden" }}>
-          <div style={{
-            position: "absolute",
-            top: 0,
-            height: "100%",
-            width: "35%",
-            background: "#D4341A",
-            animation: "scanLine 0.9s linear infinite",
-          }} />
-        </div>
+        <div className="animate-float" style={{ fontSize: 48 }}>☕</div>
+        <p style={{ color: "#8D6E63", fontSize: 14 }}>방 정보 불러오는 중...</p>
       </div>
     );
   }
 
-  /* ── 없는 방 ── */
   if (notFound) {
     return (
       <div style={{
-        minHeight: "100vh",
-        background: "#F5F3EE",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "column",
-        gap: 16,
-        textAlign: "center",
-        padding: 24,
+        minHeight: "100vh", background: "#FFF8F0",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        flexDirection: "column", gap: 16, textAlign: "center", padding: 24,
       }}>
-        <div style={{
-          fontFamily: "'DM Mono', monospace",
-          fontSize: 10,
-          color: "#B0ADA8",
-          letterSpacing: "0.12em",
-          textTransform: "uppercase",
-        }}>
-          404 Not Found
-        </div>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: "#1C1C1A", letterSpacing: "-0.01em" }}>
+        <div style={{ fontSize: 48 }}>😢</div>
+        <h2 style={{ fontFamily: "'Gowun Dodum', sans-serif", fontSize: 22, color: "#3E2723" }}>
           방을 찾을 수 없어요
         </h2>
-        <p style={{ color: "#6B6762", fontSize: 14 }}>링크가 만료됐거나 잘못됐어요.</p>
+        <p style={{ color: "#8D6E63", fontSize: 14 }}>링크가 만료됐거나 잘못됐어요.</p>
         <a
           href="/"
-          className="btn-secondary"
-          style={{ marginTop: 8, padding: "12px 24px", fontSize: 14, textDecoration: "none" }}
+          style={{
+            marginTop: 8, padding: "12px 24px", borderRadius: 18,
+            background: "linear-gradient(135deg, #C9A57B, #6F4E37)",
+            color: "#FFF8F0", textDecoration: "none", fontSize: 14, fontWeight: 700,
+            fontFamily: "'Gowun Dodum', sans-serif",
+          }}
         >
           홈으로 돌아가기
         </a>
@@ -348,114 +329,90 @@ export function RoomPageClient({ roomId }: Props) {
 
   return (
     <div style={{
-      minHeight: "100vh",
-      background: "#F5F3EE",
-      display: "flex",
-      flexDirection: "column",
-      maxWidth: 480,
-      margin: "0 auto",
+      minHeight: "100vh", background: "#FFF8F0",
+      display: "flex", flexDirection: "column",
+      maxWidth: 480, margin: "0 auto",
     }}>
       {showConfetti && <Confetti onDone={() => setShowConfetti(false)} />}
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       {showJoin && room && <JoinRoomModal roomName={room.room_name} cafeInfo={cafeInfo} onJoin={handleJoin} />}
 
-      {/* ── 헤더 ── */}
+      {/* 헤더 */}
       <div style={{
         background: "#FFFFFF",
-        padding: "14px 20px 12px",
-        borderBottom: "1.5px solid #1C1C1A",
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
+        padding: "16px 20px 14px",
+        borderBottom: "1.5px solid #F5E6D3",
+        position: "sticky", top: 0, zIndex: 100,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          {/* 카페 로고 */}
+          {/* 카페 로고 + 이름 */}
           {cafeInfo && (
             <div style={{
-              width: 36,
-              height: 36,
-              border: `1.5px solid ${cafeInfo.color}`,
-              borderRadius: 4,
-              overflow: "hidden",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "#FFFFFF",
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
               flexShrink: 0,
             }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={cafeInfo.logoPath}
-                alt={cafeInfo.name}
-                width={28}
-                height={28}
-                style={{ objectFit: "contain" }}
-              />
+              <div style={{
+                width: 40, height: 40, borderRadius: 12,
+                overflow: "hidden",
+                background: `${cafeInfo.color}15`,
+                border: `1.5px solid ${cafeInfo.color}30`,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={cafeInfo.logoPath}
+                  alt={cafeInfo.name}
+                  width={30}
+                  height={30}
+                  style={{ objectFit: "contain" }}
+                />
+              </div>
+              <span style={{ fontSize: 10, fontWeight: 700, color: cafeInfo.color }}>
+                {cafeInfo.name}
+              </span>
             </div>
           )}
 
-          {/* 방 이름 + 프로그레스 */}
+          {/* 방 이름 + 주문 현황 */}
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <h1 style={{
-                fontSize: 16,
-                fontWeight: 700,
-                color: "#1C1C1A",
-                letterSpacing: "-0.01em",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
+                fontFamily: "'Gowun Dodum', sans-serif",
+                fontSize: 20, color: "#3E2723", lineHeight: 1.2,
+                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
               }}>
                 {room?.room_name}
               </h1>
               {isClosed && (
-                <span className="chip" style={{
-                  border: "1.5px solid #1C1C1A",
-                  color: "#1C1C1A",
-                  fontSize: 10,
-                  flexShrink: 0,
-                }}>
-                  마감
+                <span className="chip" style={{ background: "#F5E6D3", color: "#6F4E37", fontSize: 12, flexShrink: 0 }}>
+                  ✨ 마감
                 </span>
               )}
             </div>
-
-            {/* 세그먼트 프로그레스 */}
-            <div style={{ marginTop: 6, display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{ marginTop: 5, display: "flex", alignItems: "center", gap: 8 }}>
               {isClosed ? (
-                <div style={{
-                  fontFamily: "'DM Mono', monospace",
-                  fontSize: 10,
-                  color: "#6B6762",
-                  letterSpacing: "0.04em",
-                }}>
-                  주문 마감됨
-                </div>
+                <div style={{ fontSize: 12, color: "#8D6E63" }}>🔒 주문이 마감됐어요</div>
               ) : (
                 <>
-                  <div style={{ display: "flex", gap: 3, flex: 1 }}>
-                    {onlineParticipants.map((p) => (
-                      <div
-                        key={p.user_id}
-                        style={{
-                          flex: 1,
-                          height: 5,
-                          borderRadius: 2,
-                          background: p.order !== null ? "#1C1C1A" : "transparent",
-                          border: `1.5px solid ${p.order !== null ? "#1C1C1A" : "#D0CCC7"}`,
-                          transition: "background 0.3s ease, border-color 0.3s ease",
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <span style={{
-                    fontFamily: "'DM Mono', monospace",
-                    fontSize: 10,
-                    color: "#6B6762",
-                    flexShrink: 0,
-                    letterSpacing: "0.02em",
+                  <div style={{
+                    flex: 1,
+                    height: 6,
+                    borderRadius: 3,
+                    background: "#EDD9C0",
+                    position: "relative",
+                    overflow: "hidden",
                   }}>
-                    {decidedCount}/{onlineParticipants.length}
+                    <div style={{
+                      position: "absolute",
+                      top: 0, left: 0, bottom: 0,
+                      width: onlineCount > 0 ? `${(decidedCount / onlineCount) * 100}%` : "0%",
+                      background: "linear-gradient(90deg, #C9A57B, #6F4E37)",
+                      borderRadius: 3,
+                      transition: "width 0.4s ease",
+                    }} />
+                  </div>
+                  <span style={{ fontSize: 11, color: "#8D6E63", fontWeight: 600, flexShrink: 0 }}>
+                    {decidedCount}/{onlineCount}명
                   </span>
                 </>
               )}
@@ -467,23 +424,24 @@ export function RoomPageClient({ roomId }: Props) {
         </div>
       </div>
 
-      {/* ── 컨텐츠 ── */}
-      <div style={{ flex: 1, padding: "20px 20px", paddingBottom: 130, overflowY: "auto" }}>
+      {/* 컨텐츠 */}
+      <div style={{ flex: 1, padding: "16px 20px", paddingBottom: 120, overflowY: "auto" }}>
 
-        {/* 메뉴 선택 뷰 */}
         {view === "menu" && !isClosed && (
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
               <button
-                className="btn-ghost"
                 onClick={handleCancelToRoom}
-                style={{ padding: "6px 0", fontSize: 13 }}
+                style={{
+                  background: "#F5E6D3", border: "none", borderRadius: 12,
+                  padding: "8px 14px", fontSize: 13, color: "#6F4E37",
+                  cursor: "pointer", fontWeight: 600, fontFamily: "inherit",
+                }}
               >
                 ← 뒤로
               </button>
-              <div style={{ width: 1, height: 14, background: "#D0CCC7" }} />
-              <h2 style={{ fontSize: 16, fontWeight: 700, color: "#1C1C1A" }}>
-                {cafeInfo ? `${cafeInfo.name} 메뉴` : "메뉴 선택"}
+              <h2 style={{ fontFamily: "'Gowun Dodum', sans-serif", fontSize: 18, color: "#3E2723" }}>
+                {cafeInfo ? `${cafeInfo.name} 메뉴` : "메뉴 선택 ☕"}
               </h2>
             </div>
             <CoffeeMenuGrid
@@ -495,19 +453,22 @@ export function RoomPageClient({ roomId }: Props) {
           </div>
         )}
 
-        {/* 옵션 선택 뷰 */}
         {view === "options" && selectedMenu && !isClosed && (
           <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
               <button
-                className="btn-ghost"
                 onClick={() => setView("menu")}
-                style={{ padding: "6px 0", fontSize: 13 }}
+                style={{
+                  background: "#F5E6D3", border: "none", borderRadius: 12,
+                  padding: "8px 14px", fontSize: 13, color: "#6F4E37",
+                  cursor: "pointer", fontWeight: 600, fontFamily: "inherit",
+                }}
               >
                 ← 뒤로
               </button>
-              <div style={{ width: 1, height: 14, background: "#D0CCC7" }} />
-              <h2 style={{ fontSize: 16, fontWeight: 700, color: "#1C1C1A" }}>옵션 선택</h2>
+              <h2 style={{ fontFamily: "'Gowun Dodum', sans-serif", fontSize: 18, color: "#3E2723" }}>
+                옵션 선택
+              </h2>
             </div>
             <OrderOptionsForm
               menuItem={selectedMenu}
@@ -517,7 +478,6 @@ export function RoomPageClient({ roomId }: Props) {
           </div>
         )}
 
-        {/* 방 뷰 */}
         {view === "room" && myUserId && (
           <RoomView
             participants={displayParticipants}
@@ -530,27 +490,21 @@ export function RoomPageClient({ roomId }: Props) {
         )}
       </div>
 
-      {/* ── 하단 바 ── */}
+      {/* 하단 바 */}
       {view === "room" && myUserId && (
         <div style={{
-          position: "fixed",
-          bottom: 0,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: "100%",
-          maxWidth: 480,
+          position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
+          width: "100%", maxWidth: 480,
           background: "#FFFFFF",
-          borderTop: "1.5px solid #1C1C1A",
-          padding: "14px 20px 32px",
-          display: "flex",
-          flexDirection: "column",
-          gap: 10,
+          borderTop: "1.5px solid #F5E6D3",
+          padding: "12px 20px 28px",
+          display: "flex", flexDirection: "column", gap: 10,
           zIndex: 200,
         }}>
           {!myOrder && !isClosed && (
             <div style={{ display: "flex", gap: 10 }}>
               <button
-                className="btn-primary"
+                className="btn-hover"
                 onClick={() => {
                   setView("menu");
                   socketRef.current.emit("status:update", { status: "ordering" });
@@ -560,44 +514,53 @@ export function RoomPageClient({ roomId }: Props) {
                     ),
                   );
                 }}
-                style={{ flex: 3, padding: "15px", fontSize: 15 }}
+                style={{
+                  flex: 3, padding: "16px", borderRadius: 18,
+                  background: "linear-gradient(135deg, #C9A57B, #6F4E37)",
+                  color: "#FFF8F0", border: "none",
+                  fontSize: 16, fontWeight: 700, cursor: "pointer",
+                  fontFamily: "'Gowun Dodum', sans-serif",
+                }}
               >
-                메뉴 고르러 가기
+                메뉴 고르러 가기 ☕
               </button>
               <button
-                className="btn-secondary"
+                className="btn-hover"
                 onClick={handleSkip}
-                style={{ flex: 1, padding: "15px", fontSize: 14 }}
+                style={{
+                  flex: 1, padding: "16px", borderRadius: 18,
+                  background: "#F5E6D3", color: "#8D6E63",
+                  border: "none", fontSize: 14, fontWeight: 600, cursor: "pointer",
+                  fontFamily: "inherit",
+                }}
               >
-                패스
+                안먹기 🙅
               </button>
             </div>
           )}
 
           {isHost && !isClosed && (
             <button
-              className="btn-ghost"
+              className="btn-hover"
               onClick={handleCloseRoom}
-              style={{ width: "100%", padding: "11px", fontSize: 13, color: "#6B6762" }}
+              style={{
+                width: "100%", padding: "13px", borderRadius: 16,
+                background: "#F5E6D3", color: "#6F4E37", border: "none",
+                fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+              }}
             >
-              주문 마감하기
+              🔒 주문 마감하기
             </button>
           )}
 
           {isClosed && (
             <div style={{
-              padding: "13px",
-              border: "1.5px solid #1C1C1A",
-              borderRadius: 4,
-              textAlign: "center",
-              color: "#1C1C1A",
-              fontSize: 13,
-              fontWeight: 600,
-              background: "#F5F3EE",
-              fontFamily: "'DM Mono', monospace",
-              letterSpacing: "0.02em",
+              padding: "12px", borderRadius: 16,
+              background: "linear-gradient(135deg, #F5E6D3, #FFF8F0)",
+              border: "1.5px solid #C9A57B",
+              textAlign: "center", color: "#6F4E37", fontSize: 14, fontWeight: 600,
             }}>
-              주문이 마감됐어요
+              ✨ 주문이 마감됐어요! 맛있는 커피 타임 되세요 ☕
             </div>
           )}
         </div>
