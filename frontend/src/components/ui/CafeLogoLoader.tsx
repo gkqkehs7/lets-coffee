@@ -10,11 +10,12 @@ export function CafeLogoLoader() {
   useEffect(() => {
     const interval = setInterval(() => {
       setVisible(false);
-      setTimeout(() => {
+      const t = setTimeout(() => {
         setIndex((i) => (i + 1) % CAFE_LIST.length);
         setVisible(true);
-      }, 150);
-    }, 500);
+      }, 80);
+      return () => clearTimeout(t);
+    }, 350);
     return () => clearInterval(interval);
   }, []);
 
