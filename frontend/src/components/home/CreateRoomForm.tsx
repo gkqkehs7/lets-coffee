@@ -262,8 +262,12 @@ export function CreateRoomForm() {
                 className="input-field"
                 placeholder="예: 민우"
                 value={hostName}
-                onChange={(e) => setHostName(e.target.value)}
-                maxLength={20}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  const hasKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(v);
+                  setHostName(v.slice(0, hasKorean ? 4 : 10));
+                }}
+                maxLength={10}
               />
             </div>
 

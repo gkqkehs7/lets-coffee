@@ -318,21 +318,6 @@ export function RoomPageClient({ roomId }: Props) {
     );
   }
 
-  const handleCloseAndShare = async () => {
-    const url = `${window.location.origin}/room/${roomId}`;
-    try {
-      await navigator.clipboard.writeText(url);
-    } catch {
-      const el = document.createElement("textarea");
-      el.value = url;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand("copy");
-      document.body.removeChild(el);
-    }
-    handleCloseRoom();
-    showToast("링크 복사 완료! ✨");
-  };
 
   return (
     <div style={{
@@ -455,7 +440,7 @@ export function RoomPageClient({ roomId }: Props) {
           {isHost && !isClosed && (
             <button
               className="btn-hover"
-              onClick={handleCloseAndShare}
+              onClick={handleCloseRoom}
               style={{
                 width: "100%", padding: "15px", borderRadius: 18,
                 background: "#FFFFFF", color: "#3E2723",
@@ -465,7 +450,7 @@ export function RoomPageClient({ roomId }: Props) {
               }}
             >
               <span>📋</span>
-              <span>주문 마감 및 공유하기</span>
+              <span>주문 마감</span>
             </button>
           )}
 

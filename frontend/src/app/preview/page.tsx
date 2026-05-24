@@ -191,7 +191,7 @@ export default function PreviewPage() {
             width: "100%", maxWidth: 480, background: "#FFF8F0",
             padding: "12px 20px 28px", display: "flex", flexDirection: "column", gap: 10, zIndex: 200,
           }}>
-            {!isHost && !isClosed && (
+            {!isClosed && (
               <div style={{ display: "flex", gap: 10 }}>
                 <button style={{
                   flex: 3, padding: "16px", borderRadius: 18,
@@ -217,7 +217,7 @@ export default function PreviewPage() {
                 fontSize: 15, fontWeight: 700, cursor: "pointer",
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
               }}>
-                <span>📋</span><span>주문 마감 및 공유하기</span>
+                <span>📋</span><span>주문 마감</span>
               </button>
             )}
             {isClosed && (

@@ -29,7 +29,7 @@ export function RoomView({
   const drinkGroups: Record<string, {
     name: string;
     emoji: string;
-    people: { name: string; note: string }[];
+    people: { name: string; note: string; isMe: boolean }[];
     count: number;
   }> = {};
   ordered.forEach((p) => {
@@ -37,7 +37,7 @@ export function RoomView({
     if (!drinkGroups[key]) {
       drinkGroups[key] = { name: key, emoji: p.order!.menu_emoji, people: [], count: 0 };
     }
-    drinkGroups[key].people.push({ name: p.user_name, note: p.order!.note });
+    drinkGroups[key].people.push({ name: p.user_name, note: p.order!.note, isMe: p.user_id === currentUserId });
     drinkGroups[key].count++;
   });
   const rankedDrinks = Object.values(drinkGroups).sort((a, b) => b.count - a.count);
@@ -167,9 +167,14 @@ export function RoomView({
                       fontSize: 11, color: "#8D6E63", marginTop: 2,
                       overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                     }}>
-                      {drink.people
-                        .map((p) => (p.note ? `${p.name} · ${p.note}` : p.name))
-                        .join(", ")}
+                      {drink.people.map((p, i) => (
+                        <span key={i}>
+                          {i > 0 && ", "}
+                          <span style={{ fontWeight: p.isMe ? 700 : 400, color: p.isMe ? "#6F4E37" : undefined }}>
+                            {p.note ? `${p.name} · ${p.note}` : p.name}
+                          </span>
+                        </span>
+                      ))}
                     </div>
                   </div>
                   <div style={{ flexShrink: 0, textAlign: "right" }}>
@@ -287,8 +292,19 @@ export function RoomView({
                   )}
                 </div>
                 {/* Name */}
-                <div style={{ fontWeight: 700, fontSize: 14, color: "#3E2723", flexShrink: 0 }}>
-                  {p.user_name}
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                  <span style={{ fontWeight: 700, fontSize: 14, color: "#3E2723" }}>
+                    {p.user_name}
+                  </span>
+                  {isMe && (
+                    <span style={{
+                      fontSize: 10, fontWeight: 700, color: "#C9A57B",
+                      background: "#FFF3E0", borderRadius: 999,
+                      padding: "2px 7px", lineHeight: 1.4,
+                    }}>
+                      나
+                    </span>
+                  )}
                 </div>
                 {/* Spacer */}
                 <div style={{ flex: 1 }} />

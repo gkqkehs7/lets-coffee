@@ -94,9 +94,13 @@ export function JoinRoomModal({ roomName, cafeInfo, onJoin }: Props) {
               className="input-field"
               placeholder="이름을 입력해주세요"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                const v = e.target.value;
+                const hasKorean = /[ㄱ-ㅎㅏ-ㅣ가-힣]/.test(v);
+                setName(v.slice(0, hasKorean ? 4 : 10));
+              }}
               autoFocus
-              maxLength={20}
+              maxLength={10}
             />
           </div>
 
