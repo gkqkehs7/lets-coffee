@@ -8,7 +8,6 @@ interface Props {
   currentUserId: string;
   roomName: string;
   cafeLogoPath: string;
-  onShare?: () => void;
 }
 
 export function RoomView({
@@ -16,7 +15,6 @@ export function RoomView({
   currentUserId,
   roomName,
   cafeLogoPath,
-  onShare,
 }: Props) {
   const decided = participants.filter((p) => p.order !== null);
   const ordered = decided.filter((p) => p.order?.menu_id !== "skip");
@@ -55,20 +53,6 @@ export function RoomView({
               }}>
                 {roomName}의<br />커피 주문
               </h1>
-              {onShare && (
-                <button
-                  onClick={onShare}
-                  style={{
-                    marginTop: 10, padding: "7px 14px", borderRadius: 999,
-                    background: "#F5E6D3", color: "#6F4E37",
-                    border: "none", fontSize: 12, fontWeight: 700, cursor: "pointer",
-                    display: "inline-flex", alignItems: "center", gap: 5,
-                    fontFamily: "inherit",
-                  }}
-                >
-                  <span>🔗</span><span>링크 공유하기</span>
-                </button>
-              )}
             </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img

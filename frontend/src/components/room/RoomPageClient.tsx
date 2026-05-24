@@ -382,17 +382,6 @@ export function RoomPageClient({ roomId }: Props) {
             currentUserId={myUserId}
             roomName={room?.room_name ?? ""}
             cafeLogoPath={cafeInfo?.logoPath ?? ""}
-            onShare={async () => {
-              const url = `${window.location.origin}/room/${roomId}`;
-              try { await navigator.clipboard.writeText(url); } catch {
-                const el = document.createElement("textarea");
-                el.value = url;
-                document.body.appendChild(el); el.select();
-                document.execCommand("copy");
-                document.body.removeChild(el);
-              }
-              showToast("링크 복사 완료! ✨");
-            }}
           />
         )}
       </div>
@@ -474,6 +463,41 @@ export function RoomPageClient({ roomId }: Props) {
               주문이 마감됐어요! 맛있는 커피 타임 되세요 ☕
             </div>
           )}
+        </div>
+      )}
+
+      {/* 공유 FAB */}
+      {view === "room" && (
+        <div style={{
+          position: "fixed", bottom: 170,
+          left: "50%", transform: "translateX(-50%)",
+          width: "100%", maxWidth: 480,
+          pointerEvents: "none", zIndex: 300,
+        }}>
+          <button
+            onClick={async () => {
+              const url = `${window.location.origin}/room/${roomId}`;
+              try { await navigator.clipboard.writeText(url); } catch {
+                const el = document.createElement("textarea");
+                el.value = url;
+                document.body.appendChild(el); el.select();
+                document.execCommand("copy");
+                document.body.removeChild(el);
+              }
+              showToast("링크 복사 완료! ✨");
+            }}
+            style={{
+              position: "absolute", right: 20, bottom: 0,
+              width: 52, height: 52, borderRadius: "50%",
+              background: "#6F4E37",
+              border: "none", cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 20, boxShadow: "0 4px 16px rgba(111,78,55,0.35)",
+              pointerEvents: "auto",
+            }}
+          >
+            🔗
+          </button>
         </div>
       )}
     </div>
