@@ -357,6 +357,7 @@ export function RoomPageClient({ roomId }: Props) {
             menuItem={selectedMenu}
             onSubmit={handleSubmitOrder}
             onBack={() => setView("menu")}
+            cafeId={room?.cafe_id}
           />
         )}
 

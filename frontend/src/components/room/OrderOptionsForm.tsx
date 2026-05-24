@@ -7,9 +7,10 @@ interface Props {
   menuItem: MenuItem;
   onSubmit: (order: Order) => void;
   onBack: () => void;
+  cafeId?: string;
 }
 
-export function OrderOptionsForm({ menuItem, onSubmit, onBack }: Props) {
+export function OrderOptionsForm({ menuItem, onSubmit, onBack, cafeId }: Props) {
   const isCustom = menuItem.id === "custom";
   const [customName, setCustomName] = useState("");
   const [temp, setTemp] = useState<Temperature>(menuItem.iced ? "ICED" : "HOT");
@@ -33,18 +34,35 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack }: Props) {
   return (
     <div className="animate-fade-up" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       {/* 메뉴 헤더 */}
-      <div
-        style={{
-          background: "linear-gradient(135deg, #F5E6D3, #FFF8F0)",
-          borderRadius: 20,
-          padding: "20px",
-          textAlign: "center",
-          border: "1.5px solid #F5E6D3",
-        }}
-      >
-        <div style={{ fontSize: 56, marginBottom: 8 }}>
-          {isCustom ? "✏️" : menuItem.emoji}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+        {/* 메뉴 카드 */}
+        <div style={{
+          width: 120, height: 120,
+          background: "#FFFFFF", borderRadius: 20,
+          border: "2px solid #F5E6D3",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          boxShadow: "0 2px 12px rgba(111,78,55,0.08)",
+        }}>
+          {!isCustom && cafeId ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={`/cafes/menus/${cafeId}/${menuItem.id}.png`}
+              alt={menuItem.name}
+              width={80}
+              height={80}
+              style={{ objectFit: "contain" }}
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+                const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
+                if (fallback) fallback.style.display = "block";
+              }}
+            />
+          ) : null}
+          <span style={{ fontSize: 48, display: (!isCustom && cafeId) ? "none" : "block" }}>
+            {isCustom ? "✏️" : menuItem.emoji}
+          </span>
         </div>
+
         {isCustom ? (
           <input
             className="input-field"
@@ -88,36 +106,40 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack }: Props) {
       </div>
 
       {/* 사이즈 */}
-      <div>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#6F4E37", marginBottom: 10 }}>
-          사이즈
+      {cafeId !== "mega" && (
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#6F4E37", marginBottom: 10 }}>
+            사이즈
+          </div>
+          <div className="toggle-group">
+            {(["Tall", "Grande", "Venti"] as Size[]).map((s) => (
+              <button
+                key={s}
+                className={`toggle-btn ${size === s ? "active" : ""}`}
+                onClick={() => setSize(s)}
+                type="button"
+              >
+                {s === "Tall" ? "S" : s === "Grande" ? "M" : "L"}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="toggle-group">
-          {(["Tall", "Grande", "Venti"] as Size[]).map((s) => (
-            <button
-              key={s}
-              className={`toggle-btn ${size === s ? "active" : ""}`}
-              onClick={() => setSize(s)}
-              type="button"
-            >
-              {s === "Tall" ? "S" : s === "Grande" ? "M" : "L"}
-            </button>
-          ))}
-        </div>
-      </div>
+      )}
 
       {/* 메모 */}
-      <div>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#6F4E37", marginBottom: 10 }}>
-          메모
+      {cafeId !== "mega" && (
+        <div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#6F4E37", marginBottom: 10 }}>
+            메모
+          </div>
+          <input
+            className="input-field"
+            placeholder="예: 얼음 적게요, 달달하게요 🥰"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
         </div>
-        <input
-          className="input-field"
-          placeholder="예: 얼음 적게요, 달달하게요 🥰"
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-        />
-      </div>
+      )}
 
       {/* 버튼 */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

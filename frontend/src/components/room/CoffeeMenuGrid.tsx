@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { MENU_CATEGORIES } from "@/lib/menu-data";
 import type { MenuItem } from "@/lib/types";
 
@@ -23,6 +24,8 @@ function MenuCard({
   cafeId?: string;
 }) {
   const imagePath = cafeId ? `/cafes/menus/${cafeId}/${item.id}.png` : null;
+  const [imgFailed, setImgFailed] = useState(false);
+  useEffect(() => { setImgFailed(false); }, [imagePath]);
 
   return (
     <div
@@ -59,7 +62,7 @@ function MenuCard({
           ✓
         </div>
       )}
-      {imagePath && (
+      {imagePath && !imgFailed && (
         <div
           style={{
             width: 52,
@@ -77,9 +80,7 @@ function MenuCard({
             width={52}
             height={52}
             style={{ objectFit: "contain" }}
-            onError={(e) => {
-              (e.currentTarget.parentElement as HTMLElement).style.display = "none";
-            }}
+            onError={() => setImgFailed(true)}
           />
         </div>
       )}

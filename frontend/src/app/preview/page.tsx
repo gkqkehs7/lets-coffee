@@ -6,8 +6,9 @@ import { CreateRoomForm } from "@/components/home/CreateRoomForm";
 import { JoinRoomModal } from "@/components/room/JoinRoomModal";
 import { CafeLogoLoader } from "@/components/ui/CafeLogoLoader";
 import { CoffeeMenuGrid } from "@/components/room/CoffeeMenuGrid";
+import { OrderOptionsForm } from "@/components/room/OrderOptionsForm";
 import { CAFE_LIST, getMenuByCafe } from "@/lib/menu-data";
-import type { Participant } from "@/lib/types";
+import type { MenuItem, Participant } from "@/lib/types";
 
 type Screen = "home" | "loading" | "notfound" | "join" | "room" | "menu";
 
@@ -65,6 +66,8 @@ export default function PreviewPage() {
   const [currentUser, setCurrentUser] = useState<"host" | "member-ordered" | "member-pending">("host");
   const [cafeId, setCafeId] = useState(CAFE_LIST[0].id);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [menuView, setMenuView] = useState<"grid" | "options">("grid");
+  const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
 
   const cafe = CAFE_LIST.find((c) => c.id === cafeId) ?? CAFE_LIST[0];
   const currentUserId = currentUser === "host" ? "user-1" : currentUser === "member-ordered" ? "user-2" : "user-4";
@@ -157,14 +160,42 @@ export default function PreviewPage() {
               }}>{c.name}</button>
             ))}
           </div>
+          {/* 메뉴/옵션 헤더 */}
+          {menuView === "options" && (
+            <div style={{
+              background: "#FFFFFF", padding: "14px 20px",
+              borderBottom: "1.5px solid #F5E6D3",
+              display: "flex", alignItems: "center", gap: 12,
+            }}>
+              <button
+                onClick={() => { setMenuView("grid"); setSelectedMenu(null); }}
+                style={{
+                  background: "#F5E6D3", border: "none", borderRadius: 12,
+                  padding: "8px 14px", fontSize: 13, color: "#6F4E37",
+                  cursor: "pointer", fontWeight: 600,
+                }}
+              >← 뒤로</button>
+              <h2 style={{ fontFamily: "'Gowun Dodum', sans-serif", fontSize: 18, color: "#3E2723" }}>옵션 선택</h2>
+            </div>
+          )}
           <div style={{ maxWidth: 480, margin: "0 auto", background: "#FFF8F0", minHeight: "calc(100vh - 90px)", padding: "16px 20px 140px" }}>
-            <CoffeeMenuGrid
-              menu={getMenuByCafe(cafe.id)}
-              selectedId={null}
-              onSelectMenu={(item) => alert(`선택: ${item.name}`)}
-              onSelectCustom={() => alert("커스텀 주문")}
-              cafeId={cafe.id}
-            />
+            {menuView === "grid" && (
+              <CoffeeMenuGrid
+                menu={getMenuByCafe(cafe.id)}
+                selectedId={selectedMenu?.id ?? null}
+                onSelectMenu={(item) => { setSelectedMenu(item); setMenuView("options"); }}
+                onSelectCustom={() => { setSelectedMenu({ id: "custom", name: "", emoji: "✏️", category: "coffee", iced: true }); setMenuView("options"); }}
+                cafeId={cafe.id}
+              />
+            )}
+            {menuView === "options" && selectedMenu && (
+              <OrderOptionsForm
+                menuItem={selectedMenu}
+                onSubmit={(order) => { alert(`주문: ${order.menu_name}`); setMenuView("grid"); setSelectedMenu(null); }}
+                onBack={() => { setMenuView("grid"); setSelectedMenu(null); }}
+                cafeId={cafe.id}
+              />
+            )}
           </div>
         </>
       )}
