@@ -7,7 +7,6 @@ interface Props {
   participants: Participant[];
   currentUserId: string;
   roomName: string;
-  isClosed: boolean;
   cafeLogoPath: string;
   onShare?: () => void;
 }
@@ -16,12 +15,10 @@ export function RoomView({
   participants,
   currentUserId,
   roomName,
-  isClosed,
   cafeLogoPath,
   onShare,
 }: Props) {
   const decided = participants.filter((p) => p.order !== null);
-  const pending = participants.filter((p) => p.order === null);
   const ordered = decided.filter((p) => p.order?.menu_id !== "skip");
   const skipped = decided.filter((p) => p.order?.menu_id === "skip");
   const totalCups = ordered.length;
@@ -72,13 +69,20 @@ export function RoomView({
             }}>
               오늘의<br />커피 주문
             </h1>
-            <p style={{ fontSize: 13, color: "#8D6E63", marginTop: 8 }}>
-              {isClosed
-                ? "🔒 주문이 마감됐어요"
-                : pending.length > 0
-                  ? `마감까지 ${pending.length}명 대기 중`
-                  : "모두 입력 완료!"}
-            </p>
+            {onShare && (
+              <button
+                onClick={onShare}
+                style={{
+                  marginTop: 10, padding: "7px 14px", borderRadius: 999,
+                  background: "#F5E6D3", color: "#6F4E37",
+                  border: "none", fontSize: 12, fontWeight: 700, cursor: "pointer",
+                  display: "inline-flex", alignItems: "center", gap: 5,
+                  fontFamily: "inherit",
+                }}
+              >
+                <span>🔗</span><span>링크 공유하기</span>
+              </button>
+            )}
           </div>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -94,7 +98,7 @@ export function RoomView({
       {/* ── Stats Card ── */}
       <div style={{
         background: "#3A1E0E", borderRadius: 20, padding: "18px 22px",
-        marginBottom: 8, color: "#FFF8F0",
+        marginBottom: 20, color: "#FFF8F0",
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
@@ -134,21 +138,6 @@ export function RoomView({
         </div>
       </div>
 
-      {/* ── 공유 버튼 ── */}
-      {onShare && (
-        <button
-          onClick={onShare}
-          style={{
-            width: "100%", padding: "14px", borderRadius: 18, marginBottom: 24,
-            background: "#F5E6D3", color: "#6F4E37",
-            border: "none", fontSize: 14, fontWeight: 700, cursor: "pointer",
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-            fontFamily: "inherit",
-          }}
-        >
-          <span>🔗</span><span>링크 공유하기</span>
-        </button>
-      )}
 
       {/* ── 음료별 집계 ── */}
       {(rankedDrinks.length > 0 || skipped.length > 0) && (

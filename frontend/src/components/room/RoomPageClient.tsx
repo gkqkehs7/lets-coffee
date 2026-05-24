@@ -381,7 +381,6 @@ export function RoomPageClient({ roomId }: Props) {
             participants={displayParticipants}
             currentUserId={myUserId}
             roomName={room?.room_name ?? ""}
-            isClosed={isClosed}
             cafeLogoPath={cafeInfo?.logoPath ?? ""}
             onShare={async () => {
               const url = `${window.location.origin}/room/${roomId}`;
