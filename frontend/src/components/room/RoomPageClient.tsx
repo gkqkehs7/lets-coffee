@@ -212,7 +212,6 @@ export function RoomPageClient({ roomId }: Props) {
     );
     setView("room");
     setShowConfetti(true);
-    showToast("주문 완료! ✨");
   };
 
   // ── 수정 ──
