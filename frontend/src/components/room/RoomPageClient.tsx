@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import { loadSession, saveSession } from "@/lib/session";
-import { connectSocket, disconnectSocket } from "@/lib/socket";
+import { connectSocket } from "@/lib/socket";
 import { getCafeInfo, getMenuByCafe, CAFE_LIST } from "@/lib/menu-data";
 import type { MenuItem, Order, Participant, Room } from "@/lib/types";
 import { JoinRoomModal } from "./JoinRoomModal";
@@ -256,10 +256,6 @@ export function RoomPageClient({ roomId }: Props) {
     showToast("주문이 마감됐어요! ✨");
   };
 
-  // ── 언마운트 시 소켓 해제 ──
-  useEffect(() => {
-    return () => { disconnectSocket(); };
-  }, []);
 
   // 내가 화면을 보고 있으면 무조건 온라인 — 백엔드 응답을 기다릴 필요 없음
   const displayParticipants = myUserId
