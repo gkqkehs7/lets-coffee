@@ -62,6 +62,7 @@ export default function PreviewPage() {
   const [isClosed, setIsClosed] = useState(false);
   const [currentUser, setCurrentUser] = useState<"host" | "member-ordered" | "member-pending">("host");
   const [cafeId, setCafeId] = useState(CAFE_LIST[0].id);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const cafe = CAFE_LIST.find((c) => c.id === cafeId) ?? CAFE_LIST[0];
   const currentUserId = currentUser === "host" ? "user-1" : currentUser === "member-ordered" ? "user-2" : "user-4";
@@ -185,22 +186,26 @@ export default function PreviewPage() {
 
           {/* 공유 FAB */}
           <div style={{
-            position: "fixed", bottom: isHost && !isClosed ? 170 : 110,
+            position: "fixed", bottom: isHost && !isClosed ? 160 : 100,
             left: "50%", transform: "translateX(-50%)",
             width: "100%", maxWidth: 480,
             pointerEvents: "none", zIndex: 300,
           }}>
             <button
-              onClick={() => alert("링크 복사 완료! ✨")}
+              onClick={() => {
+                setLinkCopied(true);
+                setTimeout(() => setLinkCopied(false), 2000);
+              }}
               style={{
                 position: "absolute", right: 20, bottom: 0,
                 width: 52, height: 52, borderRadius: "50%",
-                background: "#6F4E37", border: "none", cursor: "pointer",
+                background: "#6F4E37",
+                border: "none", cursor: "pointer",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 20, boxShadow: "0 4px 16px rgba(111,78,55,0.35)",
                 pointerEvents: "auto",
               }}
-            >🔗</button>
+            >{linkCopied ? "✓" : "🔗"}</button>
           </div>
 
           {/* Mock 하단 바 */}

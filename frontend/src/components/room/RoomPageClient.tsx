@@ -36,6 +36,7 @@ export function RoomPageClient({ roomId }: Props) {
 
   const [showConfetti, setShowConfetti] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const socketRef = useRef(connectSocket());
   // userId를 ref에도 저장 — 소켓 재연결 시 room:join 재전송에 사용
@@ -443,7 +444,7 @@ export function RoomPageClient({ roomId }: Props) {
       {/* 공유 FAB */}
       {view === "room" && !showJoin && (
         <div style={{
-          position: "fixed", bottom: isHost && !isClosed ? 170 : 110,
+          position: "fixed", bottom: isHost && !isClosed ? 160 : 100,
           left: "50%", transform: "translateX(-50%)",
           width: "100%", maxWidth: 480,
           pointerEvents: "none", zIndex: 300,
@@ -458,6 +459,8 @@ export function RoomPageClient({ roomId }: Props) {
                 document.execCommand("copy");
                 document.body.removeChild(el);
               }
+              setLinkCopied(true);
+              setTimeout(() => setLinkCopied(false), 2000);
             }}
             style={{
               position: "absolute", right: 20, bottom: 0,
@@ -469,7 +472,7 @@ export function RoomPageClient({ roomId }: Props) {
               pointerEvents: "auto",
             }}
           >
-            🔗
+            {linkCopied ? "✓" : "🔗"}
           </button>
         </div>
       )}
