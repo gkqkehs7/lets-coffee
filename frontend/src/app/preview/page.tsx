@@ -185,7 +185,7 @@ export default function PreviewPage() {
 
           {/* 공유 FAB */}
           <div style={{
-            position: "fixed", bottom: 170,
+            position: "fixed", bottom: isHost && !isClosed ? 170 : 110,
             left: "50%", transform: "translateX(-50%)",
             width: "100%", maxWidth: 480,
             pointerEvents: "none", zIndex: 300,
