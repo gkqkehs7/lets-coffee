@@ -131,10 +131,10 @@ export function CreateRoomForm() {
               lineHeight: 1.3,
             }}
           >
-            커피 뭐드실래요?
+            커피셔틀
           </h1>
           <p style={{ color: "#8D6E63", fontSize: 14, marginTop: 6 }}>
-            링크 하나로 팀 커피 주문 끝! ✨
+            링크 하나로 팀 커피 주문 끝!
           </p>
         </div>
 
