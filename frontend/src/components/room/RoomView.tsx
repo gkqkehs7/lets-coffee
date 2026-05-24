@@ -21,6 +21,7 @@ export function RoomView({
   const decided = participants.filter((p) => p.order !== null);
   const pending = participants.filter((p) => p.order === null);
   const ordered = decided.filter((p) => p.order?.menu_id !== "skip");
+  const skipped = decided.filter((p) => p.order?.menu_id === "skip");
   const totalCups = ordered.length;
   const decidedCount = decided.length;
 
@@ -117,7 +118,7 @@ export function RoomView({
           </div>
         </div>
         {/* Progress dots */}
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 7, marginTop: 16 }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 7, marginTop: 8 }}>
           {participants.map((_, i) => (
             <div
               key={i}
@@ -132,7 +133,7 @@ export function RoomView({
       </div>
 
       {/* ── 음료별 집계 ── */}
-      {rankedDrinks.length > 0 && (
+      {(rankedDrinks.length > 0 || skipped.length > 0) && (
         <div style={{ marginBottom: 24 }}>
           <div style={{
             fontSize: 12, color: "#8D6E63", fontWeight: 600,
@@ -150,7 +151,6 @@ export function RoomView({
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  {/* 가게 로고 */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={cafeLogoPath}
@@ -159,7 +159,6 @@ export function RoomView({
                     height={28}
                     style={{ objectFit: "contain", flexShrink: 0, mixBlendMode: "multiply" }}
                   />
-                  {/* Info */}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 15, fontWeight: 700, color: "#3E2723" }}>
                       {drink.name}
@@ -173,7 +172,6 @@ export function RoomView({
                         .join(", ")}
                     </div>
                   </div>
-                  {/* Count */}
                   <div style={{ flexShrink: 0, textAlign: "right" }}>
                     <span style={{
                       fontFamily: "'Gowun Dodum', sans-serif",
@@ -181,11 +179,48 @@ export function RoomView({
                     }}>
                       {drink.count}
                     </span>
-                    <span style={{ fontSize: 12, color: "#8D6E63", marginLeft: 1 }}>잔</span>
+                    <span style={{ fontSize: 12, color: "#8D6E63", marginLeft: 1 }}>명</span>
                   </div>
                 </div>
               </div>
             ))}
+            {skipped.length > 0 && (
+              <div style={{
+                background: "#FAFAFA", borderRadius: 18,
+                padding: "14px 16px", border: "1px solid #F0E6D8",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{
+                    width: 28, height: 28, flexShrink: 0,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 13, fontWeight: 900, color: "#B0A098",
+                    fontFamily: "'Quicksand', sans-serif", letterSpacing: "-0.02em",
+                  }}>
+                    pass
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "#8D6E63" }}>
+                      안먹어요
+                    </div>
+                    <div style={{
+                      fontSize: 11, color: "#B0A098", marginTop: 2,
+                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                    }}>
+                      {skipped.map((p) => p.user_name).join(", ")}
+                    </div>
+                  </div>
+                  <div style={{ flexShrink: 0, textAlign: "right" }}>
+                    <span style={{
+                      fontFamily: "'Gowun Dodum', sans-serif",
+                      fontSize: 22, fontWeight: 700, color: "#8D6E63",
+                    }}>
+                      {skipped.length}
+                    </span>
+                    <span style={{ fontSize: 12, color: "#B0A098", marginLeft: 1 }}>명</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

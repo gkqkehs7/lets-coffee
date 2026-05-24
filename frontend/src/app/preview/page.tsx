@@ -50,6 +50,11 @@ const MOCK_PARTICIPANTS: Participant[] = [
     user_id: "user-7", user_name: "태양", is_host: false, is_online: false, status: "thinking",
     order: null, joined_at: new Date().toISOString(),
   },
+  {
+    user_id: "user-8", user_name: "수빈", is_host: false, is_online: true, status: "decided",
+    order: { menu_id: "skip", menu_name: "안먹을게요", menu_emoji: "🙅", temperature: null, size: null, note: "" },
+    joined_at: new Date().toISOString(),
+  },
 ];
 
 export default function PreviewPage() {
