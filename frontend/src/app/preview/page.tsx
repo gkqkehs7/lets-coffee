@@ -223,14 +223,14 @@ export default function PreviewPage() {
                   fontFamily: "'Gowun Dodum', sans-serif",
                 }}>
                   {MOCK_PARTICIPANTS.find((p) => p.user_id === currentUserId)?.order
-                    ? "✏️ 메뉴 수정하기"
-                    : "메뉴 고르러 가기 ☕"}
+                    ? "메뉴 수정하기"
+                    : "메뉴 고르러 가기"}
                 </button>
                 <button style={{
                   flex: 1, padding: "16px", borderRadius: 18,
                   background: "#F5E6D3", color: "#8D6E63",
                   border: "none", fontSize: 14, fontWeight: 600, cursor: "pointer",
-                }}>안먹기 🙅</button>
+                }}>안먹기</button>
               </div>
             )}
             {isHost && !isClosed && (
@@ -240,7 +240,7 @@ export default function PreviewPage() {
                 fontSize: 15, fontWeight: 700, cursor: "pointer",
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
               }}>
-                <span>📋</span><span>주문 마감</span>
+                주문 마감
               </button>
             )}
             {isClosed && (

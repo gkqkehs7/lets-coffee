@@ -394,7 +394,7 @@ export function RoomPageClient({ roomId }: Props) {
                   fontFamily: "'Gowun Dodum', sans-serif",
                 }}
               >
-                {myOrder ? "✏️ 메뉴 수정하기" : "메뉴 고르러 가기 ☕"}
+                {myOrder ? "메뉴 수정하기" : "메뉴 고르러 가기"}
               </button>
               <button
                 className="btn-hover"
@@ -406,7 +406,7 @@ export function RoomPageClient({ roomId }: Props) {
                   fontFamily: "inherit",
                 }}
               >
-                안먹기 🙅
+                안먹기
               </button>
             </div>
           )}
@@ -423,8 +423,7 @@ export function RoomPageClient({ roomId }: Props) {
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
               }}
             >
-              <span>📋</span>
-              <span>주문 마감</span>
+              주문 마감
             </button>
           )}
 
