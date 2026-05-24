@@ -118,7 +118,7 @@ export function RoomView({
           </div>
         </div>
         {/* Progress dots */}
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: 7, marginTop: 8 }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 7, marginTop: 2 }}>
           {participants.map((_, i) => (
             <div
               key={i}
