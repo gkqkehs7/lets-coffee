@@ -60,7 +60,9 @@ export function CreateRoomForm() {
           gap: 16,
         }}
       >
-        <div className="animate-float" style={{ fontSize: 48 }}>☕</div>
+        <div className="animate-float">
+          <Image src="/character.png" alt="캐릭터" width={80} height={80} style={{ objectFit: "contain" }} priority />
+        </div>
         <p style={{ color: "#8D6E63", fontSize: 14 }}>방을 만들고 있어요...</p>
       </div>
     );

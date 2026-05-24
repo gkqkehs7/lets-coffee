@@ -47,51 +47,37 @@ export function RoomView({
 
       {/* ── Hero ── */}
       <div style={{ marginBottom: 20 }}>
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-              <span style={{
-                display: "inline-flex", alignItems: "center", gap: 5,
-                background: "#FFECEC", borderRadius: 999, padding: "4px 10px",
-                fontSize: 11, fontWeight: 700, color: "#D94F4F",
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+            <div>
+              <h1 style={{
+                fontFamily: "'Gowun Dodum', sans-serif",
+                fontSize: 30, color: "#3E2723", lineHeight: 1.25, fontWeight: 700,
               }}>
-                <span style={{
-                  width: 6, height: 6, borderRadius: "50%",
-                  background: "#D94F4F", display: "inline-block",
-                }} />
-                실시간 집계
-              </span>
-              <span style={{ fontSize: 13, color: "#8D6E63", fontWeight: 600 }}>{roomName}</span>
+                {roomName}의<br />커피 주문
+              </h1>
+              {onShare && (
+                <button
+                  onClick={onShare}
+                  style={{
+                    marginTop: 10, padding: "7px 14px", borderRadius: 999,
+                    background: "#F5E6D3", color: "#6F4E37",
+                    border: "none", fontSize: 12, fontWeight: 700, cursor: "pointer",
+                    display: "inline-flex", alignItems: "center", gap: 5,
+                    fontFamily: "inherit",
+                  }}
+                >
+                  <span>🔗</span><span>링크 공유하기</span>
+                </button>
+              )}
             </div>
-            <h1 style={{
-              fontFamily: "'Gowun Dodum', sans-serif",
-              fontSize: 30, color: "#3E2723", lineHeight: 1.25, fontWeight: 700,
-            }}>
-              오늘의<br />커피 주문
-            </h1>
-            {onShare && (
-              <button
-                onClick={onShare}
-                style={{
-                  marginTop: 10, padding: "7px 14px", borderRadius: 999,
-                  background: "#F5E6D3", color: "#6F4E37",
-                  border: "none", fontSize: 12, fontWeight: 700, cursor: "pointer",
-                  display: "inline-flex", alignItems: "center", gap: 5,
-                  fontFamily: "inherit",
-                }}
-              >
-                <span>🔗</span><span>링크 공유하기</span>
-              </button>
-            )}
-          </div>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={cafeLogoPath}
-            alt="cafe logo"
-            width={64}
-            height={64}
-            style={{ objectFit: "contain", flexShrink: 0, mixBlendMode: "multiply" }}
-          />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={cafeLogoPath}
+              alt="cafe logo"
+              width={64}
+              height={64}
+              style={{ objectFit: "contain", flexShrink: 0, mixBlendMode: "multiply" }}
+            />
         </div>
       </div>
 

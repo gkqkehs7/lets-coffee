@@ -4,6 +4,10 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "커피셔틀",
   description: "링크 하나로 팀 커피 주문 끝!",
+  icons: {
+    icon: "/character.png",
+    apple: "/character.png",
+  },
 };
 
 export const viewport: Viewport = {
