@@ -20,6 +20,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className="h-full">
+      <head>
+        <link rel="preload" as="image" href="/cafes/starbucks.png" />
+        <link rel="preload" as="image" href="/cafes/mega.png" />
+        <link rel="preload" as="image" href="/cafes/twosome.png" />
+      </head>
       <body className="min-h-full antialiased">{children}</body>
     </html>
   );

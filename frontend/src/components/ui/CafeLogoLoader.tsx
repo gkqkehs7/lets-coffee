@@ -8,6 +8,12 @@ export function CafeLogoLoader() {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
+    // 모든 로고 미리 로드
+    CAFE_LIST.forEach((cafe) => {
+      const img = new Image();
+      img.src = cafe.logoPath;
+    });
+
     const interval = setInterval(() => {
       setVisible(false);
       const t = setTimeout(() => {

@@ -157,7 +157,7 @@ export function CreateRoomForm() {
               <label
                 style={{ fontSize: 13, fontWeight: 600, color: "#6F4E37", display: "block", marginBottom: 10 }}
               >
-                ☕ 어느 카페로 주문할까요?
+                어느 카페로 주문할까요?
               </label>
               <div style={{ display: "flex", gap: 8 }}>
                 {CAFE_LIST.map((cafe) => {
@@ -256,7 +256,7 @@ export function CreateRoomForm() {
               <label
                 style={{ fontSize: 13, fontWeight: 600, color: "#6F4E37", display: "block", marginBottom: 8 }}
               >
-                👤 내 이름
+                내 이름
               </label>
               <input
                 className="input-field"
@@ -295,7 +295,7 @@ export function CreateRoomForm() {
                 transition: "all 0.2s",
               }}
             >
-              방 만들기 🎉
+              방 만들기
             </button>
           </form>
         </div>

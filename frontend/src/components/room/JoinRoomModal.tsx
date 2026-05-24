@@ -88,7 +88,7 @@ export function JoinRoomModal({ roomName, cafeInfo, onJoin }: Props) {
                 marginBottom: 8,
               }}
             >
-              👤 내 이름
+              내 이름
             </label>
             <input
               className="input-field"
