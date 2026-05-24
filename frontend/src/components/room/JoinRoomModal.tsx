@@ -28,40 +28,16 @@ export function JoinRoomModal({ roomName, cafeInfo, onJoin }: Props) {
     <div className="modal-overlay">
       <div className="modal-sheet animate-pop-in" style={{ maxWidth: 420 }}>
         <div style={{ textAlign: "center", marginBottom: 24 }}>
-          {/* 카페 로고 + 이름 한 줄 */}
-          <div style={{
-            display: "inline-flex", alignItems: "center", gap: 8,
-            padding: "6px 14px 6px 8px",
-            borderRadius: 24,
-            background: cafeInfo ? `${cafeInfo.color}12` : "#F5E6D3",
-            border: `1.5px solid ${cafeInfo ? `${cafeInfo.color}35` : "#E8D5C0"}`,
-            marginBottom: 16,
-          }}>
-            {cafeInfo ? (
-              <div style={{
-                width: 32, height: 32, borderRadius: 10,
-                overflow: "hidden", flexShrink: 0,
-                background: `${cafeInfo.color}20`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={cafeInfo.logoPath}
-                  alt={cafeInfo.name}
-                  width={26}
-                  height={26}
-                  style={{ objectFit: "contain" }}
-                />
-              </div>
-            ) : (
-              <span style={{ fontSize: 24 }}>☕</span>
-            )}
-            <span style={{
-              fontSize: 14, fontWeight: 700,
-              color: cafeInfo ? cafeInfo.color : "#6F4E37",
-            }}>
-              {cafeInfo ? cafeInfo.name : "커피 주문"}
-            </span>
+          {/* 캐릭터 이미지 */}
+          <div style={{ marginBottom: 8, display: "flex", justifyContent: "center" }} className="animate-float">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/character.png"
+              alt="캐릭터"
+              width={80}
+              height={80}
+              style={{ objectFit: "contain" }}
+            />
           </div>
 
           {/* 방 이름 */}
@@ -123,7 +99,7 @@ export function JoinRoomModal({ roomName, cafeInfo, onJoin }: Props) {
               cursor: name.trim() && !submitting ? "pointer" : "not-allowed",
             }}
           >
-            {submitting ? "입장 중..." : "입장하기 ✨"}
+            {submitting ? "입장 중..." : "입장하기"}
           </button>
         </form>
       </div>

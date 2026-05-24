@@ -107,7 +107,8 @@ export default function PreviewPage() {
           display: "flex", alignItems: "center", justifyContent: "center",
           flexDirection: "column", gap: 16, textAlign: "center", padding: 24,
         }}>
-          <div style={{ fontSize: 48 }}>😢</div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/character.png" alt="캐릭터" width={80} height={80} style={{ objectFit: "contain" }} />
           <h2 style={{ fontFamily: "'Gowun Dodum', sans-serif", fontSize: 22, color: "#3E2723" }}>
             방을 찾을 수 없어요
           </h2>

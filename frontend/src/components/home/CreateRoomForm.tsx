@@ -107,20 +107,16 @@ export function CreateRoomForm() {
         <div className="animate-fade-up" style={{ textAlign: "center", marginBottom: 40 }}>
           <div
             className="animate-float"
-            style={{
-              width: 80,
-              height: 80,
-              background: "linear-gradient(135deg, #C9A57B, #6F4E37)",
-              borderRadius: 28,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 40,
-              margin: "0 auto 16px",
-              boxShadow: "0 8px 24px rgba(111,78,55,0.3)",
-            }}
+            style={{ margin: "0 auto 16px", width: 80, height: 80 }}
           >
-            ☕
+            <Image
+              src="/character.png"
+              alt="캐릭터"
+              width={80}
+              height={80}
+              style={{ objectFit: "contain" }}
+              priority
+            />
           </div>
           <h1
             style={{
