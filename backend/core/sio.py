@@ -81,17 +81,6 @@ async def room_join(sid: str, data: dict) -> None:
     await _broadcast("room:state", room_state, room_id)
 
 
-@sio.on("status:update")
-async def status_update(sid: str, data: dict) -> None:
-    conn = _connections.get(sid)
-    if conn is None:
-        return
-    room_id, user_id = conn
-    status = data.get("status", "thinking")
-    p = await room_manager.update_status(room_id, user_id, status)
-    if p:
-        await _broadcast("participant:updated", {"participant": p.model_dump(mode="json")}, room_id)
-
 
 @sio.on("order:submit")
 async def order_submit(sid: str, data: dict) -> None:

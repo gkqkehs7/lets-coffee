@@ -196,12 +196,6 @@ export function RoomPageClient({ roomId }: Props) {
   const handleSelectMenu = (item: MenuItem) => {
     setSelectedMenu(item);
     setView("options");
-    socketRef.current.emit("status:update", { status: "ordering" });
-    setParticipants((prev) =>
-      prev.map((p) =>
-        p.user_id === myUserId ? { ...p, status: "ordering" } : p,
-      ),
-    );
   };
 
   const handleSelectCustom = () => {
@@ -224,10 +218,9 @@ export function RoomPageClient({ roomId }: Props) {
   // ── 수정 ──
   const handleEditOrder = () => {
     socketRef.current.emit("order:edit", {});
-    socketRef.current.emit("status:update", { status: "editing" });
     setParticipants((prev) =>
       prev.map((p) =>
-        p.user_id === myUserId ? { ...p, status: "editing", order: null } : p,
+        p.user_id === myUserId ? { ...p, order: null } : p,
       ),
     );
     setView("menu");
@@ -235,12 +228,6 @@ export function RoomPageClient({ roomId }: Props) {
 
   // ── 메뉴/옵션 취소 (room으로 복귀) ──
   const handleCancelToRoom = () => {
-    socketRef.current.emit("status:update", { status: "thinking" });
-    setParticipants((prev) =>
-      prev.map((p) =>
-        p.user_id === myUserId ? { ...p, status: "thinking" } : p,
-      ),
-    );
     setView("room");
   };
 
@@ -401,15 +388,7 @@ export function RoomPageClient({ roomId }: Props) {
               <button
                 className="btn-hover"
                 onClick={() => {
-                  myOrder ? handleEditOrder() : (() => {
-                    setView("menu");
-                    socketRef.current.emit("status:update", { status: "ordering" });
-                    setParticipants((prev) =>
-                      prev.map((p) =>
-                        p.user_id === myUserId ? { ...p, status: "ordering" } : p,
-                      ),
-                    );
-                  })();
+                  myOrder ? handleEditOrder() : setView("menu");
                 }}
                 style={{
                   flex: 3, padding: "16px", borderRadius: 18,
@@ -484,7 +463,6 @@ export function RoomPageClient({ roomId }: Props) {
                 document.execCommand("copy");
                 document.body.removeChild(el);
               }
-              showToast("링크 복사 완료! ✨");
             }}
             style={{
               position: "absolute", right: 20, bottom: 0,

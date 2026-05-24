@@ -68,19 +68,6 @@ class RoomManager:
             p.is_online = online
             return p
 
-    async def update_status(
-        self, room_id: str, user_id: str, status: str
-    ) -> Optional[Participant]:
-        async with self._lock:
-            room = self._rooms.get(room_id)
-            if room is None:
-                return None
-            p = room.participants.get(user_id)
-            if p is None:
-                return None
-            p.status = status  # type: ignore[assignment]
-            return p
-
     async def submit_order(
         self, room_id: str, user_id: str, order: Order
     ) -> Optional[Participant]:
