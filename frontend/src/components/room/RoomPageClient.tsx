@@ -348,6 +348,7 @@ export function RoomPageClient({ roomId }: Props) {
             selectedId={selectedMenu?.id ?? null}
             onSelectMenu={handleSelectMenu}
             onSelectCustom={handleSelectCustom}
+            cafeId={room?.cafe_id}
           />
         )}
 

@@ -8,17 +8,22 @@ interface Props {
   selectedId: string | null;
   onSelectMenu: (item: MenuItem) => void;
   onSelectCustom: () => void;
+  cafeId?: string;
 }
 
 function MenuCard({
   item,
   isSelected,
   onClick,
+  cafeId,
 }: {
   item: MenuItem;
   isSelected: boolean;
   onClick: () => void;
+  cafeId?: string;
 }) {
+  const imagePath = cafeId ? `/cafes/menus/${cafeId}/${item.id}.png` : null;
+
   return (
     <div
       className="card-hover"
@@ -54,15 +59,30 @@ function MenuCard({
           ✓
         </div>
       )}
-      <div
-        style={{
-          fontSize: 32,
-          marginBottom: 8,
-          filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))",
-        }}
-      >
-        {item.emoji}
-      </div>
+      {imagePath && (
+        <div
+          style={{
+            width: 52,
+            height: 52,
+            margin: "0 auto 8px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={imagePath}
+            alt={item.name}
+            width={52}
+            height={52}
+            style={{ objectFit: "contain" }}
+            onError={(e) => {
+              (e.currentTarget.parentElement as HTMLElement).style.display = "none";
+            }}
+          />
+        </div>
+      )}
       <div
         style={{
           fontSize: 12,
@@ -77,7 +97,7 @@ function MenuCard({
   );
 }
 
-export function CoffeeMenuGrid({ menu, selectedId, onSelectMenu, onSelectCustom }: Props) {
+export function CoffeeMenuGrid({ menu, selectedId, onSelectMenu, onSelectCustom, cafeId }: Props) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       {MENU_CATEGORIES.map((cat) => {
@@ -108,6 +128,7 @@ export function CoffeeMenuGrid({ menu, selectedId, onSelectMenu, onSelectCustom 
                 item={item}
                 isSelected={selectedId === item.id}
                 onClick={() => onSelectMenu(item)}
+                cafeId={cafeId}
               />
             ))}
           </div>

@@ -163,6 +163,7 @@ export default function PreviewPage() {
               selectedId={null}
               onSelectMenu={(item) => alert(`선택: ${item.name}`)}
               onSelectCustom={() => alert("커스텀 주문")}
+              cafeId={cafe.id}
             />
           </div>
         </>
