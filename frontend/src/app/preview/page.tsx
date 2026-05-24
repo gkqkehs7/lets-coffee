@@ -5,10 +5,11 @@ import { RoomView } from "@/components/room/RoomView";
 import { CreateRoomForm } from "@/components/home/CreateRoomForm";
 import { JoinRoomModal } from "@/components/room/JoinRoomModal";
 import { CafeLogoLoader } from "@/components/ui/CafeLogoLoader";
-import { CAFE_LIST } from "@/lib/menu-data";
+import { CoffeeMenuGrid } from "@/components/room/CoffeeMenuGrid";
+import { CAFE_LIST, getMenuByCafe } from "@/lib/menu-data";
 import type { Participant } from "@/lib/types";
 
-type Screen = "home" | "loading" | "notfound" | "join" | "room";
+type Screen = "home" | "loading" | "notfound" | "join" | "room" | "menu";
 
 const SCREENS: { id: Screen; label: string }[] = [
   { id: "home",     label: "홈" },
@@ -16,6 +17,7 @@ const SCREENS: { id: Screen; label: string }[] = [
   { id: "notfound", label: "방없음" },
   { id: "join",     label: "입장 모달" },
   { id: "room",     label: "방 화면" },
+  { id: "menu",     label: "메뉴판" },
 ];
 
 const MOCK_PARTICIPANTS: Participant[] = [
@@ -137,6 +139,33 @@ export default function PreviewPage() {
             onJoin={async () => { alert("입장 클릭"); }}
           />
         </div>
+      )}
+
+      {/* 메뉴판 */}
+      {screen === "menu" && (
+        <>
+          <div style={{
+            background: "#2C1810", padding: "8px 16px",
+            display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap",
+          }}>
+            <span style={{ fontSize: 11, color: "#C9A57B", fontWeight: 700 }}>카페:</span>
+            {CAFE_LIST.map((c) => (
+              <button key={c.id} onClick={() => setCafeId(c.id)} style={{
+                padding: "3px 9px", borderRadius: 6,
+                background: cafeId === c.id ? c.color : "rgba(255,255,255,0.1)",
+                color: "#FFF", border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer",
+              }}>{c.name}</button>
+            ))}
+          </div>
+          <div style={{ maxWidth: 480, margin: "0 auto", background: "#FFF8F0", minHeight: "calc(100vh - 90px)", padding: "16px 20px 140px" }}>
+            <CoffeeMenuGrid
+              menu={getMenuByCafe(cafe.id)}
+              selectedId={null}
+              onSelectMenu={(item) => alert(`선택: ${item.name}`)}
+              onSelectCustom={() => alert("커스텀 주문")}
+            />
+          </div>
+        </>
       )}
 
       {/* 방 화면 */}
