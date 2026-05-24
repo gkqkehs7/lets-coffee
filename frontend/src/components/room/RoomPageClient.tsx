@@ -4,15 +4,15 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import { loadSession, saveSession } from "@/lib/session";
 import { connectSocket, disconnectSocket } from "@/lib/socket";
-import { getCafeInfo, getMenuByCafe } from "@/lib/menu-data";
+import { getCafeInfo, getMenuByCafe, CAFE_LIST } from "@/lib/menu-data";
 import type { MenuItem, Order, Participant, Room } from "@/lib/types";
 import { JoinRoomModal } from "./JoinRoomModal";
 import { CoffeeMenuGrid } from "./CoffeeMenuGrid";
 import { OrderOptionsForm } from "./OrderOptionsForm";
 import { RoomView } from "./RoomView";
-import { ShareButton } from "./ShareButton";
 import { Confetti } from "@/components/ui/Confetti";
 import { Toast } from "@/components/ui/Toast";
+import { CafeLogoLoader } from "@/components/ui/CafeLogoLoader";
 
 type ViewState = "room" | "menu" | "options";
 
@@ -288,16 +288,7 @@ export function RoomPageClient({ roomId }: Props) {
   const cafeInfo = room ? getCafeInfo(room.cafe_id) : null;
 
   if (loading) {
-    return (
-      <div style={{
-        minHeight: "100vh", background: "#FFF8F0",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        flexDirection: "column", gap: 16,
-      }}>
-        <div className="animate-float" style={{ fontSize: 48 }}>☕</div>
-        <p style={{ color: "#8D6E63", fontSize: 14 }}>방 정보 불러오는 중...</p>
-      </div>
-    );
+    return <CafeLogoLoader />;
   }
 
   if (notFound) {
@@ -327,6 +318,22 @@ export function RoomPageClient({ roomId }: Props) {
     );
   }
 
+  const handleCloseAndShare = async () => {
+    const url = `${window.location.origin}/room/${roomId}`;
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      const el = document.createElement("textarea");
+      el.value = url;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+    }
+    handleCloseRoom();
+    showToast("링크 복사 완료! ✨");
+  };
+
   return (
     <div style={{
       minHeight: "100vh", background: "#FFF8F0",
@@ -337,155 +344,60 @@ export function RoomPageClient({ roomId }: Props) {
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       {showJoin && room && <JoinRoomModal roomName={room.room_name} cafeInfo={cafeInfo} onJoin={handleJoin} />}
 
-      {/* 헤더 */}
-      <div style={{
-        background: "#FFFFFF",
-        padding: "16px 20px 14px",
-        borderBottom: "1.5px solid #F5E6D3",
-        position: "sticky", top: 0, zIndex: 100,
-      }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          {/* 카페 로고 + 이름 */}
-          {cafeInfo && (
-            <div style={{
-              display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
-              flexShrink: 0,
-            }}>
-              <div style={{
-                width: 40, height: 40, borderRadius: 12,
-                overflow: "hidden",
-                background: `${cafeInfo.color}15`,
-                border: `1.5px solid ${cafeInfo.color}30`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={cafeInfo.logoPath}
-                  alt={cafeInfo.name}
-                  width={30}
-                  height={30}
-                  style={{ objectFit: "contain" }}
-                />
-              </div>
-              <span style={{ fontSize: 10, fontWeight: 700, color: cafeInfo.color }}>
-                {cafeInfo.name}
-              </span>
-            </div>
-          )}
-
-          {/* 방 이름 + 주문 현황 */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <h1 style={{
-                fontFamily: "'Gowun Dodum', sans-serif",
-                fontSize: 20, color: "#3E2723", lineHeight: 1.2,
-                overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-              }}>
-                {room?.room_name}
-              </h1>
-              {isClosed && (
-                <span className="chip" style={{ background: "#F5E6D3", color: "#6F4E37", fontSize: 12, flexShrink: 0 }}>
-                  ✨ 마감
-                </span>
-              )}
-            </div>
-            <div style={{ marginTop: 5, display: "flex", alignItems: "center", gap: 8 }}>
-              {isClosed ? (
-                <div style={{ fontSize: 12, color: "#8D6E63" }}>🔒 주문이 마감됐어요</div>
-              ) : (
-                <>
-                  <div style={{
-                    flex: 1,
-                    height: 6,
-                    borderRadius: 3,
-                    background: "#EDD9C0",
-                    position: "relative",
-                    overflow: "hidden",
-                  }}>
-                    <div style={{
-                      position: "absolute",
-                      top: 0, left: 0, bottom: 0,
-                      width: onlineCount > 0 ? `${(decidedCount / onlineCount) * 100}%` : "0%",
-                      background: "linear-gradient(90deg, #C9A57B, #6F4E37)",
-                      borderRadius: 3,
-                      transition: "width 0.4s ease",
-                    }} />
-                  </div>
-                  <span style={{ fontSize: 11, color: "#8D6E63", fontWeight: 600, flexShrink: 0 }}>
-                    {decidedCount}/{onlineCount}명
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* 공유 버튼 */}
-          {!isClosed && <ShareButton roomId={roomId} />}
+      {/* 메뉴/옵션 뷰용 미니 헤더 */}
+      {view !== "room" && (
+        <div style={{
+          background: "#FFFFFF",
+          padding: "14px 20px",
+          borderBottom: "1.5px solid #F5E6D3",
+          position: "sticky", top: 0, zIndex: 100,
+          display: "flex", alignItems: "center", gap: 12,
+        }}>
+          <button
+            onClick={view === "options" ? () => setView("menu") : handleCancelToRoom}
+            style={{
+              background: "#F5E6D3", border: "none", borderRadius: 12,
+              padding: "8px 14px", fontSize: 13, color: "#6F4E37",
+              cursor: "pointer", fontWeight: 600, fontFamily: "inherit",
+            }}
+          >
+            ← 뒤로
+          </button>
+          <h2 style={{ fontFamily: "'Gowun Dodum', sans-serif", fontSize: 18, color: "#3E2723" }}>
+            {view === "menu"
+              ? (cafeInfo ? `${cafeInfo.name} 메뉴` : "메뉴 선택 ☕")
+              : "옵션 선택"}
+          </h2>
         </div>
-      </div>
+      )}
 
       {/* 컨텐츠 */}
-      <div style={{ flex: 1, padding: "16px 20px", paddingBottom: 120, overflowY: "auto" }}>
+      <div style={{ flex: 1, padding: view === "room" ? "20px 20px" : "16px 20px", paddingBottom: 120, overflowY: "auto" }}>
 
         {view === "menu" && !isClosed && (
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-              <button
-                onClick={handleCancelToRoom}
-                style={{
-                  background: "#F5E6D3", border: "none", borderRadius: 12,
-                  padding: "8px 14px", fontSize: 13, color: "#6F4E37",
-                  cursor: "pointer", fontWeight: 600, fontFamily: "inherit",
-                }}
-              >
-                ← 뒤로
-              </button>
-              <h2 style={{ fontFamily: "'Gowun Dodum', sans-serif", fontSize: 18, color: "#3E2723" }}>
-                {cafeInfo ? `${cafeInfo.name} 메뉴` : "메뉴 선택 ☕"}
-              </h2>
-            </div>
-            <CoffeeMenuGrid
-              menu={cafeMenu}
-              selectedId={selectedMenu?.id ?? null}
-              onSelectMenu={handleSelectMenu}
-              onSelectCustom={handleSelectCustom}
-            />
-          </div>
+          <CoffeeMenuGrid
+            menu={cafeMenu}
+            selectedId={selectedMenu?.id ?? null}
+            onSelectMenu={handleSelectMenu}
+            onSelectCustom={handleSelectCustom}
+          />
         )}
 
         {view === "options" && selectedMenu && !isClosed && (
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
-              <button
-                onClick={() => setView("menu")}
-                style={{
-                  background: "#F5E6D3", border: "none", borderRadius: 12,
-                  padding: "8px 14px", fontSize: 13, color: "#6F4E37",
-                  cursor: "pointer", fontWeight: 600, fontFamily: "inherit",
-                }}
-              >
-                ← 뒤로
-              </button>
-              <h2 style={{ fontFamily: "'Gowun Dodum', sans-serif", fontSize: 18, color: "#3E2723" }}>
-                옵션 선택
-              </h2>
-            </div>
-            <OrderOptionsForm
-              menuItem={selectedMenu}
-              onSubmit={handleSubmitOrder}
-              onBack={() => setView("menu")}
-            />
-          </div>
+          <OrderOptionsForm
+            menuItem={selectedMenu}
+            onSubmit={handleSubmitOrder}
+            onBack={() => setView("menu")}
+          />
         )}
 
         {view === "room" && myUserId && (
           <RoomView
             participants={displayParticipants}
             currentUserId={myUserId}
-            isHost={isHost}
             roomName={room?.room_name ?? ""}
             isClosed={isClosed}
-            onEditOrder={handleEditOrder}
+            cafeLogoPath={cafeInfo?.logoPath ?? ""}
           />
         )}
       </div>
@@ -495,24 +407,25 @@ export function RoomPageClient({ roomId }: Props) {
         <div style={{
           position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)",
           width: "100%", maxWidth: 480,
-          background: "#FFFFFF",
-          borderTop: "1.5px solid #F5E6D3",
+          background: "#FFF8F0",
           padding: "12px 20px 28px",
           display: "flex", flexDirection: "column", gap: 10,
           zIndex: 200,
         }}>
-          {!myOrder && !isClosed && (
+          {!isClosed && (
             <div style={{ display: "flex", gap: 10 }}>
               <button
                 className="btn-hover"
                 onClick={() => {
-                  setView("menu");
-                  socketRef.current.emit("status:update", { status: "ordering" });
-                  setParticipants((prev) =>
-                    prev.map((p) =>
-                      p.user_id === myUserId ? { ...p, status: "ordering" } : p,
-                    ),
-                  );
+                  myOrder ? handleEditOrder() : (() => {
+                    setView("menu");
+                    socketRef.current.emit("status:update", { status: "ordering" });
+                    setParticipants((prev) =>
+                      prev.map((p) =>
+                        p.user_id === myUserId ? { ...p, status: "ordering" } : p,
+                      ),
+                    );
+                  })();
                 }}
                 style={{
                   flex: 3, padding: "16px", borderRadius: 18,
@@ -522,7 +435,7 @@ export function RoomPageClient({ roomId }: Props) {
                   fontFamily: "'Gowun Dodum', sans-serif",
                 }}
               >
-                메뉴 고르러 가기 ☕
+                {myOrder ? "✏️ 메뉴 수정하기" : "메뉴 고르러 가기 ☕"}
               </button>
               <button
                 className="btn-hover"
@@ -542,22 +455,25 @@ export function RoomPageClient({ roomId }: Props) {
           {isHost && !isClosed && (
             <button
               className="btn-hover"
-              onClick={handleCloseRoom}
+              onClick={handleCloseAndShare}
               style={{
-                width: "100%", padding: "13px", borderRadius: 16,
-                background: "#F5E6D3", color: "#6F4E37", border: "none",
-                fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                width: "100%", padding: "15px", borderRadius: 18,
+                background: "#FFFFFF", color: "#3E2723",
+                border: "1.5px solid #D8C8B8",
+                fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
               }}
             >
-              🔒 주문 마감하기
+              <span>📋</span>
+              <span>주문 마감 및 공유하기</span>
             </button>
           )}
 
           {isClosed && (
             <div style={{
-              padding: "12px", borderRadius: 16,
-              background: "linear-gradient(135deg, #F5E6D3, #FFF8F0)",
-              border: "1.5px solid #C9A57B",
+              padding: "14px", borderRadius: 18,
+              background: "#FFFFFF",
+              border: "1.5px solid #D8C8B8",
               textAlign: "center", color: "#6F4E37", fontSize: 14, fontWeight: 600,
             }}>
               ✨ 주문이 마감됐어요! 맛있는 커피 타임 되세요 ☕

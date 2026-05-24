@@ -1,351 +1,290 @@
 "use client";
 
-import { useState } from "react";
 import type { Participant } from "@/lib/types";
+
 
 interface Props {
   participants: Participant[];
   currentUserId: string;
-  isHost: boolean;
   roomName: string;
   isClosed: boolean;
-  onEditOrder: () => void;
+  cafeLogoPath: string;
 }
 
 export function RoomView({
   participants,
   currentUserId,
-  isHost,
   roomName,
   isClosed,
-  onEditOrder,
+  cafeLogoPath,
 }: Props) {
-  const [copied, setCopied] = useState(false);
-
   const decided = participants.filter((p) => p.order !== null);
   const pending = participants.filter((p) => p.order === null);
-  const skipped = decided.filter((p) => p.order?.menu_id === "skip");
   const ordered = decided.filter((p) => p.order?.menu_id !== "skip");
+  const totalCups = ordered.length;
+  const decidedCount = decided.length;
 
-  // 메뉴 그룹화
-  const groups: Record<string, { order: Participant["order"]; people: Participant[] }> = {};
-  decided.forEach((p) => {
-    if (!p.order) return;
-    const key = `${p.order.menu_name}(${p.order.temperature})`;
-    if (!groups[key]) groups[key] = { order: p.order, people: [] };
-    groups[key].people.push(p);
-  });
-
-  const summaryText = [
-    `📋 ${roomName} (총 ${ordered.length}잔)`,
-    ...Object.entries(groups)
-      .filter(([, g]) => g.order?.menu_id !== "skip")
-      .map(([key, g]) => {
-        const names = g.people
-          .map((p) => {
-            let n = p.user_name;
-            if (p.order?.note) n += `(${p.order.note})`;
-            return n;
-          })
-          .join(", ");
-        return `${g.order?.menu_emoji} ${key} x${g.people.length} - ${names}`;
-      }),
-  ].join("\n");
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(summaryText);
-    } catch {
-      const el = document.createElement("textarea");
-      el.value = summaryText;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand("copy");
-      document.body.removeChild(el);
+  // 음료별 집계
+  const drinkGroups: Record<string, {
+    name: string;
+    emoji: string;
+    people: { name: string; note: string }[];
+    count: number;
+  }> = {};
+  ordered.forEach((p) => {
+    const key = p.order!.menu_name;
+    if (!drinkGroups[key]) {
+      drinkGroups[key] = { name: key, emoji: p.order!.menu_emoji, people: [], count: 0 };
     }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+    drinkGroups[key].people.push({ name: p.user_name, note: p.order!.note });
+    drinkGroups[key].count++;
+  });
+  const rankedDrinks = Object.values(drinkGroups).sort((a, b) => b.count - a.count);
+
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {/* ── 주문 완료 ── */}
-      {decided.length > 0 && (
-        <div>
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: "#8D6E63",
-              letterSpacing: "0.05em",
-              textTransform: "uppercase",
-              marginBottom: 10,
-            }}
-          >
-            ✅ 주문 완료 · {decided.length}명
-            {skipped.length > 0 ? ` (패스 ${skipped.length}명 포함)` : ""}
-          </div>
+    <div style={{ display: "flex", flexDirection: "column" }}>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {decided.map((p) => (
+      {/* ── Hero ── */}
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+              <span style={{
+                display: "inline-flex", alignItems: "center", gap: 5,
+                background: "#FFECEC", borderRadius: 999, padding: "4px 10px",
+                fontSize: 11, fontWeight: 700, color: "#D94F4F",
+              }}>
+                <span style={{
+                  width: 6, height: 6, borderRadius: "50%",
+                  background: "#D94F4F", display: "inline-block",
+                }} />
+                실시간 집계
+              </span>
+              <span style={{ fontSize: 13, color: "#8D6E63", fontWeight: 600 }}>{roomName}</span>
+            </div>
+            <h1 style={{
+              fontFamily: "'Gowun Dodum', sans-serif",
+              fontSize: 30, color: "#3E2723", lineHeight: 1.25, fontWeight: 700,
+            }}>
+              오늘의<br />커피 주문
+            </h1>
+            <p style={{ fontSize: 13, color: "#8D6E63", marginTop: 8 }}>
+              {isClosed
+                ? "🔒 주문이 마감됐어요"
+                : pending.length > 0
+                  ? `마감까지 ${pending.length}명 대기 중`
+                  : "모두 입력 완료!"}
+            </p>
+          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={cafeLogoPath}
+            alt="cafe logo"
+            width={64}
+            height={64}
+            style={{ objectFit: "contain", flexShrink: 0, mixBlendMode: "multiply" }}
+          />
+        </div>
+      </div>
+
+      {/* ── Stats Card ── */}
+      <div style={{
+        background: "#3A1E0E", borderRadius: 20, padding: "18px 22px",
+        marginBottom: 24, color: "#FFF8F0",
+      }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <div>
+            <div style={{ fontSize: 11, opacity: 0.6, marginBottom: 6, letterSpacing: "0.04em" }}>전체 주문</div>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 3 }}>
+              <span style={{
+                fontFamily: "'Gowun Dodum', sans-serif",
+                fontSize: 44, fontWeight: 700, lineHeight: 1,
+              }}>
+                {totalCups}
+              </span>
+              <span style={{ fontSize: 18, opacity: 0.8, marginBottom: 4 }}>잔</span>
+            </div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{
+              fontFamily: "'Gowun Dodum', sans-serif",
+              fontSize: 30, fontWeight: 700, lineHeight: 1,
+            }}>
+              {decidedCount}/{participants.length}
+            </div>
+            <div style={{ fontSize: 11, opacity: 0.6, marginTop: 5 }}>입력 완료</div>
+          </div>
+        </div>
+        {/* Progress dots */}
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 7, marginTop: 16 }}>
+          {participants.map((_, i) => (
+            <div
+              key={i}
+              style={{
+                width: 10, height: 10, borderRadius: "50%",
+                background: i < decidedCount ? "#C9A57B" : "rgba(255,248,240,0.2)",
+                border: i < decidedCount ? "none" : "1.5px solid rgba(255,248,240,0.4)",
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* ── 음료별 집계 ── */}
+      {rankedDrinks.length > 0 && (
+        <div style={{ marginBottom: 24 }}>
+          <div style={{
+            fontSize: 12, color: "#8D6E63", fontWeight: 600,
+            letterSpacing: "0.02em", marginBottom: 10,
+          }}>
+            음료별 집계
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {rankedDrinks.map((drink) => (
+              <div
+                key={drink.name}
+                style={{
+                  background: "#FFFFFF", borderRadius: 18,
+                  padding: "14px 16px", border: "1px solid #F0E6D8",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  {/* 가게 로고 */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={cafeLogoPath}
+                    alt="cafe logo"
+                    width={28}
+                    height={28}
+                    style={{ objectFit: "contain", flexShrink: 0, mixBlendMode: "multiply" }}
+                  />
+                  {/* Info */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: "#3E2723" }}>
+                      {drink.name}
+                    </div>
+                    <div style={{
+                      fontSize: 11, color: "#8D6E63", marginTop: 2,
+                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                    }}>
+                      {drink.people
+                        .map((p) => (p.note ? `${p.name} · ${p.note}` : p.name))
+                        .join(", ")}
+                    </div>
+                  </div>
+                  {/* Count */}
+                  <div style={{ flexShrink: 0, textAlign: "right" }}>
+                    <span style={{
+                      fontFamily: "'Gowun Dodum', sans-serif",
+                      fontSize: 22, fontWeight: 700, color: "#3E2723",
+                    }}>
+                      {drink.count}
+                    </span>
+                    <span style={{ fontSize: 12, color: "#8D6E63", marginLeft: 1 }}>잔</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── 팀원 현황 ── */}
+      <div style={{ marginBottom: 24 }}>
+        <div style={{
+          fontSize: 12, color: "#8D6E63", fontWeight: 600,
+          letterSpacing: "0.02em", marginBottom: 10,
+        }}>
+          팀원 현황
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {participants.map((p) => {
+            const hasOrder = p.order !== null && p.order.menu_id !== "skip";
+            const isSkip = p.order?.menu_id === "skip";
+            const isMe = p.user_id === currentUserId;
+
+            let orderText = "";
+            if (hasOrder) {
+              const temp = p.order?.temperature === "HOT" ? "핫" : "아이스";
+              orderText = `${temp} ${p.order?.menu_name}`;
+              if (p.order?.note) orderText += ` (${p.order.note})`;
+            } else if (isSkip) {
+              orderText = "안먹을게요";
+            }
+
+            return (
               <div
                 key={p.user_id}
-                className="animate-fade-up"
                 style={{
-                  background: "#FFFFFF",
-                  borderRadius: 18,
-                  padding: "12px 14px",
-                  border: `2px solid ${p.user_id === currentUserId ? "#C9A57B" : "#F5E6D3"}`,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                  position: "relative",
+                  background: "#FFFFFF", borderRadius: 18,
+                  border: `1.5px solid ${isMe ? "#C9A57B" : "#F0E6D8"}`,
                   overflow: "hidden",
                 }}
               >
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    background: "linear-gradient(135deg, rgba(168,192,154,0.06), transparent)",
-                    pointerEvents: "none",
-                  }}
-                />
-                {/* 아바타 */}
-                <div
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 14,
-                    flexShrink: 0,
-                    background:
-                      p.order?.menu_id === "skip"
-                        ? "#EEE8E3"
-                        : "linear-gradient(135deg, #F5E6D3, #C9A57B)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 22,
-                  }}
-                >
-                  {p.order?.menu_emoji}
-                </div>
-                {/* 정보 */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                    <span
-                      style={{
-                        fontWeight: 700,
-                        fontSize: 14,
-                        color: p.order?.menu_id === "skip" ? "#A89990" : "#3E2723",
-                      }}
-                    >
-                      {p.user_name}
-                    </span>
-                    {p.is_host && <span style={{ fontSize: 13 }}>👑</span>}
-                    {p.user_id === currentUserId && (
-                      <span
-                        className="chip"
-                        style={{ background: "#F5E6D3", color: "#6F4E37", fontSize: 10 }}
-                      >
-                        나
-                      </span>
-                    )}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 12,
-                      color: p.order?.menu_id === "skip" ? "#C9A57B" : "#6F4E37",
-                      fontWeight: 600,
-                      marginTop: 1,
-                    }}
-                  >
-                    {p.order?.menu_id === "skip"
-                      ? "안먹을게요"
-                      : `${p.order?.menu_name} ${p.order?.temperature}${
-                          p.order?.size ? ` · ${p.order.size}` : ""
-                        }${p.order?.note ? ` · ${p.order.note}` : ""}`}
-                  </div>
-                </div>
-                {/* 수정 버튼 (나인 경우) */}
-                {p.user_id === currentUserId && !isClosed && (
-                  <button
-                    className="btn-hover"
-                    onClick={onEditOrder}
-                    style={{
-                      padding: "6px 12px",
-                      borderRadius: 10,
-                      flexShrink: 0,
-                      background: "#F5E6D3",
-                      color: "#6F4E37",
-                      border: "none",
-                      fontSize: 11,
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      fontFamily: "inherit",
-                    }}
-                  >
-                    수정
-                  </button>
-                )}
-                {p.user_id !== currentUserId && (
-                  <span style={{ color: "#A8C09A", fontSize: 18, flexShrink: 0 }}>✓</span>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* 집계 & 복사 — 방장만 */}
-          {isHost && ordered.length >= 1 && (
-            <div
-              style={{
-                marginTop: 12,
-                background: "#F5E6D3",
-                borderRadius: 16,
-                padding: "14px 16px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 12,
-              }}
-            >
-              <div style={{ fontSize: 13, color: "#6F4E37", fontWeight: 600 }}>
-                총 {ordered.length}잔 집계됐어요
-              </div>
-              <button
-                className="btn-hover"
-                onClick={handleCopy}
-                style={{
-                  padding: "7px 14px",
-                  borderRadius: 10,
-                  flexShrink: 0,
-                  background: copied ? "#A8C09A" : "#6F4E37",
-                  color: "#FFF8F0",
-                  border: "none",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  fontFamily: "inherit",
-                  transition: "background 0.2s",
+              <div style={{
+                  padding: "13px 16px",
+                  display: "flex", alignItems: "center", gap: 12,
+                  opacity: !p.is_online && !p.order ? 0.35 : 1,
+                  filter: !p.is_online && !p.order ? "grayscale(60%)" : "none",
                 }}
               >
-                {copied ? "복사됨 ✓" : "📋 주문 복사"}
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ── 고르는 중 ── */}
-      {pending.length > 0 && (
-        <div>
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: "#8D6E63",
-              letterSpacing: "0.05em",
-              textTransform: "uppercase",
-              marginBottom: 10,
-            }}
-          >
-            ⏳ 고르는 중 · {pending.length}명
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {pending.map((p) => (
-              <div
-                key={p.user_id}
-                style={{
-                  background: "#FFFFFF",
-                  borderRadius: 18,
-                  padding: "12px 14px",
-                  border: `2px solid ${p.user_id === currentUserId ? "#C9A57B" : "#F5E6D3"}`,
-                  opacity: p.is_online ? 1 : 0.5,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                }}
-              >
-                {/* 아바타 */}
-                <div
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 14,
-                    flexShrink: 0,
-                    background: p.is_online ? "#F5E6D3" : "#EEE8E3",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 18,
-                    color: p.is_online ? "#C9A57B" : "#C0B0A8",
-                    fontWeight: 700,
-                  }}
-                >
-                  ?
-                </div>
-                {/* 정보 */}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                    <span
-                      style={{
-                        fontWeight: 700,
-                        fontSize: 14,
-                        color: p.is_online ? "#3E2723" : "#A89990",
-                      }}
-                    >
-                      {p.user_name}
-                    </span>
-                    {p.is_host && <span style={{ fontSize: 13 }}>👑</span>}
-                    {p.user_id === currentUserId && (
-                      <span
-                        className="chip"
-                        style={{ background: "#F5E6D3", color: "#6F4E37", fontSize: 10 }}
-                      >
-                        나
-                      </span>
-                    )}
-                  </div>
-                  {p.status === "ordering" ? (
-                    <div
-                      style={{ fontSize: 12, color: "#D4A574", fontWeight: 600, marginTop: 1 }}
-                    >
-                      고민중<span className="thinking-dots" />
-                    </div>
-                  ) : p.status === "editing" ? (
-                    <div
-                      style={{ fontSize: 12, color: "#A8C09A", fontWeight: 600, marginTop: 1 }}
-                    >
-                      변경중<span className="thinking-dots" />
+                {/* 왼쪽: 상태 이모지 */}
+                <div style={{ width: 32, height: 32, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  {p.order ? (
+                    <div style={{
+                      width: 32, height: 32, borderRadius: "50%",
+                      border: "2.5px solid #4CAF50",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 17, color: "#4CAF50", fontWeight: 900, lineHeight: 1,
+                    }}>
+                      ✔
                     </div>
                   ) : (
-                    <div style={{ fontSize: 12, color: "#C9A57B", marginTop: 1 }}>
-                      {p.is_online ? "접속 중" : "오프라인"}
+                    <div style={{
+                      width: 32, height: 32, borderRadius: "50%",
+                      border: "2.5px solid #E05252",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 15, color: "#E05252", fontWeight: 900, lineHeight: 1,
+                    }}>
+                      ✖
                     </div>
                   )}
                 </div>
-                {/* 상태 점 */}
-                <div
-                  className={`status-dot ${
-                    p.status === "ordering" || p.status === "editing"
-                      ? "status-ordering"
-                      : p.is_online
-                      ? "status-online"
-                      : "status-offline"
-                  }`}
-                />
+                {/* Name */}
+                <div style={{ fontWeight: 700, fontSize: 14, color: "#3E2723", flexShrink: 0 }}>
+                  {p.user_name}
+                </div>
+                {/* Spacer */}
+                <div style={{ flex: 1 }} />
+                {/* 오른쪽: 주문 내용 or 상태 */}
+                {p.order ? (
+                  <span style={{ fontSize: 12, color: "#6F4E37", fontWeight: 500 }}>
+                    {orderText}
+                  </span>
+                ) : p.status === "ordering" ? (
+                  <span style={{ fontSize: 12, color: "#D4A574", fontWeight: 600 }}>
+                    고민중<span className="thinking-dots" />
+                  </span>
+                ) : p.status === "editing" ? (
+                  <span style={{ fontSize: 12, color: "#A8C09A", fontWeight: 600 }}>
+                    수정중<span className="thinking-dots" />
+                  </span>
+                ) : p.is_online ? (
+                  <span style={{ fontSize: 12, color: "#C9A57B" }}>접속 중</span>
+                ) : (
+                  <span style={{ fontSize: 12, color: "#B0A098" }}>오프라인</span>
+                )}
               </div>
-            ))}
-          </div>
+              </div>
+            );
+          })}
         </div>
-      )}
+      </div>
 
-      {decided.length === 0 && pending.length === 0 && (
-        <div style={{ textAlign: "center", padding: "40px 0", color: "#C9A57B" }}>
-          🥱 아직 아무도 없어요
-        </div>
-      )}
+
+      {/* Bottom spacer for fixed bar */}
+      <div style={{ height: 100 }} />
     </div>
   );
 }

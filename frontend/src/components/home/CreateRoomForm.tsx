@@ -296,18 +296,6 @@ export function CreateRoomForm() {
           </form>
         </div>
 
-        <p
-          className="animate-fade-up"
-          style={{
-            textAlign: "center",
-            color: "#C9A57B",
-            fontSize: 13,
-            marginTop: 20,
-            animationDelay: "0.2s",
-          }}
-        >
-          로그인 없이 바로 시작해요 🥱
-        </p>
       </div>
     </div>
   );
