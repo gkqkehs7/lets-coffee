@@ -160,12 +160,14 @@ export function RoomView({
             음료별 집계
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {rankedDrinks.map((drink) => (
+            {rankedDrinks.map((drink) => {
+              const isMyDrink = drink.people.some((p) => p.isMe);
+              return (
               <div
                 key={drink.name}
                 style={{
                   background: "#FFFFFF", borderRadius: 18,
-                  padding: "14px 16px", border: "1px solid #F0E6D8",
+                  padding: "14px 16px", border: `1.5px solid ${isMyDrink ? "#C9A57B" : "#F0E6D8"}`,
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -178,8 +180,15 @@ export function RoomView({
                     style={{ objectFit: "contain", flexShrink: 0, mixBlendMode: "multiply" }}
                   />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 15, fontWeight: 700, color: "#3E2723" }}>
-                      {drink.name}
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ fontSize: 15, fontWeight: 700, color: "#3E2723" }}>{drink.name}</span>
+                      {isMyDrink && (
+                        <span style={{
+                          fontSize: 10, fontWeight: 700, color: "#C9A57B",
+                          background: "#FFF3E0", borderRadius: 999,
+                          padding: "2px 7px", lineHeight: 1.4,
+                        }}>나</span>
+                      )}
                     </div>
                     <div style={{
                       fontSize: 11, color: "#8D6E63", marginTop: 2,
@@ -206,7 +215,8 @@ export function RoomView({
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
             {skipped.length > 0 && (
               <div style={{
                 background: "#FAFAFA", borderRadius: 18,

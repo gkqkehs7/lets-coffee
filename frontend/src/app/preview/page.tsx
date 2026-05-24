@@ -226,7 +226,7 @@ export default function PreviewPage() {
                 padding: "14px", borderRadius: 18, background: "#FFFFFF",
                 border: "1.5px solid #D8C8B8", textAlign: "center", color: "#6F4E37", fontSize: 14, fontWeight: 600,
               }}>
-                ✨ 주문이 마감됐어요! 맛있는 커피 타임 되세요 ☕
+                주문이 마감됐어요! 맛있는 커피 타임 되세요 ☕
               </div>
             )}
           </div>
