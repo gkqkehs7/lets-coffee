@@ -9,6 +9,7 @@ interface Props {
   roomName: string;
   isClosed: boolean;
   cafeLogoPath: string;
+  onShare?: () => void;
 }
 
 export function RoomView({
@@ -17,6 +18,7 @@ export function RoomView({
   roomName,
   isClosed,
   cafeLogoPath,
+  onShare,
 }: Props) {
   const decided = participants.filter((p) => p.order !== null);
   const pending = participants.filter((p) => p.order === null);
@@ -92,7 +94,7 @@ export function RoomView({
       {/* ── Stats Card ── */}
       <div style={{
         background: "#3A1E0E", borderRadius: 20, padding: "18px 22px",
-        marginBottom: 24, color: "#FFF8F0",
+        marginBottom: 8, color: "#FFF8F0",
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
           <div>
@@ -131,6 +133,22 @@ export function RoomView({
           ))}
         </div>
       </div>
+
+      {/* ── 공유 버튼 ── */}
+      {onShare && (
+        <button
+          onClick={onShare}
+          style={{
+            width: "100%", padding: "14px", borderRadius: 18, marginBottom: 24,
+            background: "#F5E6D3", color: "#6F4E37",
+            border: "none", fontSize: 14, fontWeight: 700, cursor: "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+            fontFamily: "inherit",
+          }}
+        >
+          <span>🔗</span><span>링크 공유하기</span>
+        </button>
+      )}
 
       {/* ── 음료별 집계 ── */}
       {(rankedDrinks.length > 0 || skipped.length > 0) && (

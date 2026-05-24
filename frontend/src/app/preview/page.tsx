@@ -182,7 +182,8 @@ export default function PreviewPage() {
               roomName="개발팀"
               cafeLogoPath={cafe.logoPath}
               isClosed={isClosed}
-                    />
+              onShare={() => alert("링크 복사 완료! ✨")}
+            />
           </div>
 
           {/* Mock 하단 바 */}
