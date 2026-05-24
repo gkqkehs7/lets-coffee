@@ -35,14 +35,12 @@ const MOCK_PARTICIPANTS: Participant[] = [
     joined_at: new Date().toISOString(),
   },
   {
-    user_id: "user-4", user_name: "승현", is_host: false, is_online: true, status: "decided",
-    order: { menu_id: "americano", menu_name: "아메리카노", menu_emoji: "☕", temperature: "HOT", size: null, note: "" },
-    joined_at: new Date().toISOString(),
+    user_id: "user-4", user_name: "승현", is_host: false, is_online: true, status: "ordering",
+    order: null, joined_at: new Date().toISOString(),
   },
   {
-    user_id: "user-5", user_name: "도영", is_host: false, is_online: true, status: "decided",
-    order: { menu_id: "latte", menu_name: "카페라떼", menu_emoji: "☕", temperature: "ICED", size: null, note: "" },
-    joined_at: new Date().toISOString(),
+    user_id: "user-5", user_name: "도영", is_host: false, is_online: true, status: "editing",
+    order: null, joined_at: new Date().toISOString(),
   },
   {
     user_id: "user-6", user_name: "채원", is_host: false, is_online: true, status: "thinking",

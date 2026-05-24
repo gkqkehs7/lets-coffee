@@ -256,94 +256,73 @@ export function RoomView({
           팀원 현황
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {participants.map((p) => {
-            const hasOrder = p.order !== null && p.order.menu_id !== "skip";
-            const isSkip = p.order?.menu_id === "skip";
+          {[
+            ...participants.filter((p) => p.order !== null),
+            ...participants.filter((p) => p.order === null && p.is_online),
+            ...participants.filter((p) => p.order === null && !p.is_online),
+          ].map((p) => {
+            const isDone = p.order !== null;
+            const isOffline = !p.is_online && !isDone;
             const isMe = p.user_id === currentUserId;
 
             let orderText = "";
-            if (hasOrder) {
-              const temp = p.order?.temperature === "HOT" ? "핫" : "아이스";
-              orderText = `${temp} ${p.order?.menu_name}`;
-              if (p.order?.note) orderText += ` (${p.order.note})`;
-            } else if (isSkip) {
-              orderText = "안먹을게요";
+            if (isDone && p.order!.menu_id === "skip") {
+              orderText = "안먹어요";
+            } else if (isDone) {
+              const temp = p.order!.temperature === "HOT" ? "핫" : "아이스";
+              orderText = `${temp} ${p.order!.menu_name}`;
+              if (p.order!.note) orderText += ` (${p.order!.note})`;
             }
+
+            const borderColor = isDone ? "#4CAF6A" : "#F4A830";
 
             return (
               <div
                 key={p.user_id}
                 style={{
-                  background: "#FFFFFF", borderRadius: 18,
-                  border: `1.5px solid ${isMe ? "#C9A57B" : "#F0E6D8"}`,
-                  overflow: "hidden",
-                }}
-              >
-              <div style={{
+                  background: "#FFFFFF",
+                  borderTop: "1.5px solid #E8DDD4",
+                  borderRight: "1.5px solid #E8DDD4",
+                  borderBottom: "1.5px solid #E8DDD4",
+                  borderLeft: `4px solid ${borderColor}`,
+                  borderRadius: "0 14px 14px 0",
                   padding: "13px 16px",
-                  display: "flex", alignItems: "center", gap: 12,
-                  opacity: !p.is_online && !p.order ? 0.35 : 1,
-                  filter: !p.is_online && !p.order ? "grayscale(60%)" : "none",
+                  display: "flex", alignItems: "center", gap: 13,
+                  letterSpacing: "-0.04em",
+                  opacity: isOffline ? 0.38 : 1,
                 }}
               >
-                {/* 왼쪽: 상태 이모지 */}
-                <div style={{ width: 32, height: 32, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  {p.order ? (
-                    <div style={{
-                      width: 32, height: 32, borderRadius: "50%",
-                      border: "2.5px solid #4CAF50",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 17, color: "#4CAF50", fontWeight: 900, lineHeight: 1,
-                    }}>
-                      ✔
-                    </div>
-                  ) : (
-                    <div style={{
-                      width: 32, height: 32, borderRadius: "50%",
-                      border: "2.5px solid #E05252",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 15, color: "#E05252", fontWeight: 900, lineHeight: 1,
-                    }}>
-                      ✖
-                    </div>
-                  )}
-                </div>
-                {/* Name */}
-                <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                  <span style={{ fontWeight: 700, fontSize: 14, color: "#3E2723" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1, minWidth: 0 }}>
+                  <span style={{ fontWeight: 700, fontSize: 15, color: "#2C1A0E" }}>
                     {p.user_name}
                   </span>
                   {isMe && (
                     <span style={{
                       fontSize: 10, fontWeight: 700, color: "#C9A57B",
                       background: "#FFF3E0", borderRadius: 999,
-                      padding: "2px 7px", lineHeight: 1.4,
+                      padding: "2px 7px", lineHeight: 1.4, flexShrink: 0,
                     }}>
                       나
                     </span>
                   )}
                 </div>
-                {/* Spacer */}
-                <div style={{ flex: 1 }} />
-                {/* 오른쪽: 주문 내용 or 상태 */}
-                {p.order ? (
-                  <span style={{ fontSize: 12, color: "#6F4E37", fontWeight: 500 }}>
+                {isDone ? (
+                  <span style={{ fontSize: 13, color: "#7A5C44", whiteSpace: "nowrap" }}>
                     {orderText}
                   </span>
                 ) : p.status === "ordering" ? (
-                  <span style={{ fontSize: 12, color: "#D4A574", fontWeight: 600 }}>
+                  <span style={{ fontSize: 13, color: "#CCBA9A", whiteSpace: "nowrap" }}>
                     고민중<span className="thinking-dots" />
                   </span>
                 ) : p.status === "editing" ? (
-                  <span style={{ fontSize: 12, color: "#A8C09A", fontWeight: 600 }}>
+                  <span style={{ fontSize: 13, color: "#CCBA9A", whiteSpace: "nowrap" }}>
                     수정중<span className="thinking-dots" />
                   </span>
-                ) : p.is_online ? (
-                  <span style={{ fontSize: 12, color: "#C9A57B" }}>접속 중</span>
                 ) : (
-                  <span style={{ fontSize: 12, color: "#B0A098" }}>오프라인</span>
+                  <span style={{ fontSize: 13, color: "#CCBA9A", fontStyle: "italic", whiteSpace: "nowrap" }}>
+                    {isOffline ? "오프라인" : "주문 전"}
+                  </span>
                 )}
-              </div>
               </div>
             );
           })}
