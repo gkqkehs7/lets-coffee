@@ -70,6 +70,7 @@ export default function PreviewPage() {
   const [linkCopied, setLinkCopied] = useState(false);
   const [menuView, setMenuView] = useState<"grid" | "options">("grid");
   const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
+  const [committedMenu, setCommittedMenu] = useState<MenuItem | null>(null);
 
   const cafe = CAFE_LIST.find((c) => c.id === cafeId) ?? CAFE_LIST[0];
   const currentUserId = currentUser === "host" ? "user-1" : currentUser === "member-ordered" ? "user-2" : "user-4";
@@ -163,36 +164,35 @@ export default function PreviewPage() {
             ))}
           </div>
           {/* 메뉴/옵션 헤더 */}
-          {menuView === "options" && (
-            <div style={{
-              background: "#FFFFFF", padding: "14px 20px",
-              borderBottom: "1.5px solid #F5E6D3",
-              display: "flex", alignItems: "center", gap: 12,
-            }}>
-              <button
-                onClick={() => { setMenuView("grid"); setSelectedMenu(null); }}
-                style={{
-                  background: "#F5E6D3", border: "none", borderRadius: 12,
-                  padding: "8px 14px", fontSize: 13, color: "#6F4E37",
-                  cursor: "pointer", fontWeight: 600,
-                }}
-              >← 뒤로</button>
-              <h2 style={{ fontFamily: "'Gowun Dodum', sans-serif", fontSize: 18, color: "#3E2723" }}>옵션 선택</h2>
-            </div>
-          )}
+          <div style={{
+            background: "#FFFFFF", padding: "10px 20px",
+            borderBottom: "1.5px solid #F5E6D3",
+            position: "sticky", top: 0, zIndex: 100,
+            display: "flex", alignItems: "center", gap: 12,
+          }}>
+            <button
+              onClick={() => { setSelectedMenu(committedMenu); setMenuView("grid"); }}
+              style={{
+                background: "#F5E6D3", border: "none", borderRadius: 12,
+                padding: "8px 14px", fontSize: 13, color: "#6F4E37",
+                cursor: "pointer", fontWeight: 600, flexShrink: 0,
+              }}
+            >← 뒤로</button>
+            {menuView === "grid" && (
+              <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={cafe.logoPath}
+                  alt={cafe.name}
+                  width={52}
+                  height={52}
+                  style={{ objectFit: "contain", mixBlendMode: "multiply", display: "block" }}
+                />
+              </div>
+            )}
+          </div>
           <div style={{ maxWidth: 480, margin: "0 auto", background: "#FFF8F0", minHeight: "calc(100vh - 90px)", padding: "16px 20px 140px" }}>
             {menuView === "grid" && (
-              <>
-                <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={cafe.logoPath}
-                    alt={cafe.name}
-                    width={80}
-                    height={80}
-                    style={{ objectFit: "contain", mixBlendMode: "multiply" }}
-                  />
-                </div>
               <CoffeeMenuGrid
                 menu={getMenuByCafe(cafe.id)}
                 selectedId={selectedMenu?.id ?? null}
@@ -200,13 +200,12 @@ export default function PreviewPage() {
                 onSelectCustom={() => { setSelectedMenu({ id: "custom", name: "", emoji: "✏️", category: "coffee", iced: true }); setMenuView("options"); }}
                 cafeId={cafe.id}
               />
-              </>
             )}
             {menuView === "options" && selectedMenu && (
               <OrderOptionsForm
                 menuItem={selectedMenu}
-                onSubmit={(order) => { alert(`주문: ${order.menu_name}`); setMenuView("grid"); setSelectedMenu(null); }}
-                onBack={() => { setMenuView("grid"); setSelectedMenu(null); }}
+                onSubmit={(order) => { alert(`주문: ${order.menu_name}`); setCommittedMenu(selectedMenu); setMenuView("grid"); }}
+                onBack={() => { setSelectedMenu(committedMenu); setMenuView("grid"); }}
                 cafeId={cafe.id}
               />
             )}
