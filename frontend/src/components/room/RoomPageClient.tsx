@@ -33,6 +33,7 @@ export function RoomPageClient({ roomId }: Props) {
 
   const [view, setView] = useState<ViewState>("room");
   const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
+  const [committedMenu, setCommittedMenu] = useState<MenuItem | null>(null);
 
   const [showConfetti, setShowConfetti] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -211,6 +212,7 @@ export function RoomPageClient({ roomId }: Props) {
         p.user_id === myUserId ? { ...p, status: "decided", order } : p,
       ),
     );
+    setCommittedMenu(selectedMenu);
     setView("room");
     setShowConfetti(true);
   };
@@ -322,7 +324,7 @@ export function RoomPageClient({ roomId }: Props) {
           display: "flex", alignItems: "center", gap: 12,
         }}>
           <button
-            onClick={view === "options" ? () => { setSelectedMenu(null); setView("menu"); } : handleCancelToRoom}
+            onClick={view === "options" ? () => { setSelectedMenu(committedMenu); setView("menu"); } : handleCancelToRoom}
             style={{
               background: "#F5E6D3", border: "none", borderRadius: 12,
               padding: "8px 14px", fontSize: 13, color: "#6F4E37",
@@ -371,7 +373,7 @@ export function RoomPageClient({ roomId }: Props) {
           <OrderOptionsForm
             menuItem={selectedMenu}
             onSubmit={handleSubmitOrder}
-            onBack={() => { setSelectedMenu(null); setView("menu"); }}
+            onBack={() => { setSelectedMenu(committedMenu); setView("menu"); }}
             cafeId={room?.cafe_id}
           />
         )}
