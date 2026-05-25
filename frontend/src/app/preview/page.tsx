@@ -163,7 +163,7 @@ export default function PreviewPage() {
               }}>{c.name}</button>
             ))}
           </div>
-          <div style={{ maxWidth: 480, margin: "0 auto", background: "#FFF8F0", minHeight: "calc(100vh - 90px)", padding: "16px 20px 140px" }}>
+          <div style={{ maxWidth: 480, margin: "0 auto", background: "#FFF8F0", minHeight: "calc(100vh - 90px)", padding: "16px 20px 140px", ...(menuView === "options" && { display: "flex", flexDirection: "column", justifyContent: "center" }) }}>
             {menuView === "grid" && (
               <>
                 <div style={{ display: "flex", flexDirection: "column", marginBottom: 20 }}>

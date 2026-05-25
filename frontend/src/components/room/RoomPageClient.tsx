@@ -316,7 +316,10 @@ export function RoomPageClient({ roomId }: Props) {
 
 
       {/* 컨텐츠 */}
-      <div style={{ flex: 1, padding: view === "room" ? "20px 20px" : "16px 20px", paddingBottom: 120, overflowY: "auto" }}>
+      <div style={{
+        flex: 1, padding: view === "room" ? "20px 20px" : "16px 20px", paddingBottom: 120, overflowY: "auto",
+        ...(view === "options" && { display: "flex", flexDirection: "column", justifyContent: "center" }),
+      }}>
 
         {view === "menu" && !isClosed && (
           <>
