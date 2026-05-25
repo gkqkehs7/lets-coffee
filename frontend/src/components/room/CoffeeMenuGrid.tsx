@@ -144,7 +144,7 @@ export function CoffeeMenuGrid({ menu, selectedId, onSelectMenu, onSelectCustom,
             onClick={() => setActiveCat(cat.id)}
             style={{
               padding: "7px 14px",
-              borderRadius: 20,
+              borderRadius: 15,
               border: activeCat === cat.id ? "2px solid #6F4E37" : "2px solid #F5E6D3",
               background: activeCat === cat.id
                 ? "linear-gradient(135deg, #C9A57B, #6F4E37)"

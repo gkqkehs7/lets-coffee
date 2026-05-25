@@ -166,16 +166,22 @@ export default function PreviewPage() {
           <div style={{ maxWidth: 480, margin: "0 auto", background: "#FFF8F0", minHeight: "calc(100vh - 90px)", padding: "16px 20px 140px" }}>
             {menuView === "grid" && (
               <>
-                <div style={{ position: "relative", display: "flex", alignItems: "center", marginBottom: 20 }}>
-                  <button
-                    onClick={() => setMenuView("grid")}
-                    style={{
-                      background: "none", border: "none", fontSize: 20,
-                      color: "#6F4E37", cursor: "pointer", padding: "4px 8px",
-                      lineHeight: 1,
-                    }}
-                  >←</button>
-                  <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
+                <div style={{ display: "flex", flexDirection: "column", marginBottom: 20 }}>
+                  <div>
+                    <button
+                      onClick={() => setMenuView("grid")}
+                      style={{
+                        background: "none", border: "none",
+                        color: "#6F4E37", cursor: "pointer", padding: "4px 8px",
+                        fontFamily: "inherit", fontSize: 15, fontWeight: 600,
+                        display: "flex", alignItems: "center", gap: 4,
+                      }}
+                    >
+                      <span>←</span>
+                      <span>뒤로가기</span>
+                    </button>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "center", marginTop: 8 }}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={cafe.logoPath}
