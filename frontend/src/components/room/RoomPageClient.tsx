@@ -319,8 +319,7 @@ export function RoomPageClient({ roomId }: Props) {
           padding: "10px 20px",
           borderBottom: "1.5px solid #F5E6D3",
           position: "sticky", top: 0, zIndex: 100,
-          display: "flex", alignItems: "center",
-          ...(view === "menu" ? { position: "relative" as const } : { gap: 12 }),
+          display: "flex", alignItems: "center", gap: 12,
         }}>
           <button
             onClick={view === "options" ? () => { setSelectedMenu(null); setView("menu"); } : handleCancelToRoom}
