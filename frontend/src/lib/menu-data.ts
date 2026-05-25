@@ -45,7 +45,7 @@ export function getCategoriesByCafe(cafeId: CafeId): { id: string; label: string
 
 // ─── 메가커피 이미지 경로 헬퍼 ────────────────────────────────────────────────
 
-function megaImg(category: string, temp: "hot" | "ice", name: string, ext: "jpg" | "png" = "jpg"): string {
+function megaImg(category: string, temp: "hot" | "ice", name: string, ext: "webp" = "webp"): string {
   return `/cafes/menus/mega/${encodeURIComponent(category)}/${temp}/${encodeURIComponent(name)}.${ext}`;
 }
 
@@ -154,7 +154,7 @@ const MEGA: MenuItem[] = [
   { id: "mega_tea_페퍼민트",   name: "페퍼민트",   emoji: "🌿", category: "티", iced: true,  imagePath: megaImg("티", "ice", "페퍼민트") },
   { id: "mega_tea_허니자몽블랙티", name: "허니자몽블랙티", emoji: "🍊", category: "티", iced: true, imagePath: megaImg("티", "ice", "허니자몽블랙티") },
   // 티 / hot only
-  { id: "mega_teahot_유자생강차", name: "유자생강차", emoji: "🫚", category: "티", iced: false, imagePath: megaImg("티", "hot", "유자생강차", "png") },
+  { id: "mega_teahot_유자생강차", name: "유자생강차", emoji: "🫚", category: "티", iced: false, imagePath: megaImg("티", "hot", "유자생강차", "webp") },
   // 티 / ice only
   { id: "mega_teaice_복숭아이스티",    name: "복숭아이스티",    emoji: "🍑", category: "티", iced: true, imagePath: megaImg("티", "ice", "복숭아이스티") },
   { id: "mega_teaice_왕메가사과유자",  name: "왕메가사과유자",  emoji: "🍎", category: "티", iced: true, imagePath: megaImg("티", "ice", "왕메가사과유자") },
@@ -163,13 +163,13 @@ const MEGA: MenuItem[] = [
 
   // ── 에이드&주스 (모두 ICE) ──
   { id: "mega_ade_레몬에이드",      name: "레몬에이드",      emoji: "🍋", category: "에이드&주스", iced: true, imagePath: megaImg("에이드&주스", "ice", "레몬에이드") },
-  { id: "mega_ade_자몽에이드",      name: "자몽에이드",      emoji: "🍊", category: "에이드&주스", iced: true, imagePath: megaImg("에이드&주스", "ice", "자몽에이드", "png") },
+  { id: "mega_ade_자몽에이드",      name: "자몽에이드",      emoji: "🍊", category: "에이드&주스", iced: true, imagePath: megaImg("에이드&주스", "ice", "자몽에이드", "webp") },
   { id: "mega_ade_청포도에이드",    name: "청포도에이드",    emoji: "🍇", category: "에이드&주스", iced: true, imagePath: megaImg("에이드&주스", "ice", "청포도에이드") },
   { id: "mega_ade_블루레몬에이드",  name: "블루레몬에이드",  emoji: "💙", category: "에이드&주스", iced: true, imagePath: megaImg("에이드&주스", "ice", "블루레몬에이드") },
   { id: "mega_ade_메가에이드",      name: "메가에이드",      emoji: "🟡", category: "에이드&주스", iced: true, imagePath: megaImg("에이드&주스", "ice", "메가에이드") },
   { id: "mega_ade_제로부스트에이드", name: "제로부스트에이드", emoji: "⚡", category: "에이드&주스", iced: true, imagePath: megaImg("에이드&주스", "ice", "제로부스트에이드") },
   { id: "mega_ade_라임모히또",      name: "라임모히또",      emoji: "🌿", category: "에이드&주스", iced: true, imagePath: megaImg("에이드&주스", "ice", "라임모히또") },
-  { id: "mega_ade_체리콜라",        name: "체리콜라",        emoji: "🍒", category: "에이드&주스", iced: true, imagePath: megaImg("에이드&주스", "ice", "체리콜라", "png") },
+  { id: "mega_ade_체리콜라",        name: "체리콜라",        emoji: "🍒", category: "에이드&주스", iced: true, imagePath: megaImg("에이드&주스", "ice", "체리콜라", "webp") },
   { id: "mega_ade_딸기주스",        name: "딸기주스",        emoji: "🍓", category: "에이드&주스", iced: true, imagePath: megaImg("에이드&주스", "ice", "딸기주스") },
   { id: "mega_ade_딸기바나나주스",  name: "딸기바나나주스",  emoji: "🍓", category: "에이드&주스", iced: true, imagePath: megaImg("에이드&주스", "ice", "딸기바나나주스") },
   { id: "mega_ade_골드키위주스",    name: "골드키위주스",    emoji: "🥝", category: "에이드&주스", iced: true, imagePath: megaImg("에이드&주스", "ice", "골드키위주스") },
@@ -177,12 +177,12 @@ const MEGA: MenuItem[] = [
 
   // ── 스무디&프라페 (모두 ICE) ──
   { id: "mega_smo_커피프라페",          name: "커피프라페",          emoji: "☕", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "커피프라페") },
-  { id: "mega_smo_녹차프라페",          name: "녹차프라페",          emoji: "🍵", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "녹차프라페", "png") },
+  { id: "mega_smo_녹차프라페",          name: "녹차프라페",          emoji: "🍵", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "녹차프라페", "webp") },
   { id: "mega_smo_민트프라페",          name: "민트프라페",          emoji: "🌿", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "민트프라페") },
   { id: "mega_smo_리얼초코프라페",      name: "리얼초코프라페",      emoji: "🍫", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "리얼초코프라페") },
   { id: "mega_smo_쿠키프라페",          name: "쿠키프라페",          emoji: "🍪", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "쿠키프라페") },
   { id: "mega_smo_딸기쿠키프라페",      name: "딸기쿠키프라페",      emoji: "🍓", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "딸기쿠키프라페") },
-  { id: "mega_smo_밀크쉐이크",          name: "밀크쉐이크",          emoji: "🥤", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "밀크쉐이크", "png") },
+  { id: "mega_smo_밀크쉐이크",          name: "밀크쉐이크",          emoji: "🥤", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "밀크쉐이크", "webp") },
   { id: "mega_smo_골드망고스무디",      name: "골드망고스무디",      emoji: "🥭", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "골드망고스무디") },
   { id: "mega_smo_망고요거트스무디",    name: "망고요거트스무디",    emoji: "🥭", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "망고요거트스무디") },
   { id: "mega_smo_딸기요거트",          name: "딸기요거트",          emoji: "🍓", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "딸기요거트") },
@@ -190,22 +190,22 @@ const MEGA: MenuItem[] = [
   { id: "mega_smo_블루베리요거트스무디", name: "블루베리요거트스무디", emoji: "🫐", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "블루베리요거트스무디") },
   { id: "mega_smo_귤톡톡제리스무디",    name: "귤톡톡제리스무디",    emoji: "🍊", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "귤톡톡제리스무디") },
   { id: "mega_smo_코코넛커피스무디",    name: "코코넛커피스무디",    emoji: "🥥", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "코코넛커피스무디") },
-  { id: "mega_smo_그린키위콕콕딸키스무디", name: "그린키위콕콕딸키스무디", emoji: "🥝", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "그린키위콕콕딸키스무디", "png") },
+  { id: "mega_smo_그린키위콕콕딸키스무디", name: "그린키위콕콕딸키스무디", emoji: "🥝", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "그린키위콕콕딸키스무디", "webp") },
   { id: "mega_smo_딸기퐁크러쉬",        name: "딸기퐁크러쉬",        emoji: "🍓", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "딸기퐁크러쉬") },
   { id: "mega_smo_바나나퐁크러쉬",      name: "바나나퐁크러쉬",      emoji: "🍌", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "바나나퐁크러쉬") },
   { id: "mega_smo_초코허니퐁크러쉬",    name: "초코허니퐁크러쉬",    emoji: "🍫", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "초코허니퐁크러쉬") },
   { id: "mega_smo_플레인퐁크러쉬",      name: "플레인퐁크러쉬",      emoji: "🥤", category: "스무디&프라페", iced: true, imagePath: megaImg("스무디&프라페", "ice", "플레인퐁크러쉬") },
 
   // ── 신상품 (모두 ICE) ──
-  { id: "mega_new_꿀수박주스",              name: "꿀수박주스",              emoji: "🍉", category: "신상품", iced: true, imagePath: megaImg("신상품", "ice", "꿀수박주스", "png") },
-  { id: "mega_new_수박리치코코슬러시",      name: "수박리치코코슬러시",      emoji: "🍉", category: "신상품", iced: true, imagePath: megaImg("신상품", "ice", "수박리치코코슬러시", "png") },
-  { id: "mega_new_수박소르베밀키스무디",    name: "수박소르베밀키스무디",    emoji: "🍉", category: "신상품", iced: true, imagePath: megaImg("신상품", "ice", "수박소르베밀키스무디", "png") },
-  { id: "mega_new_자몽톡톡스무디",          name: "자몽톡톡스무디",          emoji: "🍊", category: "신상품", iced: true, imagePath: megaImg("신상품", "ice", "자몽톡톡스무디", "png") },
-  { id: "mega_new_애플머스캣요거트스무디",  name: "애플머스캣요거트스무디",  emoji: "🍇", category: "신상품", iced: true, imagePath: megaImg("신상품", "ice", "애플머스캣요거트스무디", "png") },
-  { id: "mega_new_파인망고코코스무디",      name: "파인망고코코스무디",      emoji: "🍍", category: "신상품", iced: true, imagePath: megaImg("신상품", "ice", "파인망고코코스무디", "png") },
-  { id: "mega_new_제로레몬말차아이스티",    name: "제로레몬말차아이스티",    emoji: "🍵", category: "신상품", iced: true, imagePath: megaImg("신상품", "ice", "제로레몬말차아이스티", "png") },
-  { id: "mega_new_저당꿀배XO야구르트",      name: "저당꿀배XO야구르트",      emoji: "🍐", category: "신상품", iced: true, imagePath: megaImg("신상품", "ice", "저당꿀배XO야구르트", "png") },
-  { id: "mega_new_M망고G구아바C캐럿주스",   name: "M망고G구아바C캐럿주스",   emoji: "🥭", category: "신상품", iced: true, imagePath: megaImg("신상품", "ice", "M망고G구아바C캐럿주스", "png") },
+  { id: "mega_new_꿀수박주스",              name: "꿀수박주스",              emoji: "🍉", category: "신상품", iced: true, imagePath: megaImg("신상품", "ice", "꿀수박주스", "webp") },
+  { id: "mega_new_수박리치코코슬러시",      name: "수박리치코코슬러시",      emoji: "🍉", category: "신상품", iced: true, imagePath: megaImg("신상품", "ice", "수박리치코코슬러시", "webp") },
+  { id: "mega_new_수박소르베밀키스무디",    name: "수박소르베밀키스무디",    emoji: "🍉", category: "신상품", iced: true, imagePath: megaImg("신상품", "ice", "수박소르베밀키스무디", "webp") },
+  { id: "mega_new_자몽톡톡스무디",          name: "자몽톡톡스무디",          emoji: "🍊", category: "신상품", iced: true, imagePath: megaImg("신상품", "ice", "자몽톡톡스무디", "webp") },
+  { id: "mega_new_애플머스캣요거트스무디",  name: "애플머스캣요거트스무디",  emoji: "🍇", category: "신상품", iced: true, imagePath: megaImg("신상품", "ice", "애플머스캣요거트스무디", "webp") },
+  { id: "mega_new_파인망고코코스무디",      name: "파인망고코코스무디",      emoji: "🍍", category: "신상품", iced: true, imagePath: megaImg("신상품", "ice", "파인망고코코스무디", "webp") },
+  { id: "mega_new_제로레몬말차아이스티",    name: "제로레몬말차아이스티",    emoji: "🍵", category: "신상품", iced: true, imagePath: megaImg("신상품", "ice", "제로레몬말차아이스티", "webp") },
+  { id: "mega_new_저당꿀배XO야구르트",      name: "저당꿀배XO야구르트",      emoji: "🍐", category: "신상품", iced: true, imagePath: megaImg("신상품", "ice", "저당꿀배XO야구르트", "webp") },
+  { id: "mega_new_M망고G구아바C캐럿주스",   name: "M망고G구아바C캐럿주스",   emoji: "🥭", category: "신상품", iced: true, imagePath: megaImg("신상품", "ice", "M망고G구아바C캐럿주스", "webp") },
 ];
 
 const TWOSOME: MenuItem[] = [
