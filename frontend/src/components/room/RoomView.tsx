@@ -160,17 +160,9 @@ export function RoomView({
                   )}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ fontSize: 15, fontWeight: 700, color: "#3E2723" }}>{drink.name}</span>
-                      {drink.temperature && (
-                        <span style={{
-                          fontSize: 9, fontWeight: 700,
-                          padding: "2px 6px", borderRadius: 8, lineHeight: 1.4,
-                          background: drink.temperature === "HOT" ? "#FFF3E0" : "#E3F2FD",
-                          color:      drink.temperature === "HOT" ? "#E65100" : "#1565C0",
-                        }}>
-                          {drink.temperature === "HOT" ? "HOT" : "ICE"}
-                        </span>
-                      )}
+                      <span style={{ fontSize: 15, fontWeight: 700, color: "#3E2723" }}>
+                        {drink.temperature ? `${drink.temperature === "HOT" ? "HOT" : "ICE"} ${drink.name}` : drink.name}
+                      </span>
                       {isMyDrink && (
                         <span style={{
                           fontSize: 10, fontWeight: 700, color: "#C9A57B",
@@ -259,13 +251,21 @@ export function RoomView({
           {/* 주문완료 */}
           {participants.filter((p) => p.order !== null).map((p) => {
             const isMe = p.user_id === currentUserId;
+            const order = p.order!;
+            const isSkip = order.menu_id === "skip";
             let orderText = "";
-            if (p.order!.menu_id === "skip") {
+            if (isSkip) {
               orderText = "안먹어요";
             } else {
-              const temp = p.order!.temperature === "HOT" ? "핫" : "아이스";
-              orderText = `${temp} ${p.order!.menu_name}`;
+              const temp = order.temperature === "HOT" ? "HOT" : "ICE";
+              orderText = `${temp} ${order.menu_name}`;
             }
+            const menuItem = menuData.find((m) => m.id === order.menu_id);
+            const imgPath = !isSkip
+              ? (order.temperature === "HOT" && menuItem?.imagePathHot
+                  ? menuItem.imagePathHot
+                  : (menuItem?.imagePath ?? null))
+              : null;
             return (
               <div key={p.user_id} style={{
                 background: "#FFFFFF",
@@ -285,7 +285,28 @@ export function RoomView({
                     }}>나</span>
                   )}
                 </div>
-                <span style={{ fontSize: 13, color: "#7A5C44", whiteSpace: "nowrap" }}>{orderText}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 3, flexShrink: 0 }}>
+                  <span style={{ fontSize: 13, color: "#7A5C44", whiteSpace: "nowrap" }}>{orderText}</span>
+                  {isSkip ? (
+                    <div style={{
+                      width: 28, height: 28, flexShrink: 0,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 13, fontWeight: 900, color: "#B0A098",
+                      fontFamily: "'Quicksand', sans-serif", letterSpacing: "-0.02em",
+                      marginLeft: 4,
+                    }}>pass</div>
+                  ) : imgPath && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={imgPath}
+                      alt={order.menu_name}
+                      width={28}
+                      height={28}
+                      style={{ objectFit: "contain" }}
+                      onError={(e) => { e.currentTarget.style.display = "none"; }}
+                    />
+                  )}
+                </div>
               </div>
             );
           })}
@@ -300,7 +321,6 @@ export function RoomView({
                 padding: "13px 16px",
                 display: "flex", alignItems: "center", gap: 13,
                 letterSpacing: "-0.04em",
-                opacity: 0.38,
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, flex: 1, minWidth: 0 }}>
                   <span style={{ fontWeight: 700, fontSize: 15, color: "#2C1A0E" }}>{p.user_name}</span>
