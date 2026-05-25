@@ -367,6 +367,7 @@ export function RoomPageClient({ roomId }: Props) {
             currentUserId={myUserId}
             roomName={room?.room_name ?? ""}
             cafeLogoPath={cafeInfo?.logoPath ?? ""}
+            cafeId={room?.cafe_id}
           />
         )}
       </div>

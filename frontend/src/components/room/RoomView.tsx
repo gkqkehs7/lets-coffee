@@ -1,6 +1,7 @@
 "use client";
 
-import type { Participant } from "@/lib/types";
+import type { CafeId, Participant, Temperature } from "@/lib/types";
+import { getMenuByCafe } from "@/lib/menu-data";
 
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
   currentUserId: string;
   roomName: string;
   cafeLogoPath: string;
+  cafeId?: CafeId;
 }
 
 export function RoomView({
@@ -15,6 +17,7 @@ export function RoomView({
   currentUserId,
   roomName,
   cafeLogoPath,
+  cafeId,
 }: Props) {
   const decided = participants.filter((p) => p.order !== null);
   const ordered = decided.filter((p) => p.order?.menu_id !== "skip");
@@ -22,19 +25,31 @@ export function RoomView({
   const totalCups = ordered.length;
   const decidedCount = decided.length;
 
-  // 음료별 집계
-  const drinkGroups: Record<string, {
-    name: string;
-    emoji: string;
+  // 음료별 집계 (hot/ice 별도 그룹)
+  const menuData = cafeId ? getMenuByCafe(cafeId) : [];
+  type DrinkGroup = {
+    name: string; emoji: string;
+    temperature: Temperature | null; imagePath: string | null;
     people: { name: string; note: string; isMe: boolean }[];
     count: number;
-  }> = {};
+  };
+  const drinkGroups: Record<string, DrinkGroup> = {};
   ordered.forEach((p) => {
-    const key = p.order!.menu_name;
+    const order = p.order!;
+    const key = `${order.menu_name}_${order.temperature ?? ""}`;
     if (!drinkGroups[key]) {
-      drinkGroups[key] = { name: key, emoji: p.order!.menu_emoji, people: [], count: 0 };
+      const menuItem = menuData.find((m) => m.id === order.menu_id);
+      const imgPath =
+        order.temperature === "HOT" && menuItem?.imagePathHot
+          ? menuItem.imagePathHot
+          : (menuItem?.imagePath ?? null);
+      drinkGroups[key] = {
+        name: order.menu_name, emoji: order.menu_emoji,
+        temperature: order.temperature, imagePath: imgPath,
+        people: [], count: 0,
+      };
     }
-    drinkGroups[key].people.push({ name: p.user_name, note: p.order!.note, isMe: p.user_id === currentUserId });
+    drinkGroups[key].people.push({ name: p.user_name, note: order.note, isMe: p.user_id === currentUserId });
     drinkGroups[key].count++;
   });
   const rankedDrinks = Object.values(drinkGroups).sort((a, b) => b.count - a.count);
@@ -130,17 +145,32 @@ export function RoomView({
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={cafeLogoPath}
-                    alt="cafe logo"
-                    width={28}
-                    height={28}
-                    style={{ objectFit: "contain", flexShrink: 0, mixBlendMode: "multiply" }}
-                  />
+                  {drink.imagePath ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={drink.imagePath}
+                      alt={drink.name}
+                      width={36}
+                      height={36}
+                      style={{ objectFit: "contain", flexShrink: 0 }}
+                      onError={(e) => { e.currentTarget.style.display = "none"; }}
+                    />
+                  ) : (
+                    <span style={{ fontSize: 24, flexShrink: 0, width: 36, textAlign: "center" }}>{drink.emoji}</span>
+                  )}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <span style={{ fontSize: 15, fontWeight: 700, color: "#3E2723" }}>{drink.name}</span>
+                      {drink.temperature && (
+                        <span style={{
+                          fontSize: 9, fontWeight: 700,
+                          padding: "2px 6px", borderRadius: 8, lineHeight: 1.4,
+                          background: drink.temperature === "HOT" ? "#FFF3E0" : "#E3F2FD",
+                          color:      drink.temperature === "HOT" ? "#E65100" : "#1565C0",
+                        }}>
+                          {drink.temperature === "HOT" ? "HOT" : "ICE"}
+                        </span>
+                      )}
                       {isMyDrink && (
                         <span style={{
                           fontSize: 10, fontWeight: 700, color: "#C9A57B",

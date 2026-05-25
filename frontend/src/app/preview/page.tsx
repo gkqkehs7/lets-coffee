@@ -8,7 +8,7 @@ import { CafeLogoLoader } from "@/components/ui/CafeLogoLoader";
 import { CoffeeMenuGrid } from "@/components/room/CoffeeMenuGrid";
 import { OrderOptionsForm } from "@/components/room/OrderOptionsForm";
 import { CAFE_LIST, getMenuByCafe } from "@/lib/menu-data";
-import type { MenuItem, Participant } from "@/lib/types";
+import type { CafeId, MenuItem, Participant } from "@/lib/types";
 
 type Screen = "home" | "loading" | "notfound" | "join" | "room" | "menu";
 
@@ -24,26 +24,28 @@ const SCREENS: { id: Screen; label: string }[] = [
 const MOCK_PARTICIPANTS: Participant[] = [
   {
     user_id: "user-1", user_name: "민우", is_host: true, is_online: true, status: "decided",
-    order: { menu_id: "americano", menu_name: "아메리카노", menu_emoji: "☕", temperature: "ICED", size: null, note: "" },
+    order: { menu_id: "mega_아메리카노", menu_name: "아메리카노", menu_emoji: "☕", temperature: "ICED", size: null, note: "" },
     joined_at: new Date().toISOString(),
   },
   {
     user_id: "user-2", user_name: "지연", is_host: false, is_online: true, status: "decided",
-    order: { menu_id: "latte", menu_name: "카페라떼", menu_emoji: "☕", temperature: "HOT", size: null, note: "" },
+    order: { menu_id: "mega_아메리카노", menu_name: "아메리카노", menu_emoji: "☕", temperature: "HOT", size: null, note: "" },
     joined_at: new Date().toISOString(),
   },
   {
     user_id: "user-3", user_name: "혜원", is_host: false, is_online: true, status: "decided",
-    order: { menu_id: "vanilla-latte", menu_name: "바닐라라떼", menu_emoji: "☕", temperature: "ICED", size: null, note: "디카페인" },
+    order: { menu_id: "mega_아메리카노", menu_name: "아메리카노", menu_emoji: "☕", temperature: "ICED", size: null, note: "얼음 적게요" },
     joined_at: new Date().toISOString(),
   },
   {
-    user_id: "user-4", user_name: "승현", is_host: false, is_online: true, status: "ordering",
-    order: null, joined_at: new Date().toISOString(),
+    user_id: "user-4", user_name: "승현", is_host: false, is_online: true, status: "decided",
+    order: { menu_id: "mega_카페라떼", menu_name: "카페라떼", menu_emoji: "☕", temperature: "HOT", size: null, note: "" },
+    joined_at: new Date().toISOString(),
   },
   {
-    user_id: "user-5", user_name: "도영", is_host: false, is_online: true, status: "editing",
-    order: null, joined_at: new Date().toISOString(),
+    user_id: "user-5", user_name: "도영", is_host: false, is_online: true, status: "decided",
+    order: { menu_id: "mega_바닐라라떼", menu_name: "바닐라라떼", menu_emoji: "☕", temperature: "ICED", size: null, note: "" },
+    joined_at: new Date().toISOString(),
   },
   {
     user_id: "user-6", user_name: "채원", is_host: false, is_online: true, status: "thinking",
@@ -64,7 +66,7 @@ export default function PreviewPage() {
   const [screen, setScreen] = useState<Screen>("room");
   const [isClosed, setIsClosed] = useState(false);
   const [currentUser, setCurrentUser] = useState<"host" | "member-ordered" | "member-pending">("host");
-  const [cafeId, setCafeId] = useState(CAFE_LIST[0].id);
+  const [cafeId, setCafeId] = useState<CafeId>("mega");
   const [linkCopied, setLinkCopied] = useState(false);
   const [menuView, setMenuView] = useState<"grid" | "options">("grid");
   const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
@@ -242,6 +244,7 @@ export default function PreviewPage() {
               currentUserId={currentUserId}
               roomName="개발팀"
               cafeLogoPath={cafe.logoPath}
+              cafeId={cafe.id}
             />
           </div>
 

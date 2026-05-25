@@ -12,8 +12,11 @@ interface Props {
 
 export function OrderOptionsForm({ menuItem, onSubmit, onBack, cafeId }: Props) {
   const isCustom = menuItem.id === "custom";
+  const fixedTemp = menuItem.tempFixed ?? null;
   const [customName, setCustomName] = useState("");
-  const [temp, setTemp] = useState<Temperature>(menuItem.iced ? "ICED" : "HOT");
+  const [temp, setTemp] = useState<Temperature>(
+    fixedTemp ?? (menuItem.iced ? "ICED" : "HOT")
+  );
   const [size, setSize] = useState<Size>("Grande");
   const [note, setNote] = useState("");
 
@@ -43,22 +46,29 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack, cafeId }: Props) 
           display: "flex", alignItems: "center", justifyContent: "center",
           boxShadow: "0 2px 12px rgba(111,78,55,0.08)",
         }}>
-          {!isCustom && cafeId ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={`/cafes/menus/${cafeId}/${menuItem.id}.png`}
-              alt={menuItem.name}
-              width={80}
-              height={80}
-              style={{ objectFit: "contain" }}
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-                const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
-                if (fallback) fallback.style.display = "block";
-              }}
-            />
-          ) : null}
-          <span style={{ fontSize: 48, display: (!isCustom && cafeId) ? "none" : "block" }}>
+          {!isCustom ? (() => {
+            // 온도에 따라 표시할 이미지 결정
+            const src = temp === "HOT" && menuItem.imagePathHot
+              ? menuItem.imagePathHot
+              : (menuItem.imagePath ?? (cafeId ? `/cafes/menus/${cafeId}/${menuItem.id}.png` : null));
+            return src ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={src}
+                src={src}
+                alt={menuItem.name}
+                width={80}
+                height={80}
+                style={{ objectFit: "contain" }}
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                  const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
+                  if (fallback) fallback.style.display = "block";
+                }}
+              />
+            ) : null;
+          })() : null}
+          <span style={{ fontSize: 48, display: (!isCustom && (menuItem.imagePath ?? menuItem.imagePathHot ?? cafeId)) ? "none" : "block" }}>
             {isCustom ? "✏️" : menuItem.emoji}
           </span>
         </div>
@@ -91,18 +101,38 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack, cafeId }: Props) 
         <div style={{ fontSize: 13, fontWeight: 700, color: "#6F4E37", marginBottom: 10 }}>
           온도
         </div>
-        <div className="toggle-group">
-          {(["HOT", "ICED"] as Temperature[]).map((t) => (
-            <button
-              key={t}
-              className={`toggle-btn ${temp === t ? "active" : ""}`}
-              onClick={() => setTemp(t)}
-              type="button"
-            >
-              {t === "HOT" ? "🔥 HOT" : "🧊 ICED"}
-            </button>
-          ))}
-        </div>
+        {fixedTemp ? (
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "8px 16px",
+              borderRadius: 20,
+              background: fixedTemp === "HOT" ? "#FFF3E0" : "#E3F2FD",
+              border:     `1.5px solid ${fixedTemp === "HOT" ? "#FF8C00" : "#42A5F5"}`,
+              color:      fixedTemp === "HOT" ? "#E65100" : "#1565C0",
+              fontSize: 13,
+              fontWeight: 700,
+            }}
+          >
+            {fixedTemp === "HOT" ? "HOT 전용" : "ICED 전용"}
+
+          </div>
+        ) : (
+          <div className="toggle-group">
+            {(["HOT", "ICED"] as Temperature[]).map((t) => (
+              <button
+                key={t}
+                className={`toggle-btn ${temp === t ? "active" : ""}`}
+                onClick={() => setTemp(t)}
+                type="button"
+              >
+                {t === "HOT" ? "🔥 HOT" : "🧊 ICED"}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 사이즈 */}

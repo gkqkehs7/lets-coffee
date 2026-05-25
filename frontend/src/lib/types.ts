@@ -36,8 +36,11 @@ export interface MenuItem {
   id: string;
   name: string;
   emoji: string;
-  category: "coffee" | "decaf" | "non-coffee";
+  category: string;
   iced: boolean;
+  imagePath?: string;
+  imagePathHot?: string;
+  tempFixed?: Temperature;
 }
 
 /* REST API 응답 */
