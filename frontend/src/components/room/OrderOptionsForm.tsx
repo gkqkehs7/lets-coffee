@@ -97,7 +97,7 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack, cafeId }: Props) 
       </div>
 
       {/* 온도 */}
-      <div>
+      <div style={{ display: "flex", justifyContent: "center" }}>
         <div className="toggle-group">
           {(["HOT", "ICED"] as Temperature[])
             .filter((t) => !fixedTemp || t === fixedTemp)
