@@ -316,10 +316,11 @@ export function RoomPageClient({ roomId }: Props) {
       {view !== "room" && (
         <div style={{
           background: "#FFFFFF",
-          padding: "14px 20px",
+          padding: "10px 20px",
           borderBottom: "1.5px solid #F5E6D3",
           position: "sticky", top: 0, zIndex: 100,
-          display: "flex", alignItems: "center", gap: 12,
+          display: "flex", alignItems: "center",
+          ...(view === "menu" ? { position: "relative" as const } : { gap: 12 }),
         }}>
           <button
             onClick={view === "options" ? () => { setSelectedMenu(null); setView("menu"); } : handleCancelToRoom}
@@ -327,15 +328,28 @@ export function RoomPageClient({ roomId }: Props) {
               background: "#F5E6D3", border: "none", borderRadius: 12,
               padding: "8px 14px", fontSize: 13, color: "#6F4E37",
               cursor: "pointer", fontWeight: 600, fontFamily: "inherit",
+              flexShrink: 0,
             }}
           >
             ← 뒤로
           </button>
-          <h2 style={{ fontFamily: "'Gowun Dodum', sans-serif", fontSize: 18, color: "#3E2723" }}>
-            {view === "menu"
-              ? (cafeInfo ? `${cafeInfo.name} 메뉴` : "메뉴 선택 ☕")
-              : "옵션 선택"}
-          </h2>
+          {view === "menu" && cafeInfo && (
+            <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={cafeInfo.logoPath}
+                alt={cafeInfo.name}
+                width={52}
+                height={52}
+                style={{ objectFit: "contain", mixBlendMode: "multiply", display: "block" }}
+              />
+            </div>
+          )}
+          {view === "options" && (
+            <h2 style={{ fontFamily: "'Gowun Dodum', sans-serif", fontSize: 18, color: "#3E2723" }}>
+              옵션 선택
+            </h2>
+          )}
         </div>
       )}
 
@@ -344,18 +358,6 @@ export function RoomPageClient({ roomId }: Props) {
 
         {view === "menu" && !isClosed && (
           <>
-            {cafeInfo && (
-              <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={cafeInfo.logoPath}
-                  alt={cafeInfo.name}
-                  width={80}
-                  height={80}
-                  style={{ objectFit: "contain", mixBlendMode: "multiply" }}
-                />
-              </div>
-            )}
             <CoffeeMenuGrid
               menu={cafeMenu}
               selectedId={selectedMenu?.id ?? null}
