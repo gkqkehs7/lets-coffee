@@ -314,46 +314,34 @@ export function RoomPageClient({ roomId }: Props) {
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
       {showJoin && room && <JoinRoomModal roomName={room.room_name} cafeInfo={cafeInfo} onJoin={handleJoin} />}
 
-      {/* 메뉴/옵션 뷰용 미니 헤더 */}
-      {view !== "room" && (
-        <div style={{
-          background: "#FFFFFF",
-          padding: "10px 20px",
-          borderBottom: "1.5px solid #F5E6D3",
-          position: "sticky", top: 0, zIndex: 100,
-          display: "flex", alignItems: "center", gap: 12,
-        }}>
-          <button
-            onClick={view === "options" ? () => { setSelectedMenu(committedMenu); setView("menu"); } : handleCancelToRoom}
-            style={{
-              background: "#F5E6D3", border: "none", borderRadius: 12,
-              padding: "8px 14px", fontSize: 13, color: "#6F4E37",
-              cursor: "pointer", fontWeight: 600, fontFamily: "inherit",
-              flexShrink: 0,
-            }}
-          >
-            ← 뒤로
-          </button>
-          {view === "menu" && cafeInfo && (
-            <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={cafeInfo.logoPath}
-                alt={cafeInfo.name}
-                width={52}
-                height={52}
-                style={{ objectFit: "contain", mixBlendMode: "multiply", display: "block" }}
-              />
-            </div>
-          )}
-        </div>
-      )}
 
       {/* 컨텐츠 */}
       <div style={{ flex: 1, padding: view === "room" ? "20px 20px" : "16px 20px", paddingBottom: 120, overflowY: "auto" }}>
 
         {view === "menu" && !isClosed && (
           <>
+            <div style={{ position: "relative", display: "flex", alignItems: "center", marginBottom: 20 }}>
+              <button
+                onClick={handleCancelToRoom}
+                style={{
+                  background: "none", border: "none", fontSize: 20,
+                  color: "#6F4E37", cursor: "pointer", padding: "4px 8px",
+                  fontFamily: "inherit", lineHeight: 1,
+                }}
+              >←</button>
+              {cafeInfo && (
+                <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={cafeInfo.logoPath}
+                    alt={cafeInfo.name}
+                    width={52}
+                    height={52}
+                    style={{ objectFit: "contain", mixBlendMode: "multiply", display: "block" }}
+                  />
+                </div>
+              )}
+            </div>
             <CoffeeMenuGrid
               menu={cafeMenu}
               selectedId={selectedMenu?.id ?? null}

@@ -163,43 +163,37 @@ export default function PreviewPage() {
               }}>{c.name}</button>
             ))}
           </div>
-          {/* 메뉴/옵션 헤더 */}
-          <div style={{
-            background: "#FFFFFF", padding: "10px 20px",
-            borderBottom: "1.5px solid #F5E6D3",
-            position: "sticky", top: 0, zIndex: 100,
-            display: "flex", alignItems: "center", gap: 12,
-          }}>
-            <button
-              onClick={() => { setSelectedMenu(committedMenu); setMenuView("grid"); }}
-              style={{
-                background: "#F5E6D3", border: "none", borderRadius: 12,
-                padding: "8px 14px", fontSize: 13, color: "#6F4E37",
-                cursor: "pointer", fontWeight: 600, flexShrink: 0,
-              }}
-            >← 뒤로</button>
-            {menuView === "grid" && (
-              <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={cafe.logoPath}
-                  alt={cafe.name}
-                  width={52}
-                  height={52}
-                  style={{ objectFit: "contain", mixBlendMode: "multiply", display: "block" }}
-                />
-              </div>
-            )}
-          </div>
           <div style={{ maxWidth: 480, margin: "0 auto", background: "#FFF8F0", minHeight: "calc(100vh - 90px)", padding: "16px 20px 140px" }}>
             {menuView === "grid" && (
-              <CoffeeMenuGrid
-                menu={getMenuByCafe(cafe.id)}
-                selectedId={selectedMenu?.id ?? null}
-                onSelectMenu={(item) => { setSelectedMenu(item); setMenuView("options"); }}
-                onSelectCustom={() => { setSelectedMenu({ id: "custom", name: "", emoji: "✏️", category: "coffee", iced: true }); setMenuView("options"); }}
-                cafeId={cafe.id}
-              />
+              <>
+                <div style={{ position: "relative", display: "flex", alignItems: "center", marginBottom: 20 }}>
+                  <button
+                    onClick={() => setMenuView("grid")}
+                    style={{
+                      background: "none", border: "none", fontSize: 20,
+                      color: "#6F4E37", cursor: "pointer", padding: "4px 8px",
+                      lineHeight: 1,
+                    }}
+                  >←</button>
+                  <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={cafe.logoPath}
+                      alt={cafe.name}
+                      width={52}
+                      height={52}
+                      style={{ objectFit: "contain", mixBlendMode: "multiply", display: "block" }}
+                    />
+                  </div>
+                </div>
+                <CoffeeMenuGrid
+                  menu={getMenuByCafe(cafe.id)}
+                  selectedId={selectedMenu?.id ?? null}
+                  onSelectMenu={(item) => { setSelectedMenu(item); setMenuView("options"); }}
+                  onSelectCustom={() => { setSelectedMenu({ id: "custom", name: "", emoji: "✏️", category: "coffee", iced: true }); setMenuView("options"); }}
+                  cafeId={cafe.id}
+                />
+              </>
             )}
             {menuView === "options" && selectedMenu && (
               <OrderOptionsForm
