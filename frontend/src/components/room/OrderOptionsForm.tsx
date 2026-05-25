@@ -96,45 +96,6 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack, cafeId }: Props) 
         )}
       </div>
 
-      {/* 온도 */}
-      <div>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "#6F4E37", marginBottom: 10 }}>
-          온도
-        </div>
-        {fixedTemp ? (
-          <div
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "8px 16px",
-              borderRadius: 20,
-              background: fixedTemp === "HOT" ? "#FFF3E0" : "#E3F2FD",
-              border:     `1.5px solid ${fixedTemp === "HOT" ? "#FF8C00" : "#42A5F5"}`,
-              color:      fixedTemp === "HOT" ? "#E65100" : "#1565C0",
-              fontSize: 13,
-              fontWeight: 700,
-            }}
-          >
-            {fixedTemp === "HOT" ? "HOT 전용" : "ICED 전용"}
-
-          </div>
-        ) : (
-          <div className="toggle-group">
-            {(["HOT", "ICED"] as Temperature[]).map((t) => (
-              <button
-                key={t}
-                className={`toggle-btn ${temp === t ? "active" : ""}`}
-                onClick={() => setTemp(t)}
-                type="button"
-              >
-                {t === "HOT" ? "🔥 HOT" : "🧊 ICED"}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
       {/* 사이즈 */}
       {cafeId !== "mega" && (
         <div>
