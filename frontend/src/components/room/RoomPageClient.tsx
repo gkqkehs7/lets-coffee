@@ -346,11 +346,6 @@ export function RoomPageClient({ roomId }: Props) {
               />
             </div>
           )}
-          {view === "options" && (
-            <h2 style={{ fontFamily: "'Gowun Dodum', sans-serif", fontSize: 18, color: "#3E2723" }}>
-              옵션 선택
-            </h2>
-          )}
         </div>
       )}
 
