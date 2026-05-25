@@ -343,13 +343,27 @@ export function RoomPageClient({ roomId }: Props) {
       <div style={{ flex: 1, padding: view === "room" ? "20px 20px" : "16px 20px", paddingBottom: 120, overflowY: "auto" }}>
 
         {view === "menu" && !isClosed && (
-          <CoffeeMenuGrid
-            menu={cafeMenu}
-            selectedId={selectedMenu?.id ?? null}
-            onSelectMenu={handleSelectMenu}
-            onSelectCustom={handleSelectCustom}
-            cafeId={room?.cafe_id}
-          />
+          <>
+            {cafeInfo && (
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={cafeInfo.logoPath}
+                  alt={cafeInfo.name}
+                  width={80}
+                  height={80}
+                  style={{ objectFit: "contain", mixBlendMode: "multiply" }}
+                />
+              </div>
+            )}
+            <CoffeeMenuGrid
+              menu={cafeMenu}
+              selectedId={selectedMenu?.id ?? null}
+              onSelectMenu={handleSelectMenu}
+              onSelectCustom={handleSelectCustom}
+              cafeId={room?.cafe_id}
+            />
+          </>
         )}
 
         {view === "options" && selectedMenu && !isClosed && (

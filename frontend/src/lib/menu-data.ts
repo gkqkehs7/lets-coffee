@@ -28,7 +28,7 @@ const MEGA_CATEGORIES = [
   { id: "티",         label: "티" },
   { id: "에이드&주스", label: "에이드&주스" },
   { id: "스무디&프라페", label: "스무디&프라페" },
-  { id: "신상품",     label: "신상품 🆕" },
+  { id: "신상품",     label: "신상품" },
 ] as const;
 
 const TWOSOME_CATEGORIES = [

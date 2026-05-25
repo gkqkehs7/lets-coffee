@@ -138,7 +138,7 @@ export function RoomView({
               const isMyDrink = drink.people.some((p) => p.isMe);
               return (
               <div
-                key={drink.name}
+                key={`${drink.name}_${drink.temperature ?? ""}`}
                 style={{
                   background: "#FFFFFF", borderRadius: 18,
                   padding: "14px 16px", border: `1.5px solid ${isMyDrink ? "#C9A57B" : "#F0E6D8"}`,
@@ -187,7 +187,7 @@ export function RoomView({
                         <span key={i}>
                           {i > 0 && ", "}
                           <span style={{ fontWeight: p.isMe ? 700 : 400, color: p.isMe ? "#6F4E37" : undefined }}>
-                            {p.note ? `${p.name} · ${p.note}` : p.name}
+                            {p.name}
                           </span>
                         </span>
                       ))}
@@ -200,7 +200,7 @@ export function RoomView({
                     }}>
                       {drink.count}
                     </span>
-                    <span style={{ fontSize: 12, color: "#8D6E63", marginLeft: 1 }}>명</span>
+                    <span style={{ fontSize: 12, color: "#8D6E63", marginLeft: 1 }}>잔</span>
                   </div>
                 </div>
               </div>
@@ -265,7 +265,6 @@ export function RoomView({
             } else {
               const temp = p.order!.temperature === "HOT" ? "핫" : "아이스";
               orderText = `${temp} ${p.order!.menu_name}`;
-              if (p.order!.note) orderText += ` (${p.order!.note})`;
             }
             return (
               <div key={p.user_id} style={{

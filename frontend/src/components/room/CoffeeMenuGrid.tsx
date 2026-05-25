@@ -133,10 +133,8 @@ export function CoffeeMenuGrid({ menu, selectedId, onSelectMenu, onSelectCustom,
       <div
         style={{
           display: "flex",
+          flexWrap: "wrap",
           gap: 8,
-          overflowX: "auto",
-          paddingBottom: 4,
-          scrollbarWidth: "none",
         }}
       >
         {visibleCategories.map((cat) => (
@@ -145,7 +143,6 @@ export function CoffeeMenuGrid({ menu, selectedId, onSelectMenu, onSelectCustom,
             type="button"
             onClick={() => setActiveCat(cat.id)}
             style={{
-              flexShrink: 0,
               padding: "7px 14px",
               borderRadius: 20,
               border: activeCat === cat.id ? "2px solid #6F4E37" : "2px solid #F5E6D3",

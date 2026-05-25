@@ -182,6 +182,17 @@ export default function PreviewPage() {
           )}
           <div style={{ maxWidth: 480, margin: "0 auto", background: "#FFF8F0", minHeight: "calc(100vh - 90px)", padding: "16px 20px 140px" }}>
             {menuView === "grid" && (
+              <>
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: 20 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={cafe.logoPath}
+                    alt={cafe.name}
+                    width={80}
+                    height={80}
+                    style={{ objectFit: "contain", mixBlendMode: "multiply" }}
+                  />
+                </div>
               <CoffeeMenuGrid
                 menu={getMenuByCafe(cafe.id)}
                 selectedId={selectedMenu?.id ?? null}
@@ -189,6 +200,7 @@ export default function PreviewPage() {
                 onSelectCustom={() => { setSelectedMenu({ id: "custom", name: "", emoji: "✏️", category: "coffee", iced: true }); setMenuView("options"); }}
                 cafeId={cafe.id}
               />
+              </>
             )}
             {menuView === "options" && selectedMenu && (
               <OrderOptionsForm
