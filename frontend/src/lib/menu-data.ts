@@ -8,8 +8,8 @@ export interface CafeInfo {
 }
 
 export const CAFE_LIST: CafeInfo[] = [
+  { id: "mega",      name: "메가커피",    logoPath: "/cafes/mega.png",      color: "#E6B800" },
   { id: "starbucks", name: "스타벅스",    logoPath: "/cafes/starbucks.png", color: "#00704A" },
-  { id: "mega",      name: "메가커피",    logoPath: "/cafes/mega.png",      color: "#FFD600" },
   { id: "twosome",   name: "투썸플레이스", logoPath: "/cafes/twosome.png",   color: "#C8102E" },
 ];
 

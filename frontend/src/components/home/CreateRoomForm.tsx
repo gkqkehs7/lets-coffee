@@ -19,7 +19,7 @@ const BG_EMOJIS = [
 
 export function CreateRoomForm() {
   const router = useRouter();
-  const [cafeId, setCafeId] = useState<CafeId>("starbucks");
+  const [cafeId, setCafeId] = useState<CafeId>("mega");
   const [roomName, setRoomName] = useState("");
   const [hostName, setHostName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -160,27 +160,28 @@ export function CreateRoomForm() {
               <div style={{ display: "flex", gap: 8 }}>
                 {CAFE_LIST.map((cafe) => {
                   const selected = cafeId === cafe.id;
+                  const comingSoon = cafe.id !== "mega";
                   return (
                     <button
                       key={cafe.id}
                       type="button"
-                      onClick={() => setCafeId(cafe.id)}
+                      onClick={() => { if (!comingSoon) setCafeId(cafe.id); }}
                       style={{
                         flex: 1,
                         padding: "12px 8px",
                         borderRadius: 16,
                         border: `2px solid ${selected ? cafe.color : "#F5E6D3"}`,
                         background: selected ? `${cafe.color}12` : "#FAFAFA",
-                        cursor: "pointer",
+                        cursor: comingSoon ? "default" : "pointer",
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
                         gap: 6,
                         transition: "all 0.15s",
                         outline: "none",
+                        position: "relative",
                       }}
                     >
-                      {/* 카페 로고 — 이미지가 없으면 color dot으로 fallback */}
                       <div
                         style={{
                           width: 40,
@@ -216,6 +217,19 @@ export function CreateRoomForm() {
                       >
                         {cafe.name}
                       </span>
+                      {comingSoon && (
+                        <div style={{
+                          position: "absolute", inset: 0,
+                          borderRadius: 14,
+                          background: "rgba(80, 80, 80, 0.6)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                        }}>
+                          <span style={{
+                            fontSize: 10, fontWeight: 700, color: "#FFFFFF",
+                            textAlign: "center", lineHeight: 1.4,
+                          }}>준비중입니다</span>
+                        </div>
+                      )}
                       {selected && (
                         <div
                           style={{
@@ -239,11 +253,11 @@ export function CreateRoomForm() {
               <label
                 style={{ fontSize: 13, fontWeight: 600, color: "#6F4E37", display: "block", marginBottom: 8 }}
               >
-                오늘의 커피타임 이름
+                팀 이름
               </label>
               <input
                 className="input-field"
-                placeholder="예: 오후 3시 커피타임"
+                placeholder="예: 기획팀"
                 value={roomName}
                 onChange={(e) => setRoomName(e.target.value)}
                 maxLength={50}
@@ -258,7 +272,7 @@ export function CreateRoomForm() {
               </label>
               <input
                 className="input-field"
-                placeholder="예: 민우"
+                placeholder="예: 김민우"
                 value={hostName}
                 onChange={(e) => {
                   const v = e.target.value;
