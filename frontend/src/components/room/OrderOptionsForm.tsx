@@ -193,7 +193,7 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack, cafeId }: Props) 
             fontFamily: "'Gowun Dodum', sans-serif",
           }}
         >
-          주문 완료 ✨
+          주문 완료
         </button>
         <button
           type="button"
@@ -212,7 +212,7 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack, cafeId }: Props) 
             fontFamily: "inherit",
           }}
         >
-          ← 다시 고를게요
+          다시 고를게요
         </button>
       </div>
     </div>
