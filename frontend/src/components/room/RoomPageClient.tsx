@@ -322,7 +322,7 @@ export function RoomPageClient({ roomId }: Props) {
           display: "flex", alignItems: "center", gap: 12,
         }}>
           <button
-            onClick={view === "options" ? () => setView("menu") : handleCancelToRoom}
+            onClick={view === "options" ? () => { setSelectedMenu(null); setView("menu"); } : handleCancelToRoom}
             style={{
               background: "#F5E6D3", border: "none", borderRadius: 12,
               padding: "8px 14px", fontSize: 13, color: "#6F4E37",
@@ -370,7 +370,7 @@ export function RoomPageClient({ roomId }: Props) {
           <OrderOptionsForm
             menuItem={selectedMenu}
             onSubmit={handleSubmitOrder}
-            onBack={() => setView("menu")}
+            onBack={() => { setSelectedMenu(null); setView("menu"); }}
             cafeId={room?.cafe_id}
           />
         )}
