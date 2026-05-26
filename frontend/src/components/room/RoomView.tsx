@@ -86,7 +86,7 @@ export function RoomView({
               alt="cafe logo"
               width={64}
               height={64}
-              style={{ objectFit: "contain", flexShrink: 0, mixBlendMode: "multiply" }}
+              style={{ objectFit: "contain", flexShrink: 0, mixBlendMode: "multiply", borderRadius: 16 }}
             />
         </div>
       </div>
