@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import { loadSession, saveSession } from "@/lib/session";
-import { connectSocket } from "@/lib/socket";
+import { getSocket } from "@/lib/socket";
 import { getCafeInfo, getMenuByCafe, CAFE_LIST } from "@/lib/menu-data";
 import type { MenuItem, Order, Participant, Room } from "@/lib/types";
 import { JoinRoomModal } from "./JoinRoomModal";
@@ -39,7 +39,7 @@ export function RoomPageClient({ roomId }: Props) {
   const [toast, setToast] = useState<string | null>(null);
   const [linkCopied, setLinkCopied] = useState(false);
 
-  const socketRef = useRef(connectSocket());
+  const socketRef = useRef(getSocket());
   // userId를 ref에도 저장 — 소켓 재연결 시 room:join 재전송에 사용
   const userIdRef = useRef<string | null>(null);
 
@@ -76,6 +76,7 @@ export function RoomPageClient({ roomId }: Props) {
     };
     s.on("connect", handleConnect);
     s.on("disconnect", handleDisconnect);
+    if (!s.connected) s.connect();
     return () => {
       s.off("connect", handleConnect);
       s.off("disconnect", handleDisconnect);
