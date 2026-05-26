@@ -256,6 +256,7 @@ export default function PreviewPage() {
               roomName="개발팀"
               cafeLogoPath={cafe.logoPath}
               cafeId={cafe.id}
+              onRefresh={async () => {}}
             />
           </div>
 

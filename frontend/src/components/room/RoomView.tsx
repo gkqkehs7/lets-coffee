@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { CafeId, Participant, Temperature } from "@/lib/types";
 import { getMenuByCafe } from "@/lib/menu-data";
 
@@ -10,6 +11,7 @@ interface Props {
   roomName: string;
   cafeLogoPath: string;
   cafeId?: CafeId;
+  onRefresh?: () => Promise<void>;
 }
 
 export function RoomView({
@@ -18,7 +20,16 @@ export function RoomView({
   roomName,
   cafeLogoPath,
   cafeId,
+  onRefresh,
 }: Props) {
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    if (!onRefresh || refreshing) return;
+    setRefreshing(true);
+    await onRefresh();
+    setRefreshing(false);
+  };
   const decided = participants.filter((p) => p.order !== null);
   const ordered = decided.filter((p) => p.order?.menu_id !== "skip");
   const skipped = decided.filter((p) => p.order?.menu_id === "skip");
@@ -127,11 +138,33 @@ export function RoomView({
       {/* ── 음료별 집계 ── */}
       {(rankedDrinks.length > 0 || skipped.length > 0) && (
         <div style={{ marginBottom: 24 }}>
-          <div style={{
-            fontSize: 12, color: "#8D6E63", fontWeight: 600,
-            letterSpacing: "0.02em", marginBottom: 10,
-          }}>
-            음료별 집계
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+            <div style={{
+              fontSize: 12, color: "#8D6E63", fontWeight: 600,
+              letterSpacing: "0.02em",
+            }}>
+              음료별 집계
+            </div>
+            {onRefresh && (
+              <button
+                onClick={handleRefresh}
+                disabled={refreshing}
+                style={{
+                  background: "none", border: "none",
+                  cursor: refreshing ? "default" : "pointer",
+                  padding: "0 4px",
+                  opacity: refreshing ? 0.4 : 0.7,
+                  transition: "opacity 0.15s",
+                  display: "flex", alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <span style={{
+                  display: "inline-block", fontSize: 24, lineHeight: 1, fontWeight: 900,
+                  animation: refreshing ? "spin 0.7s linear infinite" : "none",
+                }}>↻</span>
+              </button>
+            )}
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {rankedDrinks.map((drink) => {

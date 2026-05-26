@@ -377,6 +377,12 @@ export function RoomPageClient({ roomId }: Props) {
             roomName={room?.room_name ?? ""}
             cafeLogoPath={cafeInfo?.logoPath ?? ""}
             cafeId={room?.cafe_id}
+            onRefresh={async () => {
+              const roomData = await api.getRoom(roomId);
+              setRoom(roomData);
+              setParticipants(roomData.participants);
+              setIsClosed(roomData.is_closed);
+            }}
           />
         )}
       </div>

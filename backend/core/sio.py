@@ -14,6 +14,8 @@ sio = socketio.AsyncServer(
     cors_allowed_origins="*",
     logger=False,
     engineio_logger=False,
+    ping_interval=10,
+    ping_timeout=20,
 )
 
 # sid → (room_id, user_id)
