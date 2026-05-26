@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 import socketio
 
@@ -41,6 +42,14 @@ async def disconnect(sid: str) -> None:
     if conn is None:
         return
     room_id, user_id = conn
+    # 짧은 대기 후 재연결 여부 확인 (transport 업그레이드 또는 순간 끊김 대응)
+    await asyncio.sleep(2)
+    already_reconnected = any(
+        u == user_id and r == room_id for r, u in _connections.values()
+    )
+    if already_reconnected:
+        log.debug("[DISCONNECT] user=%s reconnected, skipping participant:left", user_id)
+        return
     p = await room_manager.set_online(room_id, user_id, False)
     if p:
         log.debug("[DISCONNECT] broadcasting participant:left user=%s room=%s", user_id, room_id)
