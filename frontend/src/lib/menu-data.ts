@@ -10,7 +10,7 @@ export interface CafeInfo {
 export const CAFE_LIST: CafeInfo[] = [
   { id: "mega",      name: "메가커피",    logoPath: "/cafes/mega.png",      color: "#E6B800" },
   { id: "starbucks", name: "스타벅스",    logoPath: "/cafes/starbucks.png", color: "#00704A" },
-  { id: "twosome",   name: "투썸플레이스", logoPath: "/cafes/twosome.png",   color: "#C8102E" },
+  { id: "compose",   name: "컴포즈커피",   logoPath: "/cafes/compose.svg",   color: "#FFD700" },
 ];
 
 // ─── 카테고리 정의 ────────────────────────────────────────────────────────────
@@ -46,7 +46,7 @@ const TWOSOME_CATEGORIES = [
 
 export function getCategoriesByCafe(cafeId: CafeId): { id: string; label: string }[] {
   if (cafeId === "mega")     return [...MEGA_CATEGORIES];
-  if (cafeId === "twosome")  return [...TWOSOME_CATEGORIES];
+  if (cafeId === "compose")  return [...TWOSOME_CATEGORIES];
   return [...STARBUCKS_CATEGORIES];
 }
 
@@ -428,7 +428,7 @@ const STARBUCKS_FINAL: MenuItem[] = STARBUCKS_NEW.map((item) => {
 export const CAFE_MENUS: Record<CafeId, MenuItem[]> = {
   starbucks: STARBUCKS_FINAL,
   mega:      MEGA_FINAL,
-  twosome:   TWOSOME,
+  compose:   TWOSOME,
 };
 
 export function getMenuByCafe(cafeId: CafeId): MenuItem[] {

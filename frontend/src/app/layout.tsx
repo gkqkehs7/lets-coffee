@@ -26,7 +26,7 @@ export default function RootLayout({
       <head>
         <link rel="preload" as="image" href="/cafes/starbucks.png" />
         <link rel="preload" as="image" href="/cafes/mega.png" />
-        <link rel="preload" as="image" href="/cafes/twosome.png" />
+        <link rel="preload" as="image" href="/cafes/compose.svg" />
       </head>
       <body className="min-h-full antialiased">{children}</body>
     </html>

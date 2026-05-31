@@ -160,7 +160,7 @@ export function CreateRoomForm() {
               <div style={{ display: "flex", gap: 8 }}>
                 {CAFE_LIST.map((cafe) => {
                   const selected = cafeId === cafe.id;
-                  const comingSoon = cafe.id === "twosome";
+                  const comingSoon = cafe.id === "compose";
                   return (
                     <button
                       key={cafe.id}
