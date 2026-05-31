@@ -36,28 +36,32 @@ function MenuCard({
 
   const splitReady  = imgLoaded && hotLoaded;
   const singleReady = imgLoaded;
-  const shimmer = {
-    background: "linear-gradient(90deg, #F5E6D3 25%, #EDD9C8 50%, #F5E6D3 75%)",
-    backgroundSize: "200% 100%",
-    animation: "shimmer 1.4s linear infinite",
-    borderRadius: 10,
-  } as const;
+  const hasImage    = !!(imagePath && (imagePathHot ? !imgFailed && !imgHotFailed : !imgFailed));
+  const cardLoading = hasImage && (imagePathHot ? !splitReady : !singleReady);
 
   return (
     <div
-      className="card-hover"
-      onClick={onClick}
+      className={cardLoading ? undefined : "card-hover"}
+      onClick={cardLoading ? undefined : onClick}
       style={{
-        background: isSelected
-          ? "linear-gradient(135deg, #C9A57B22, #6F4E3722)"
-          : "#FFFFFF",
+        background: cardLoading
+          ? undefined
+          : isSelected ? "linear-gradient(135deg, #C9A57B22, #6F4E3722)" : "#FFFFFF",
+        ...(cardLoading ? {
+          background: "linear-gradient(90deg, #F5E6D3 25%, #EDD9C8 50%, #F5E6D3 75%)",
+          backgroundSize: "200% 100%",
+          animation: "shimmer 1.4s linear infinite",
+        } : {}),
         borderRadius: 20,
         padding: "16px 12px",
-        border: `2px solid ${isSelected ? "#6F4E37" : "#F5E6D3"}`,
+        border: `2px solid ${cardLoading ? "transparent" : isSelected ? "#6F4E37" : "#F5E6D3"}`,
         textAlign: "center",
         position: "relative",
+        minHeight: 110,
+        transition: "opacity 0.3s",
       }}
     >
+    <div style={{ opacity: cardLoading ? 0 : 1, transition: "opacity 0.25s" }}>
       {isSelected && (
         <div
           style={{
@@ -100,28 +104,25 @@ function MenuCard({
         cafeId === "starbucks" ? (
           /* 스타벅스: 수직 스플릿 */
           <div style={{ width: 56, height: 56, position: "relative", margin: "0 auto 8px", borderRadius: 10, overflow: "hidden" }}>
-            {!splitReady && <div style={{ position: "absolute", inset: 0, ...shimmer }} />}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={imagePathHot} alt="hot" onLoad={() => setHotLoaded(true)} onError={() => setImgHotFailed(true)} style={{ position: "absolute", width: "100%", height: "100%", objectFit: "contain", clipPath: "inset(0 23% 0 0)", transform: "translateX(-13px)", opacity: splitReady ? 1 : 0, transition: "opacity 0.3s" }} />
+            <img src={imagePathHot} alt="hot" onLoad={() => setHotLoaded(true)} onError={() => setImgHotFailed(true)} style={{ position: "absolute", width: "100%", height: "100%", objectFit: "contain", clipPath: "inset(0 23% 0 0)", transform: "translateX(-13px)" }} />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={imagePath}    alt="ice"  onLoad={() => setImgLoaded(true)}  onError={() => setImgFailed(true)}    style={{ position: "absolute", width: "100%", height: "100%", objectFit: "contain", clipPath: "inset(0 0 0 23%)", transform: "translateX(13px)",  opacity: splitReady ? 1 : 0, transition: "opacity 0.3s" }} />
+            <img src={imagePath}    alt="ice"  onLoad={() => setImgLoaded(true)}  onError={() => setImgFailed(true)}    style={{ position: "absolute", width: "100%", height: "100%", objectFit: "contain", clipPath: "inset(0 0 0 23%)", transform: "translateX(13px)" }} />
           </div>
         ) : (
           /* 기본: 대각선 스플릿 */
           <div style={{ width: 56, height: 56, position: "relative", margin: "0 auto 8px", borderRadius: 10, overflow: "hidden" }}>
-            {!splitReady && <div style={{ position: "absolute", inset: 0, ...shimmer }} />}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={imagePathHot} alt="hot" onLoad={() => setHotLoaded(true)} onError={() => setImgHotFailed(true)} style={{ position: "absolute", width: "100%", height: "100%", objectFit: "contain", clipPath: "polygon(0 0, 100% 0, 0 100%)",       opacity: splitReady ? 1 : 0, transition: "opacity 0.3s" }} />
+            <img src={imagePathHot} alt="hot" onLoad={() => setHotLoaded(true)} onError={() => setImgHotFailed(true)} style={{ position: "absolute", width: "100%", height: "100%", objectFit: "contain", clipPath: "polygon(0 0, 100% 0, 0 100%)" }} />
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={imagePath}    alt="ice"  onLoad={() => setImgLoaded(true)}  onError={() => setImgFailed(true)}    style={{ position: "absolute", width: "100%", height: "100%", objectFit: "contain", clipPath: "polygon(100% 0, 100% 100%, 0 100%)", opacity: splitReady ? 1 : 0, transition: "opacity 0.3s" }} />
-            {splitReady && <div style={{ position: "absolute", top: "50%", left: "50%", width: "142%", height: "1.5px", background: "rgba(180,155,130,0.5)", transform: "translate(-50%,-50%) rotate(-45deg)", pointerEvents: "none" }} />}
+            <img src={imagePath}    alt="ice"  onLoad={() => setImgLoaded(true)}  onError={() => setImgFailed(true)}    style={{ position: "absolute", width: "100%", height: "100%", objectFit: "contain", clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }} />
+            <div style={{ position: "absolute", top: "50%", left: "50%", width: "142%", height: "1.5px", background: "rgba(180,155,130,0.5)", transform: "translate(-50%,-50%) rotate(-45deg)", pointerEvents: "none" }} />
           </div>
         )
       ) : imagePath && !imgFailed ? (
-        <div style={{ width: 52, height: 52, margin: "0 auto 8px", position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          {!singleReady && <div style={{ position: "absolute", inset: 0, ...shimmer }} />}
+        <div style={{ width: 52, height: 52, margin: "0 auto 8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imagePath} alt={item.name} width={52} height={52} onLoad={() => setImgLoaded(true)} style={{ objectFit: "contain", borderRadius: 10, opacity: singleReady ? 1 : 0, transition: "opacity 0.3s" }} onError={() => setImgFailed(true)} />
+          <img src={imagePath} alt={item.name} width={52} height={52} onLoad={() => setImgLoaded(true)} style={{ objectFit: "contain", borderRadius: 10 }} onError={() => setImgFailed(true)} />
         </div>
       ) : (
         <div style={{ fontSize: 32, marginBottom: 8 }}>{item.emoji}</div>
@@ -135,6 +136,7 @@ function MenuCard({
         }}
       >
         {item.name}
+      </div>
       </div>
     </div>
   );
