@@ -129,6 +129,7 @@ export function RoomPageClient({ roomId }: Props) {
     s.on("room:closed", () => {
       console.log("[EVENT] room:closed");
       setIsClosed(true);
+      setView("room");
       showToast("주문이 마감됐어요! ✨");
     });
 
@@ -207,6 +208,11 @@ export function RoomPageClient({ roomId }: Props) {
 
   // ── 주문 제출 ──
   const handleSubmitOrder = (order: Order) => {
+    if (isClosed) {
+      showToast("주문이 마감되었습니다 🙅");
+      setView("room");
+      return;
+    }
     socketRef.current.emit("order:submit", { order });
     setParticipants((prev) =>
       prev.map((p) =>
