@@ -94,13 +94,26 @@ class RoomManager:
             p.status = "ordering"
             return p
 
-    async def close_room(self, room_id: str, user_id: str) -> bool:
+    async def close_room(self, room_id: str, user_id: str) -> tuple[bool, list[Participant]]:
         async with self._lock:
             room = self._rooms.get(room_id)
             if room is None or room.host_id != user_id:
-                return False
+                return False, []
+            skip_order = Order(
+                menu_id="skip",
+                menu_name="안먹을게요",
+                menu_emoji="🙅",
+                temperature=None,
+                size=None,
+            )
+            auto_skipped = []
+            for p in room.participants.values():
+                if p.status != "decided":
+                    p.order = skip_order
+                    p.status = "decided"
+                    auto_skipped.append(p)
             room.is_closed = True
-            return True
+            return True, auto_skipped
 
 
 room_manager = RoomManager()

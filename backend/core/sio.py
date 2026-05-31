@@ -144,8 +144,10 @@ async def room_close(sid: str, data: dict) -> None:
     if conn is None:
         return
     room_id, user_id = conn
-    ok = await room_manager.close_room(room_id, user_id)
+    ok, auto_skipped = await room_manager.close_room(room_id, user_id)
     if ok:
+        for p in auto_skipped:
+            await _broadcast("participant:updated", {"participant": p.model_dump(mode="json")}, room_id)
         await _broadcast("room:closed", {}, room_id)
     else:
         await sio.emit("error", {"message": "마감 권한이 없어요"}, to=sid)
