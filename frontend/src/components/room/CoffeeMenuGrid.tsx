@@ -95,7 +95,7 @@ function MenuCard({
       ) : imagePath && !imgFailed ? (
         <div style={{ width: 52, height: 52, margin: "0 auto 8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imagePath} alt={item.name} width={52} height={52} style={{ objectFit: "contain" }} onError={() => setImgFailed(true)} />
+          <img src={imagePath} alt={item.name} width={52} height={52} style={{ objectFit: "contain", borderRadius: 10 }} onError={() => setImgFailed(true)} />
         </div>
       ) : (
         <div style={{ fontSize: 32, marginBottom: 8 }}>{item.emoji}</div>
