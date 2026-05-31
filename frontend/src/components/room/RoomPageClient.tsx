@@ -353,7 +353,7 @@ export function RoomPageClient({ roomId }: Props) {
                     alt={cafeInfo.name}
                     width={52}
                     height={52}
-                    style={{ objectFit: "contain", mixBlendMode: "multiply", display: "block" }}
+                    style={{ objectFit: "contain", mixBlendMode: "multiply", display: "block", borderRadius: 16 }}
                   />
                 </div>
               )}
