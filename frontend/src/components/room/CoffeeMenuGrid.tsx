@@ -16,10 +16,12 @@ function MenuCard({
   item,
   isSelected,
   onClick,
+  cafeId,
 }: {
   item: MenuItem;
   isSelected: boolean;
   onClick: () => void;
+  cafeId?: string;
 }) {
   const imagePath    = item.imagePath    ?? null;
   const imagePathHot = item.imagePathHot ?? null;
@@ -81,17 +83,29 @@ function MenuCard({
         </div>
       )}
       {imagePath && imagePathHot && !imgFailed && !imgHotFailed ? (
-        /* 통합 메뉴: 대각선 스플릿 (좌상단 = HOT, 우하단 = ICE) */
-        <div style={{ width: 56, height: 56, position: "relative", margin: "0 auto 8px", borderRadius: 10, overflow: "hidden" }}>
-          {/* HOT - 좌상단 삼각형 */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imagePathHot} alt="hot" style={{ position: "absolute", width: "100%", height: "100%", objectFit: "contain", clipPath: "polygon(0 0, 100% 0, 0 100%)" }} onError={() => setImgHotFailed(true)} />
-          {/* ICE - 우하단 삼각형 */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imagePath} alt="ice" style={{ position: "absolute", width: "100%", height: "100%", objectFit: "contain", clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }} onError={() => setImgFailed(true)} />
-          {/* 대각선 구분선 */}
-          <div style={{ position: "absolute", top: "50%", left: "50%", width: "142%", height: "1.5px", background: "rgba(180,155,130,0.5)", transform: "translate(-50%,-50%) rotate(-45deg)", pointerEvents: "none" }} />
-        </div>
+        cafeId === "starbucks" ? (
+          /* 스타벅스: 수직 스플릿 (왼쪽 = HOT, 오른쪽 = ICE) */
+          <div style={{ width: 56, height: 56, position: "relative", margin: "0 auto 8px", borderRadius: 10, overflow: "hidden" }}>
+            {/* HOT - 왼쪽 */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={imagePathHot} alt="hot" style={{ position: "absolute", width: "100%", height: "100%", objectFit: "contain", clipPath: "inset(0 23% 0 0)", transform: "translateX(-13px)" }} onError={() => setImgHotFailed(true)} />
+            {/* ICE - 오른쪽 */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={imagePath} alt="ice" style={{ position: "absolute", width: "100%", height: "100%", objectFit: "contain", clipPath: "inset(0 0 0 23%)", transform: "translateX(13px)" }} onError={() => setImgFailed(true)} />
+          </div>
+        ) : (
+          /* 기본: 대각선 스플릿 (좌상단 = HOT, 우하단 = ICE) */
+          <div style={{ width: 56, height: 56, position: "relative", margin: "0 auto 8px", borderRadius: 10, overflow: "hidden" }}>
+            {/* HOT - 좌상단 삼각형 */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={imagePathHot} alt="hot" style={{ position: "absolute", width: "100%", height: "100%", objectFit: "contain", clipPath: "polygon(0 0, 100% 0, 0 100%)" }} onError={() => setImgHotFailed(true)} />
+            {/* ICE - 우하단 삼각형 */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={imagePath} alt="ice" style={{ position: "absolute", width: "100%", height: "100%", objectFit: "contain", clipPath: "polygon(100% 0, 100% 100%, 0 100%)" }} onError={() => setImgFailed(true)} />
+            {/* 대각선 구분선 */}
+            <div style={{ position: "absolute", top: "50%", left: "50%", width: "142%", height: "1.5px", background: "rgba(180,155,130,0.5)", transform: "translate(-50%,-50%) rotate(-45deg)", pointerEvents: "none" }} />
+          </div>
+        )
       ) : imagePath && !imgFailed ? (
         <div style={{ width: 52, height: 52, margin: "0 auto 8px", display: "flex", alignItems: "center", justifyContent: "center" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -135,6 +149,7 @@ export function CoffeeMenuGrid({ menu, selectedId, onSelectMenu, onSelectCustom,
           display: "flex",
           flexWrap: "wrap",
           gap: 8,
+          justifyContent: "center",
         }}
       >
         {visibleCategories.map((cat) => (
@@ -176,6 +191,7 @@ export function CoffeeMenuGrid({ menu, selectedId, onSelectMenu, onSelectCustom,
             item={item}
             isSelected={selectedId === item.id}
             onClick={() => onSelectMenu(item)}
+            cafeId={cafeId}
           />
         ))}
       </div>
