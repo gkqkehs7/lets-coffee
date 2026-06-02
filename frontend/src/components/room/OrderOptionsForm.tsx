@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { MenuItem, Order, Temperature, Size } from "@/lib/types";
 
 interface Props {
@@ -19,6 +19,19 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack, cafeId }: Props) 
   );
   const [size, setSize] = useState<Size>("Grande");
   const [note, setNote] = useState("");
+
+  const imgSrc = !isCustom
+    ? (temp === "HOT" && menuItem.imagePathHot
+        ? menuItem.imagePathHot
+        : (menuItem.imagePath ?? (cafeId ? `/cafes/menus/${cafeId}/${menuItem.id}.png` : null)))
+    : null;
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgFailed, setImgFailed] = useState(false);
+  useEffect(() => {
+    setImgLoaded(false);
+    setImgFailed(false);
+  }, [imgSrc]);
+  const cardLoading = !!imgSrc && !imgLoaded && !imgFailed;
 
   const canSubmit = isCustom ? customName.trim().length > 0 : true;
 
@@ -41,36 +54,33 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack, cafeId }: Props) 
         {/* 메뉴 카드 */}
         <div style={{
           width: 120, height: 120,
-          background: "#FFFFFF", borderRadius: 20,
-          border: "2px solid #F5E6D3",
+          borderRadius: 20,
+          border: `2px solid ${cardLoading ? "transparent" : "#F5E6D3"}`,
           display: "flex", alignItems: "center", justifyContent: "center",
           boxShadow: "0 2px 12px rgba(111,78,55,0.08)",
+          ...(cardLoading ? {
+            background: "linear-gradient(90deg, #F5E6D3 25%, #EDD9C8 50%, #F5E6D3 75%)",
+            backgroundSize: "200% 100%",
+            animation: "shimmer 1.4s linear infinite",
+          } : { background: "#FFFFFF" }),
         }}>
-          {!isCustom ? (() => {
-            // 온도에 따라 표시할 이미지 결정
-            const src = temp === "HOT" && menuItem.imagePathHot
-              ? menuItem.imagePathHot
-              : (menuItem.imagePath ?? (cafeId ? `/cafes/menus/${cafeId}/${menuItem.id}.png` : null));
-            return src ? (
+          <div style={{ opacity: cardLoading ? 0 : 1, transition: "opacity 0.25s", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            {imgSrc && !imgFailed ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                key={src}
-                src={src}
+                key={imgSrc}
+                src={imgSrc}
                 alt={menuItem.name}
                 width={80}
                 height={80}
                 style={{ objectFit: "contain" }}
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                  const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
-                  if (fallback) fallback.style.display = "block";
-                }}
+                onLoad={() => setImgLoaded(true)}
+                onError={() => setImgFailed(true)}
               />
-            ) : null;
-          })() : null}
-          <span style={{ fontSize: 48, display: (!isCustom && (menuItem.imagePath ?? menuItem.imagePathHot ?? cafeId)) ? "none" : "block" }}>
-            {isCustom ? "✏️" : menuItem.emoji}
-          </span>
+            ) : (
+              <span style={{ fontSize: 48 }}>{isCustom ? "✏️" : menuItem.emoji}</span>
+            )}
+          </div>
         </div>
 
         {isCustom ? (
