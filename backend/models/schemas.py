@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 Temperature = Literal["HOT", "ICED"]
 Size = Literal["Tall", "Grande", "Venti"]
 ParticipantStatus = Literal["thinking", "ordering", "editing", "decided"]
-CafeId = Literal["starbucks", "mega", "compose"]
+CafeId = Literal["starbucks", "mega", "compose", "cafe-mountain"]
 
 
 class Order(BaseModel):
