@@ -93,15 +93,22 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack, cafeId }: Props) 
             style={{ textAlign: "center", fontSize: 17, fontWeight: 700 }}
           />
         ) : (
-          <div
-            style={{
-              fontFamily: "'Gowun Dodum', sans-serif",
-              fontSize: 20,
-              fontWeight: 700,
-              color: "#3E2723",
-            }}
-          >
-            {menuItem.name}
+          <div style={{ textAlign: "center" }}>
+            <div
+              style={{
+                fontFamily: "'Gowun Dodum', sans-serif",
+                fontSize: 20,
+                fontWeight: 700,
+                color: "#3E2723",
+              }}
+            >
+              {menuItem.name}
+            </div>
+            {menuItem.price != null && (
+              <div style={{ fontSize: 13, color: "#B0906F", fontWeight: 500, marginTop: 4 }}>
+                {menuItem.price.toLocaleString()}원
+              </div>
+            )}
           </div>
         )}
       </div>

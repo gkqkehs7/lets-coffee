@@ -210,6 +210,11 @@ export function RoomView({
   });
   const rankedDrinks = Object.values(drinkGroups).sort((a, b) => b.count - a.count);
 
+  const totalPrice = ordered.reduce((sum, p) => {
+    const menuItem = menuData.find((m) => m.id === p.order!.menu_id);
+    return sum + (menuItem?.price ?? 3000);
+  }, 0);
+
   // 음료별 집계: 이미지 있는 카드가 모두 settle되면 안먹어요 포함 전체를 한번에 reveal
   const drinkImgCount = rankedDrinks.filter((d) => !!d.imagePath).length;
   const [drinkSettledCount, setDrinkSettledCount] = useState(0);
@@ -384,6 +389,17 @@ export function RoomView({
               </div>
             )}
           </div>
+          {totalPrice > 0 && (
+            <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: 6, marginTop: 10 }}>
+              <span style={{ fontSize: 12, color: "#8D6E63" }}>총</span>
+              <span style={{
+                fontFamily: "'Gowun Dodum', sans-serif",
+                fontSize: 18, fontWeight: 700, color: "#3E2723",
+              }}>
+                {totalPrice.toLocaleString()}원
+              </span>
+            </div>
+          )}
         </div>
       )}
 

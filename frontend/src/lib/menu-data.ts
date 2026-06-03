@@ -577,12 +577,13 @@ const CM_HOT_PREFIX = ["cm_hot_"];
 const CM_ICE_PREFIX = ["cm_ice_", "cm_ade_"];
 
 const CAFE_MOUNTAIN_FINAL: MenuItem[] = CAFE_MOUNTAIN.map((item) => {
-  if (CM_HOT_PREFIX.some((p) => item.id.startsWith(p))) return { ...item, tempFixed: "HOT" as const };
-  if (CM_ICE_PREFIX.some((p) => item.id.startsWith(p))) return { ...item, tempFixed: "ICED" as const };
-  if (item.imagePath && !item.imagePathHot) {
-    return { ...item, imagePathHot: item.imagePath.replace("/ice/", "/hot/") };
+  const base = { ...item, price: item.price ?? 3000 };
+  if (CM_HOT_PREFIX.some((p) => item.id.startsWith(p))) return { ...base, tempFixed: "HOT" as const };
+  if (CM_ICE_PREFIX.some((p) => item.id.startsWith(p))) return { ...base, tempFixed: "ICED" as const };
+  if (base.imagePath && !base.imagePathHot) {
+    return { ...base, imagePathHot: base.imagePath.replace("/ice/", "/hot/") };
   }
-  return item;
+  return base;
 });
 
 // ID 접두사로 tempFixed 자동 설정:
@@ -596,13 +597,14 @@ const ICE_PREFIX = ["mega_ice_", "mega_dcice_", "mega_teaice_", "mega_ade_", "me
 const MERGED_PREFIX = ["mega_dc_", "mega_tea_"];
 
 const MEGA_FINAL: MenuItem[] = MEGA.map((item) => {
-  if (HOT_PREFIX.some((p) => item.id.startsWith(p))) return { ...item, tempFixed: "HOT" as const };
-  if (ICE_PREFIX.some((p) => item.id.startsWith(p))) return { ...item, tempFixed: "ICED" as const };
+  const base = { ...item, price: item.price ?? 3000 };
+  if (HOT_PREFIX.some((p) => item.id.startsWith(p))) return { ...base, tempFixed: "HOT" as const };
+  if (ICE_PREFIX.some((p) => item.id.startsWith(p))) return { ...base, tempFixed: "ICED" as const };
   // 통합 아이템: ice 이미지 경로에서 /ice/ → /hot/ 으로 hot 경로 유도
-  if (MERGED_PREFIX.some((p) => item.id.startsWith(p)) && item.imagePath) {
-    return { ...item, imagePathHot: item.imagePath.replace("/ice/", "/hot/") };
+  if (MERGED_PREFIX.some((p) => item.id.startsWith(p)) && base.imagePath) {
+    return { ...base, imagePathHot: base.imagePath.replace("/ice/", "/hot/") };
   }
-  return item;
+  return base;
 });
 
 // ID 접두사로 tempFixed 자동 설정:
@@ -613,13 +615,14 @@ const SBUX_HOT_PREFIX = ["sbux_hot_"];
 const SBUX_ICE_PREFIX = ["sbux_ice_"];
 
 const STARBUCKS_FINAL: MenuItem[] = STARBUCKS_NEW.map((item) => {
-  if (SBUX_HOT_PREFIX.some((p) => item.id.startsWith(p))) return { ...item, tempFixed: "HOT" as const };
-  if (SBUX_ICE_PREFIX.some((p) => item.id.startsWith(p))) return { ...item, tempFixed: "ICED" as const };
+  const base = { ...item, price: item.price ?? 3000 };
+  if (SBUX_HOT_PREFIX.some((p) => item.id.startsWith(p))) return { ...base, tempFixed: "HOT" as const };
+  if (SBUX_ICE_PREFIX.some((p) => item.id.startsWith(p))) return { ...base, tempFixed: "ICED" as const };
   // 통합 아이템: imagePathHot 없는 경우 ice 경로에서 /ice/ → /hot/ 으로 유도
-  if (item.imagePath && !item.imagePathHot) {
-    return { ...item, imagePathHot: item.imagePath.replace("/ice/", "/hot/") };
+  if (base.imagePath && !base.imagePathHot) {
+    return { ...base, imagePathHot: base.imagePath.replace("/ice/", "/hot/") };
   }
-  return item;
+  return base;
 });
 
 // ID 접두사로 tempFixed 자동 설정:
@@ -630,12 +633,13 @@ const COMPOSE_HOT_PREFIX = ["compose_hot_"];
 const COMPOSE_ICE_PREFIX = ["compose_ice_"];
 
 const COMPOSE_FINAL: MenuItem[] = COMPOSE.map((item) => {
-  if (COMPOSE_HOT_PREFIX.some((p) => item.id.startsWith(p))) return { ...item, tempFixed: "HOT" as const };
-  if (COMPOSE_ICE_PREFIX.some((p) => item.id.startsWith(p))) return { ...item, tempFixed: "ICED" as const };
-  if (item.imagePath && !item.imagePathHot) {
-    return { ...item, imagePathHot: item.imagePath.replace("/ice/", "/hot/") };
+  const base = { ...item, price: item.price ?? 3000 };
+  if (COMPOSE_HOT_PREFIX.some((p) => item.id.startsWith(p))) return { ...base, tempFixed: "HOT" as const };
+  if (COMPOSE_ICE_PREFIX.some((p) => item.id.startsWith(p))) return { ...base, tempFixed: "ICED" as const };
+  if (base.imagePath && !base.imagePathHot) {
+    return { ...base, imagePathHot: base.imagePath.replace("/ice/", "/hot/") };
   }
-  return item;
+  return base;
 });
 
 export const CAFE_MENUS: Record<CafeId, MenuItem[]> = {
