@@ -34,10 +34,11 @@ function MenuCard({
     setImgLoaded(false); setHotLoaded(false);
   }, [imagePath]);
 
+  const showSplit   = !!(imagePath && imagePathHot && !imgFailed && !imgHotFailed && cafeId !== "cafe-mountain");
   const splitReady  = imgLoaded && hotLoaded;
   const singleReady = imgLoaded;
-  const hasImage    = !!(imagePath && (imagePathHot ? !imgFailed && !imgHotFailed : !imgFailed));
-  const cardLoading = hasImage && (imagePathHot ? !splitReady : !singleReady);
+  const hasImage    = !!(imagePath && !imgFailed);
+  const cardLoading = hasImage && (showSplit ? !splitReady : !singleReady);
 
   return (
     <div
@@ -100,7 +101,7 @@ function MenuCard({
           {item.tempFixed === "HOT" ? "HOT" : "ICE"}
         </div>
       )}
-      {imagePath && imagePathHot && !imgFailed && !imgHotFailed ? (
+      {showSplit ? (
         cafeId === "starbucks" ? (
           /* 스타벅스: 수직 스플릿 */
           <div style={{ width: 56, height: 56, position: "relative", margin: "0 auto 8px", borderRadius: 10, overflow: "hidden" }}>

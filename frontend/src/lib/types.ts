@@ -1,7 +1,7 @@
 export type Temperature = "HOT" | "ICED";
 export type Size = "Tall" | "Grande" | "Venti";
 export type ParticipantStatus = "thinking" | "ordering" | "editing" | "decided";
-export type CafeId = "starbucks" | "mega" | "compose";
+export type CafeId = "starbucks" | "mega" | "compose" | "cafe-mountain";
 
 export interface Order {
   menu_id: string;

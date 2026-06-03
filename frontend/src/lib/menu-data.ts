@@ -8,9 +8,10 @@ export interface CafeInfo {
 }
 
 export const CAFE_LIST: CafeInfo[] = [
-  { id: "mega",      name: "메가커피",    logoPath: "/cafes/mega.png",      color: "#E6B800" },
-  { id: "starbucks", name: "스타벅스",    logoPath: "/cafes/starbucks.png", color: "#00704A" },
-  { id: "compose",   name: "컴포즈커피",   logoPath: "/cafes/compose.svg",   color: "#FFD700" },
+  { id: "mega",           name: "메가커피",    logoPath: "/cafes/mega.png",           color: "#E6B800" },
+  { id: "starbucks",      name: "스타벅스",    logoPath: "/cafes/starbucks.png",      color: "#00704A" },
+  { id: "compose",        name: "컴포즈커피",  logoPath: "/cafes/compose.svg",        color: "#FFD700" },
+  { id: "cafe-mountain",  name: "카페마운틴",  logoPath: "/cafes/cafe-mountain.png",  color: "#4A7C59" },
 ];
 
 // ─── 카테고리 정의 ────────────────────────────────────────────────────────────
@@ -47,9 +48,18 @@ const COMPOSE_CATEGORIES = [
   { id: "밀크쉐이크",   label: "밀크쉐이크" },
 ] as const;
 
+const CAFE_MOUNTAIN_CATEGORIES = [
+  { id: "커피",     label: "커피" },
+  { id: "콜드브루", label: "콜드브루" },
+  { id: "베버리지", label: "베버리지" },
+  { id: "차",       label: "차" },
+  { id: "에이드",   label: "에이드" },
+] as const;
+
 export function getCategoriesByCafe(cafeId: CafeId): { id: string; label: string }[] {
-  if (cafeId === "mega")     return [...MEGA_CATEGORIES];
-  if (cafeId === "compose")  return [...COMPOSE_CATEGORIES];
+  if (cafeId === "mega")           return [...MEGA_CATEGORIES];
+  if (cafeId === "compose")        return [...COMPOSE_CATEGORIES];
+  if (cafeId === "cafe-mountain")  return [...CAFE_MOUNTAIN_CATEGORIES];
   return [...STARBUCKS_CATEGORIES];
 }
 
@@ -491,6 +501,90 @@ const COMPOSE: MenuItem[] = [
   { id: "compose_ice_플레인밀크쉐이크",  name: "플레인 밀크쉐이크",   emoji: "🥤", category: "밀크쉐이크", iced: true, imagePath: composeImg("밀크쉐이크","ice","플레인 밀크쉐이크") },
 ];
 
+// ─── 카페마운틴 ────────────────────────────────────────────────────────────────
+// 폴더 구조: /cafes/menus/cafe-mountain/{카테고리}/{hot|ice}/{메뉴명}.{webp|png}
+//            에이드는 hot/ice 구분 없이 /에이드/{메뉴명}.{webp|png}
+
+function cmImg(category: string, temp: "hot" | "ice", name: string, ext: "webp" | "png" = "webp"): string {
+  return `/cafes/menus/cafe-mountain/${encodeURIComponent(category)}/${temp}/${encodeURIComponent(name)}.${ext}`;
+}
+function cmAdeImg(name: string, ext: "webp" | "png" = "webp"): string {
+  return `/cafes/menus/cafe-mountain/${encodeURIComponent("에이드")}/${encodeURIComponent(name)}.${ext}`;
+}
+
+const CAFE_MOUNTAIN: MenuItem[] = [
+  // ── 커피 / 통합 (hot + ice 동일명) ──
+  { id: "cm_아메리카노",      name: "아메리카노",      emoji: "☕",  category: "커피", iced: true, imagePath: cmImg("커피","ice","아메리카노") },
+  { id: "cm_카멜아메리카노",  name: "카멜 아메리카노", emoji: "☕",  category: "커피", iced: true, imagePath: cmImg("커피","ice","카멜 아메리카노") },
+  { id: "cm_꿀메리카노",      name: "꿀메리카노",      emoji: "🍯", category: "커피", iced: true, imagePath: cmImg("커피","ice","꿀메리카노") },
+  { id: "cm_카페모카",        name: "카페모카",        emoji: "🍫", category: "커피", iced: true, imagePath: cmImg("커피","ice","카페모카") },
+  { id: "cm_카라멜마끼아또",  name: "카라멜마끼아또",  emoji: "🍮", category: "커피", iced: true, imagePath: cmImg("커피","ice","카라멜마끼아또") },
+  { id: "cm_바닐라라떼",      name: "바닐라라떼",      emoji: "🤍", category: "커피", iced: true, imagePath: cmImg("커피","ice","바닐라라떼") },
+  { id: "cm_카멜라떼",        name: "카멜라떼",        emoji: "☕",  category: "커피", iced: true, imagePath: cmImg("커피","ice","카멜라떼") },
+  { id: "cm_헤이즐넛라떼",    name: "헤이즐넛라떼",    emoji: "☕",  category: "커피", iced: true, imagePath: cmImg("커피","ice","헤이즐넛라떼") },
+  { id: "cm_소금라떼",        name: "소금라떼",        emoji: "🧂", category: "커피", iced: true, imagePath: cmImg("커피","ice","소금라떼") },
+  { id: "cm_소금커피",        name: "소금커피",        emoji: "🧂", category: "커피", iced: true, imagePath: cmImg("커피","ice","소금커피") },
+  { id: "cm_연유라떼",        name: "연유라떼",        emoji: "🥛", category: "커피", iced: true, imagePath: cmImg("커피","ice","연유라떼") },
+  { id: "cm_우베라떼",        name: "우베라떼",        emoji: "💜", category: "커피", iced: true, imagePath: cmImg("커피","ice","우베라떼") },
+  { id: "cm_카푸치노",        name: "카푸치노",        emoji: "☁️", category: "커피", iced: true, imagePath: cmImg("커피","ice","카푸치노") },
+  { id: "cm_오늘의커피",      name: "오늘의커피",      emoji: "☕",  category: "커피", iced: true, imagePath: cmImg("커피","ice","오늘의커피") },
+  // 커피 / HOT 전용
+  { id: "cm_hot_에스프레소",  name: "에스프레소",      emoji: "⚡", category: "커피", iced: false, imagePath: cmImg("커피","hot","에스프레소") },
+
+  // ── 콜드브루 / 통합 (hot + ice 동일명) ──
+  { id: "cm_콜드브루과테말라",     name: "콜드브루 과테말라",     emoji: "🧊", category: "콜드브루", iced: true, imagePath: cmImg("콜드브루","ice","콜드브루 과테말라") },
+  { id: "cm_콜드브루디카페인",     name: "콜드브루 디카페인",     emoji: "🧊", category: "콜드브루", iced: true, imagePath: cmImg("콜드브루","ice","콜드브루 디카페인") },
+  { id: "cm_콜드브루케냐AA",       name: "콜드브루 케냐AA",       emoji: "🧊", category: "콜드브루", iced: true, imagePath: cmImg("콜드브루","ice","콜드브루 케냐AA") },
+  { id: "cm_콜드브루라떼과테말라", name: "콜드브루라떼 과테말라", emoji: "🧊", category: "콜드브루", iced: true, imagePath: cmImg("콜드브루","ice","콜드브루라떼 과테말라") },
+  { id: "cm_콜드브루라떼디카페인", name: "콜드브루라떼 디카페인", emoji: "🧊", category: "콜드브루", iced: true, imagePath: cmImg("콜드브루","ice","콜드브루라떼 디카페인") },
+  { id: "cm_콜드브루라떼케냐AA",   name: "콜드브루라떼 케냐AA",   emoji: "🧊", category: "콜드브루", iced: true, imagePath: cmImg("콜드브루","ice","콜드브루라떼 케냐AA") },
+
+  // ── 베버리지 / 통합 (hot + ice 동일명) ──
+  { id: "cm_녹차라떼",       name: "녹차라떼",         emoji: "🍵", category: "베버리지", iced: true, imagePath: cmImg("베버리지","ice","녹차라떼") },
+  { id: "cm_초코라떼",       name: "초코라떼",         emoji: "🍫", category: "베버리지", iced: true, imagePath: cmImg("베버리지","ice","초코라떼") },
+  { id: "cm_밀크티",         name: "밀크티",           emoji: "🧋", category: "베버리지", iced: true, imagePath: cmImg("베버리지","ice","밀크티","png") },
+  { id: "cm_선식라떼",       name: "선식라떼",         emoji: "🌾", category: "베버리지", iced: true, imagePath: cmImg("베버리지","ice","선식라떼","png") },
+  { id: "cm_어썸제로밀크티", name: "어썸 제로 밀크티", emoji: "🧋", category: "베버리지", iced: true, imagePath: cmImg("베버리지","ice","어썸 제로 밀크티","png") },
+  { id: "cm_자두제로밀크티", name: "자두 제로 밀크티", emoji: "🧋", category: "베버리지", iced: true, imagePath: cmImg("베버리지","ice","자두 제로 밀크티","png") },
+
+  // ── 차 / 통합 (hot + ice 동일명) ──
+  { id: "cm_매실차",   name: "매실차",   emoji: "🍈", category: "차", iced: true, imagePath: cmImg("차","ice","매실차") },
+  { id: "cm_생강차",   name: "생강차",   emoji: "🫚", category: "차", iced: true, imagePath: cmImg("차","ice","생강차") },
+  { id: "cm_석류차",   name: "석류차",   emoji: "🍎", category: "차", iced: true, imagePath: cmImg("차","ice","석류차") },
+  { id: "cm_얼그레이", name: "얼그레이", emoji: "🫖", category: "차", iced: true, imagePath: cmImg("차","ice","얼그레이") },
+  { id: "cm_유자차",   name: "유자차",   emoji: "🍊", category: "차", iced: true, imagePath: cmImg("차","ice","유자차") },
+  { id: "cm_청귤차",   name: "청귤차",   emoji: "🍋", category: "차", iced: true, imagePath: cmImg("차","ice","청귤차") },
+  { id: "cm_캐모마일", name: "캐모마일", emoji: "🌼", category: "차", iced: true, imagePath: cmImg("차","ice","캐모마일") },
+  { id: "cm_페퍼민트", name: "페퍼민트", emoji: "🌿", category: "차", iced: true, imagePath: cmImg("차","ice","페퍼민트") },
+  // 차 / ICE 전용
+  { id: "cm_ice_복숭아아이스티",     name: "복숭아 아이스티",     emoji: "🍑", category: "차", iced: true, imagePath: cmImg("차","ice","복숭아 아이스티") },
+  { id: "cm_ice_복숭아아이스티제로", name: "복숭아 아이스티 제로", emoji: "🍑", category: "차", iced: true, imagePath: cmImg("차","ice","복숭아 아이스티 제로") },
+
+  // ── 에이드 (ICE 전용, 폴더에 hot/ice 구분 없음) ──
+  { id: "cm_ade_딸기바나나주스", name: "딸기바나나 주스", emoji: "🍓", category: "에이드", iced: true, imagePath: cmAdeImg("딸기바나나 주스") },
+  { id: "cm_ade_레모네이드",     name: "레모네이드",     emoji: "🍋", category: "에이드", iced: true, imagePath: cmAdeImg("레모네이드") },
+  { id: "cm_ade_수박주스",       name: "수박주스",       emoji: "🍉", category: "에이드", iced: true, imagePath: cmAdeImg("수박주스") },
+  { id: "cm_ade_자몽에이드",     name: "자몽에이드",     emoji: "🍊", category: "에이드", iced: true, imagePath: cmAdeImg("자몽에이드") },
+  { id: "cm_ade_청귤에이드",     name: "청귤에이드",     emoji: "🍋", category: "에이드", iced: true, imagePath: cmAdeImg("청귤에이드","png") },
+  { id: "cm_ade_청포도에이드",   name: "청포도에이드",   emoji: "🍇", category: "에이드", iced: true, imagePath: cmAdeImg("청포도에이드") },
+];
+
+// ID 접두사로 tempFixed 자동 설정:
+//   cm_hot_*            → HOT 고정
+//   cm_ice_*, cm_ade_*  → ICE 고정 (차 ice 전용, 에이드 전체)
+//   cm_*  (그 외)       → 통합, /ice/ → /hot/ 경로 유도
+const CM_HOT_PREFIX = ["cm_hot_"];
+const CM_ICE_PREFIX = ["cm_ice_", "cm_ade_"];
+
+const CAFE_MOUNTAIN_FINAL: MenuItem[] = CAFE_MOUNTAIN.map((item) => {
+  if (CM_HOT_PREFIX.some((p) => item.id.startsWith(p))) return { ...item, tempFixed: "HOT" as const };
+  if (CM_ICE_PREFIX.some((p) => item.id.startsWith(p))) return { ...item, tempFixed: "ICED" as const };
+  if (item.imagePath && !item.imagePathHot) {
+    return { ...item, imagePathHot: item.imagePath.replace("/ice/", "/hot/") };
+  }
+  return item;
+});
+
 // ID 접두사로 tempFixed 자동 설정:
 //   mega_hot_*, mega_dchot_*, mega_teahot_*          → HOT 고정
 //   mega_ice_*, mega_dcice_*, mega_teaice_*,
@@ -545,9 +639,10 @@ const COMPOSE_FINAL: MenuItem[] = COMPOSE.map((item) => {
 });
 
 export const CAFE_MENUS: Record<CafeId, MenuItem[]> = {
-  starbucks: STARBUCKS_FINAL,
-  mega:      MEGA_FINAL,
-  compose:   COMPOSE_FINAL,
+  starbucks:        STARBUCKS_FINAL,
+  mega:             MEGA_FINAL,
+  compose:          COMPOSE_FINAL,
+  "cafe-mountain":  CAFE_MOUNTAIN_FINAL,
 };
 
 export function getMenuByCafe(cafeId: CafeId): MenuItem[] {
