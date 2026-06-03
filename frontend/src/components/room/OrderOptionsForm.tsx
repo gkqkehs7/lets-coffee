@@ -104,9 +104,9 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack, cafeId }: Props) 
             >
               {menuItem.name}
             </div>
-            {menuItem.price != null && (
+            {menuItem.priceIce != null && (
               <div style={{ fontSize: 13, color: "#B0906F", fontWeight: 500, marginTop: 4 }}>
-                {menuItem.price.toLocaleString()}원
+                {(temp === "HOT" && menuItem.priceHot != null ? menuItem.priceHot : menuItem.priceIce).toLocaleString()}원
               </div>
             )}
           </div>

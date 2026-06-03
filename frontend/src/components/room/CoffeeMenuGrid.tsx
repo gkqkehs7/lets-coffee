@@ -138,11 +138,6 @@ function MenuCard({
       >
         {item.name}
       </div>
-      {item.price != null && (
-        <div style={{ fontSize: 10, color: "#B0906F", marginTop: 3, fontWeight: 500 }}>
-          {item.price.toLocaleString()}원
-        </div>
-      )}
       </div>
     </div>
   );

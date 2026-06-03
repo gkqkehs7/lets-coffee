@@ -211,8 +211,12 @@ export function RoomView({
   const rankedDrinks = Object.values(drinkGroups).sort((a, b) => b.count - a.count);
 
   const totalPrice = ordered.reduce((sum, p) => {
-    const menuItem = menuData.find((m) => m.id === p.order!.menu_id);
-    return sum + (menuItem?.price ?? 3000);
+    const order = p.order!;
+    const menuItem = menuData.find((m) => m.id === order.menu_id);
+    const price = order.temperature === "HOT" && menuItem?.priceHot != null
+      ? menuItem.priceHot
+      : (menuItem?.priceIce ?? 3000);
+    return sum + price;
   }, 0);
 
   // 음료별 집계: 이미지 있는 카드가 모두 settle되면 안먹어요 포함 전체를 한번에 reveal

@@ -38,7 +38,8 @@ export interface MenuItem {
   emoji: string;
   category: string;
   iced: boolean;
-  price?: number;
+  priceIce?: number;
+  priceHot?: number;
   imagePath?: string;
   imagePathHot?: string;
   tempFixed?: Temperature;
