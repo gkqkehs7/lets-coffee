@@ -152,20 +152,6 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack, cafeId }: Props) 
         </div>
       )}
 
-      {/* 메모 */}
-      {cafeId !== "mega" && (
-        <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#6F4E37", marginBottom: 10 }}>
-            메모
-          </div>
-          <input
-            className="input-field"
-            placeholder="예: 얼음 적게요, 달달하게요 🥰"
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-          />
-        </div>
-      )}
 
       {/* 버튼 */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
