@@ -71,6 +71,7 @@ export default function PreviewPage() {
   const [menuView, setMenuView] = useState<"grid" | "options">("grid");
   const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
   const [committedMenu, setCommittedMenu] = useState<MenuItem | null>(null);
+  const [menuActiveCat, setMenuActiveCat] = useState<string>("");
 
   const cafe = CAFE_LIST.find((c) => c.id === cafeId) ?? CAFE_LIST[0];
   const currentUserId = currentUser === "host" ? "user-1" : currentUser === "member-ordered" ? "user-2" : "user-4";
@@ -198,6 +199,8 @@ export default function PreviewPage() {
                   onSelectMenu={(item) => { setSelectedMenu(item); setMenuView("options"); }}
                   onSelectCustom={() => { setSelectedMenu({ id: "custom", name: "", emoji: "✏️", category: "coffee", iced: true }); setMenuView("options"); }}
                   cafeId={cafe.id}
+                  activeCat={menuActiveCat}
+                  onActiveCatChange={setMenuActiveCat}
                 />
               </>
             )}

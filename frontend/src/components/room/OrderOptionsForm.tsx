@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { MenuItem, Order, Temperature, Size } from "@/lib/types";
+import type { MenuItem, Order, Temperature } from "@/lib/types";
 
 interface Props {
   menuItem: MenuItem;
@@ -17,7 +17,6 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack, cafeId }: Props) 
   const [temp, setTemp] = useState<Temperature>(
     fixedTemp ?? (menuItem.iced ? "ICED" : "HOT")
   );
-  const [size, setSize] = useState<Size>("Grande");
   const [note, setNote] = useState("");
 
   const imgSrc = !isCustom
@@ -42,7 +41,7 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack, cafeId }: Props) 
       menu_name:  isCustom ? customName.trim() : menuItem.name,
       menu_emoji: isCustom ? "✏️" : menuItem.emoji,
       temperature: temp,
-      size,
+      size: null,
       note,
     });
   };
@@ -130,28 +129,6 @@ export function OrderOptionsForm({ menuItem, onSubmit, onBack, cafeId }: Props) 
             ))}
         </div>
       </div>
-
-      {/* 사이즈 */}
-      {cafeId !== "mega" && (
-        <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#6F4E37", marginBottom: 10 }}>
-            사이즈
-          </div>
-          <div className="toggle-group">
-            {(["Tall", "Grande", "Venti"] as Size[]).map((s) => (
-              <button
-                key={s}
-                className={`toggle-btn ${size === s ? "active" : ""}`}
-                onClick={() => setSize(s)}
-                type="button"
-              >
-                {s === "Tall" ? "S" : s === "Grande" ? "M" : "L"}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
 
       {/* 버튼 */}
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

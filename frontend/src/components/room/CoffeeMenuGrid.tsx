@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getCategoriesByCafe } from "@/lib/menu-data";
 import type { CafeId, MenuItem } from "@/lib/types";
 
@@ -10,6 +10,8 @@ interface Props {
   onSelectMenu: (item: MenuItem) => void;
   onSelectCustom?: () => void;
   cafeId?: string;
+  activeCat?: string;
+  onActiveCatChange?: (cat: string) => void;
 }
 
 function MenuCard({
@@ -143,14 +145,31 @@ function MenuCard({
   );
 }
 
-export function CoffeeMenuGrid({ menu, selectedId, onSelectMenu, onSelectCustom, cafeId }: Props) {
+export function CoffeeMenuGrid({ menu, selectedId, onSelectMenu, onSelectCustom, cafeId, activeCat: activeCatProp, onActiveCatChange }: Props) {
   const categories = getCategoriesByCafe((cafeId as CafeId) ?? "starbucks");
   const visibleCategories = categories.filter((cat) => menu.some((m) => m.category === cat.id));
-  const [activeCat, setActiveCat] = useState<string>(visibleCategories[0]?.id ?? "");
+  const [activeCatInternal, setActiveCatInternal] = useState<string>(visibleCategories[0]?.id ?? "");
 
-  // cafeId 바뀌면 첫 번째 카테고리로 리셋
+  const isControlled = activeCatProp !== undefined;
+  const activeCat = isControlled ? activeCatProp : activeCatInternal;
+  const setActiveCat = (cat: string) => {
+    if (isControlled) onActiveCatChange?.(cat);
+    else setActiveCatInternal(cat);
+  };
+
+  const didMountRef = useRef(false);
   useEffect(() => {
-    setActiveCat(visibleCategories[0]?.id ?? "");
+    const first = visibleCategories[0]?.id ?? "";
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      // 마운트 시: 부모에 값이 없을 때만 초기화
+      if (isControlled && !activeCatProp) onActiveCatChange?.(first);
+      else if (!isControlled) setActiveCatInternal(first);
+    } else {
+      // cafeId 변경 시: 항상 첫 번째로 리셋
+      if (isControlled) onActiveCatChange?.(first);
+      else setActiveCatInternal(first);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cafeId]);
 

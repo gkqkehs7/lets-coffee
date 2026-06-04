@@ -34,6 +34,7 @@ export function RoomPageClient({ roomId }: Props) {
   const [view, setView] = useState<ViewState>("room");
   const [selectedMenu, setSelectedMenu] = useState<MenuItem | null>(null);
   const [committedMenu, setCommittedMenu] = useState<MenuItem | null>(null);
+  const [menuActiveCat, setMenuActiveCat] = useState<string>("");
 
   const [showConfetti, setShowConfetti] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -364,6 +365,8 @@ export function RoomPageClient({ roomId }: Props) {
               onSelectMenu={handleSelectMenu}
               onSelectCustom={handleSelectCustom}
               cafeId={room?.cafe_id}
+              activeCat={menuActiveCat}
+              onActiveCatChange={setMenuActiveCat}
             />
           </>
         )}

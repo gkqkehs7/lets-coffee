@@ -515,29 +515,30 @@ function cmAdeImg(name: string, ext: "webp" | "png" = "webp"): string {
 const CAFE_MOUNTAIN: MenuItem[] = [
   // ── 커피 / 통합 (hot + ice 동일명) ──
   { id: "cm_아메리카노",      name: "아메리카노",      emoji: "☕",  category: "커피", iced: true, priceIce: 2000, priceHot: 1800, imagePath: cmImg("커피","ice","아메리카노") },
+  { id: "cm_카페라떼",        name: "카페라떼",        emoji: "☕",  category: "커피", iced: true, priceIce: 2200, priceHot: 2000, imagePath: cmImg("커피","ice","카페라떼") },
   { id: "cm_카멜아메리카노",  name: "카멜 아메리카노", emoji: "☕",  category: "커피", iced: true, priceIce: 2800, priceHot: 2800, imagePath: cmImg("커피","ice","카멜 아메리카노") },
   { id: "cm_꿀메리카노",      name: "꿀메리카노",      emoji: "🍯", category: "커피", iced: true, priceIce: 2500, priceHot: 2500, imagePath: cmImg("커피","ice","꿀메리카노") },
   { id: "cm_카페모카",        name: "카페모카",        emoji: "🍫", category: "커피", iced: true, priceIce: 2800, priceHot: 2300, imagePath: cmImg("커피","ice","카페모카") },
   { id: "cm_카라멜마끼아또",  name: "카라멜마끼아또",  emoji: "🍮", category: "커피", iced: true, priceIce: 2800, priceHot: 2300, imagePath: cmImg("커피","ice","카라멜마끼아또") },
   { id: "cm_바닐라라떼",      name: "바닐라라떼",      emoji: "🤍", category: "커피", iced: true, priceIce: 2500, priceHot: 2300, imagePath: cmImg("커피","ice","바닐라라떼") },
-  { id: "cm_카멜라떼",        name: "카멜라떼",        emoji: "☕",  category: "커피", iced: true, priceIce: 3300, priceHot: 3000, imagePath: cmImg("커피","ice","카멜라떼") },
+  { id: "cm_카멜라떼",        name: "카멜라떼",        emoji: "☕",  category: "커피", iced: true, priceIce: 3300, imagePath: cmImg("커피","ice","카멜라떼") },
   { id: "cm_헤이즐넛라떼",    name: "헤이즐넛라떼",    emoji: "☕",  category: "커피", iced: true, priceIce: 2500, priceHot: 2300, imagePath: cmImg("커피","ice","헤이즐넛라떼") },
   { id: "cm_소금라떼",        name: "소금라떼",        emoji: "🧂", category: "커피", iced: true, priceIce: 4000, priceHot: 4000, imagePath: cmImg("커피","ice","소금라떼") },
   { id: "cm_소금커피",        name: "소금커피",        emoji: "🧂", category: "커피", iced: true, priceIce: 3500, priceHot: 3500, imagePath: cmImg("커피","ice","소금커피") },
-  { id: "cm_연유라떼",        name: "연유라떼",        emoji: "🥛", category: "커피", iced: true, priceIce: 3000, priceHot: 3000, imagePath: cmImg("커피","ice","연유라떼") },
+  { id: "cm_연유라떼",        name: "연유라떼",        emoji: "🥛", category: "커피", iced: true, priceIce: 2800, priceHot: 3300, imagePath: cmImg("커피","ice","연유라떼") },
   { id: "cm_우베라떼",        name: "우베라떼",        emoji: "💜", category: "커피", iced: true, priceIce: 3300, priceHot: 3300, imagePath: cmImg("커피","ice","우베라떼") },
   { id: "cm_카푸치노",        name: "카푸치노",        emoji: "☁️", category: "커피", iced: true, priceIce: 2200, priceHot: 2000, imagePath: cmImg("커피","ice","카푸치노") },
   { id: "cm_오늘의커피",      name: "오늘의커피",      emoji: "☕",  category: "커피", iced: true, priceIce: 2700, priceHot: 2500, imagePath: cmImg("커피","ice","오늘의커피") },
   // 커피 / HOT 전용
-  { id: "cm_hot_에스프레소",  name: "에스프레소",      emoji: "⚡", category: "커피", iced: false, priceIce: 3000, priceHot: 3000, imagePath: cmImg("커피","hot","에스프레소") },
+  { id: "cm_hot_에스프레소",  name: "에스프레소",      emoji: "⚡", category: "커피", iced: false, priceIce: 1800, priceHot: 2000, imagePath: cmImg("커피","hot","에스프레소") },
 
   // ── 콜드브루 / 통합 (hot + ice 동일명) ──
   { id: "cm_콜드브루과테말라",     name: "콜드브루 과테말라",     emoji: "🧊", category: "콜드브루", iced: true, priceIce: 3000, priceHot: 2500, imagePath: cmImg("콜드브루","ice","콜드브루 과테말라") },
-  { id: "cm_콜드브루디카페인",     name: "콜드브루 디카페인",     emoji: "🧊", category: "콜드브루", iced: true, priceIce: 3500, priceHot: 3500, imagePath: cmImg("콜드브루","ice","콜드브루 디카페인") },
-  { id: "cm_콜드브루케냐AA",       name: "콜드브루 케냐AA",       emoji: "🧊", category: "콜드브루", iced: true, priceIce: 3000, priceHot: 3000, imagePath: cmImg("콜드브루","ice","콜드브루 케냐AA") },
-  { id: "cm_콜드브루라떼과테말라", name: "콜드브루라떼 과테말라", emoji: "🧊", category: "콜드브루", iced: true, priceIce: 3300, priceHot: 3300, imagePath: cmImg("콜드브루","ice","콜드브루라떼 과테말라") },
-  { id: "cm_콜드브루라떼디카페인", name: "콜드브루라떼 디카페인", emoji: "🧊", category: "콜드브루", iced: true, priceIce: 4000, priceHot: 4000, imagePath: cmImg("콜드브루","ice","콜드브루라떼 디카페인") },
-  { id: "cm_콜드브루라떼케냐AA",   name: "콜드브루라떼 케냐AA",   emoji: "🧊", category: "콜드브루", iced: true, priceIce: 3300, priceHot: 3300, imagePath: cmImg("콜드브루","ice","콜드브루라떼 케냐AA") },
+  { id: "cm_콜드브루디카페인",     name: "콜드브루 디카페인",     emoji: "🧊", category: "콜드브루", iced: true, priceIce: 3500, priceHot: 3000, imagePath: cmImg("콜드브루","ice","콜드브루 디카페인") },
+  { id: "cm_콜드브루케냐AA",       name: "콜드브루 케냐AA",       emoji: "🧊", category: "콜드브루", iced: true, priceIce: 3000, priceHot: 2500, imagePath: cmImg("콜드브루","ice","콜드브루 케냐AA") },
+  { id: "cm_콜드브루라떼과테말라", name: "콜드브루라떼 과테말라", emoji: "🧊", category: "콜드브루", iced: true, priceIce: 3300, priceHot: 2800, imagePath: cmImg("콜드브루","ice","콜드브루라떼 과테말라") },
+  { id: "cm_콜드브루라떼디카페인", name: "콜드브루라떼 디카페인", emoji: "🧊", category: "콜드브루", iced: true, priceIce: 4000, priceHot: 3500, imagePath: cmImg("콜드브루","ice","콜드브루라떼 디카페인") },
+  { id: "cm_콜드브루라떼케냐AA",   name: "콜드브루라떼 케냐AA",   emoji: "🧊", category: "콜드브루", iced: true, priceIce: 3300, priceHot: 2800, imagePath: cmImg("콜드브루","ice","콜드브루라떼 케냐AA") },
 
   // ── 베버리지 / 통합 (hot + ice 동일명) ──
   { id: "cm_녹차라떼",       name: "녹차라떼",         emoji: "🍵", category: "베버리지", iced: true, priceIce: 2200, priceHot: 2000, imagePath: cmImg("베버리지","ice","녹차라떼") },
